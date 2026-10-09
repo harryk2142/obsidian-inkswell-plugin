@@ -56,7 +56,8 @@ export interface SceneMeta {
   notes?: string;
 }
 
-const FIELD_KEYS: (keyof SceneMeta)[] = [
+/** Every scene frontmatter key Inkswell's metadata form owns. */
+export const FIELD_KEYS: (keyof SceneMeta)[] = [
   "status",
   "pov",
   "synopsis",
@@ -172,6 +173,7 @@ export type InspectorFieldId =
   | "plotlines"
   | "targetWords"
   | "color"
+  | "custom"
   | "notes"
   | "inactive";
 
@@ -186,6 +188,9 @@ export const INSPECTOR_FIELDS: readonly { id: InspectorFieldId; label: string }[
   { id: "plotlines", label: "Plotlines" },
   { id: "targetWords", label: "Target words" },
   { id: "color", label: "Color" },
+  // The writer's own fields (#52) as one movable block; their order within it
+  // comes from the scene template's `scene-fields`.
+  { id: "custom", label: "Your fields" },
   { id: "notes", label: "Notes" },
   { id: "inactive", label: "Archived" },
 ];
@@ -230,7 +235,8 @@ function listValue(key: string, list: string[]): unknown {
 export async function updateSceneList(
   app: App,
   file: TFile,
-  key: "characters" | "location" | "plotlines",
+  /** `characters` / `location` / `plotlines`, or a writer-defined list/links field (#52). */
+  key: string,
   transform: (current: string[]) => string[]
 ): Promise<void> {
   await app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
@@ -250,9 +256,12 @@ export async function writeSceneMeta(
   app: App,
   file: TFile,
   patch: Partial<SceneMeta>,
-  defaults?: Partial<SceneMeta>
+  defaults?: Partial<SceneMeta>,
+  /** Keys to delete in the same write (template-only keys on a new scene). */
+  remove: readonly string[] = []
 ): Promise<void> {
   await app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
+    for (const key of remove) delete fm[key];
     for (const key of FIELD_KEYS) {
       if (!(key in patch)) continue;
       const value = patch[key];

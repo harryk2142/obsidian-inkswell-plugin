@@ -12,6 +12,7 @@ import { RightPanel } from "../views/right-panel";
 import { openScene } from "./scene-actions";
 import { renderSceneAuditFields, renderSceneMetaFields } from "./scene-meta-form";
 import { inspectorFields, sceneStatuses } from "./scene-meta";
+import { sceneFieldExtras } from "./scene-template-io";
 import { sceneCheckpoints } from "../revisions/audit";
 import type InkswellPlugin from "../../main";
 
@@ -66,7 +67,8 @@ export class SceneInspector implements RightPanel {
       markWrite,
       this.plugin.store.getProjects(),
       sceneStatuses(this.plugin.settings.listOverrides["scene.status"]),
-      inspectorFields(this.plugin.settings.listOverrides["scene.fields"])
+      inspectorFields(this.plugin.settings.listOverrides["scene.fields"]),
+      sceneFieldExtras(this.app, this.plugin.settings)
     );
 
     // Revision audit — collapsed by default so it doesn't crowd the drafting

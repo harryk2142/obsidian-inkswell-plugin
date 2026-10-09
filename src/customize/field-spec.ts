@@ -65,11 +65,17 @@ export function rowTypeHint(row: FieldRow): string {
 }
 
 /** Rows → spec. A label is written only when it differs from the default for
- *  that key in `category`, so shipped fields stay compact in the note. */
-export function rowsToSpec(rows: readonly FieldRow[], category: string): FieldSpec[] {
+ *  that key — a codex `category`'s rule, or the caller's own (scene fields) —
+ *  so shipped fields stay compact in the note. */
+export function rowsToSpec(
+  rows: readonly FieldRow[],
+  category: string | ((key: string) => string)
+): FieldSpec[] {
+  const defaultLabel =
+    typeof category === "function" ? category : (key: string) => defaultFieldLabel(category, key);
   return rows.map((row) => {
     const spec: FieldSpec = { key: row.key, type: rowTypeHint(row) };
-    if (row.label.trim() && row.label.trim() !== defaultFieldLabel(category, row.key)) {
+    if (row.label.trim() && row.label.trim() !== defaultLabel(row.key)) {
       spec.label = row.label.trim();
     }
     return spec;
@@ -96,7 +102,8 @@ const KEY_RE = /^\p{L}[\p{L}\p{N}_-]*$/u;
 export function isValidNewKey(
   key: string,
   existing: readonly string[],
-  label = ""
+  label = "",
+  reserved: ReadonlySet<string> = RESERVED_FIELD_KEYS
 ): { ok: true } | { ok: false; reason: string } {
   const k = key.trim();
   if (!k) {
@@ -105,7 +112,7 @@ export function isValidNewKey(
       reason: label.trim() ? "Start the label with a letter." : "Enter a label.",
     };
   }
-  if (RESERVED_FIELD_KEYS.has(k)) return { ok: false, reason: `"${k}" is managed by Inkswell.` };
+  if (reserved.has(k)) return { ok: false, reason: `"${k}" is managed by Inkswell.` };
   if (existing.includes(k)) return { ok: false, reason: `"${k}" is already a field.` };
   if (!KEY_RE.test(k)) return { ok: false, reason: "Use letters and numbers (no spaces or symbols)." };
   return { ok: true };

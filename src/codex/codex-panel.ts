@@ -11,7 +11,6 @@ import { App, Menu, Notice, TFile, normalizePath, setIcon } from "obsidian";
 import { extensionFor, pickVaultImage, writeImageBinary } from "../lib/images";
 import { attachRowMenu } from "../lib/row-menu";
 import { preserveFocus, tagField } from "../lib/focus-preserve";
-import { autosizeTextarea } from "../lib/form-fields";
 import {
   confirmDelete,
   openScene,
@@ -28,7 +27,7 @@ import {
   writeEntityScope,
 } from "./codex-store";
 import { awaitCacheUpdate } from "./codex-template-io";
-import { firstMentionOffset, linkAlias, linkTarget, toLink } from "./codex";
+import { firstMentionOffset } from "./codex";
 import { stripFrontmatter } from "../lib/frontmatter";
 import type { SceneHighlight } from "../views/write-panel";
 import {
@@ -44,6 +43,7 @@ import {
 import { sanitizeSegment } from "../settings/folders";
 import { tryFileOp } from "../lib/notify";
 import { codexEntryText } from "../plan/story-bible";
+import { renderProfileFieldControl } from "./profile-field-controls";
 import { codexEntryData } from "../plan/story-bible-io";
 import { readProfile, resolveProfileFields, writeProfile } from "./codex-profile";
 import { Profile, ProfileField } from "./profile-schema";
@@ -651,160 +651,30 @@ export class CodexPanel {
       this.refreshPanes();
     };
 
-    this.field(host, field.label, (control) => {
-      if (field.type === "text") {
-        const t = control.createEl("input", { type: "text" });
-        tagField(t, `codex:${field.key}`);
-        t.value = (profile[field.key] as string) ?? "";
-        if (field.placeholder) t.placeholder = field.placeholder;
-        t.onchange = () => void save(t.value);
-        return;
-      }
-      if (field.type === "textarea") {
-        const ta = control.createEl("textarea", { cls: "inkswell-inspector__textarea" });
-        tagField(ta, `codex:${field.key}`);
-        ta.rows = 4; // prose fields (motivation, arc, voice…) — autosize grows from here
-        ta.value = (profile[field.key] as string) ?? "";
-        if (field.placeholder) ta.placeholder = field.placeholder;
-        ta.onchange = () => void save(ta.value);
-        autosizeTextarea(ta);
-        return;
-      }
-      if (field.type === "list") {
-        const current = (profile[field.key] as string[]) ?? [];
-        const chips = control.createDiv({ cls: "inkswell-inspector__chips" });
-        for (const val of current) {
-          const chip = chips.createSpan({ cls: "inkswell-chip", text: val });
-          const x = chip.createSpan({ cls: "inkswell-chip__x", text: "×" });
-          x.onclick = () => void saveAndRefresh(current.filter((c) => c !== val));
-        }
-        const addRow = control.createDiv({ cls: "inkswell-inspector__addrow" });
-        const input = addRow.createEl("input", { type: "text" });
-        tagField(input, `codex:${field.key}-add`);
-        input.placeholder = field.placeholder ?? "Add…";
-        const commit = () => {
-          const v = input.value.trim();
-          // Clear before the refresh so the focus-preserving rebuild hands
-          // back an empty input, ready for the next value.
-          input.value = "";
-          if (v && !current.includes(v)) void saveAndRefresh([...current, v]);
-        };
-        input.onkeydown = (e) => {
-          if (e.key !== "Enter") return;
-          commit();
-        };
-        // Android IMEs often don't deliver an Enter keydown at all (key
-        // "Unidentified"/229 while composing) — the button always works.
-        const addBtn = addRow.createEl("button", { text: "Add" });
-        addBtn.onclick = commit;
-        return;
-      }
-      if (field.type === "number") {
-        // Saved as a JS number → a bare YAML number, so Bases/Dataview can sort
-        // and sum it. A non-numeric stored value shows empty and is only
-        // overwritten when the user actually edits the field (onchange).
-        const t = control.createEl("input", {
-          type: "number",
-          attr: { step: "any", inputmode: "decimal" },
-        });
-        tagField(t, `codex:${field.key}`);
-        const v = profile[field.key];
-        t.value = typeof v === "number" ? String(v) : "";
-        if (field.placeholder) t.placeholder = field.placeholder;
-        t.onchange = () => {
-          const s = t.value.trim();
-          const n = Number(s);
-          void save(s !== "" && Number.isFinite(n) ? n : "");
-        };
-        return;
-      }
-      // links
-      this.renderLinkField(control, field, profile, entities, entity, (value) =>
-        void saveAndRefresh(value)
-      );
-    });
-  }
-
-  private renderLinkField(
-    control: HTMLElement,
-    field: ProfileField,
-    profile: Profile,
-    entities: CodexEntity[],
-    self: CodexEntity,
-    saveAndRefresh: (value: Profile[string]) => void
-  ): void {
-    // Scope the candidates to what THIS entity can see: a series/project-scoped
-    // character only links entities in its own scope (+ globals); a global entity
-    // is unconstrained. Without this the picker listed every entity vault-wide,
-    // ignoring the character's scope.
-    const ctx = scopeContextForEntity(self, this.plugin.store.getProjects());
-    const inScope = ctx ? filterToScope(entities, ctx) : entities;
-    const candidates = inScope.filter(
-      (e) =>
-        e.path !== self.path &&
-        (!field.linkCategory || e.category === field.linkCategory)
+    this.field(host, field.label, (control) =>
+      renderProfileFieldControl(control, {
+        app: this.app,
+        field,
+        value: profile[field.key],
+        // Scope the candidates to what THIS entity can see: a series/project-
+        // scoped character only links entities in its own scope (+ globals); a
+        // global entity is unconstrained. Never itself.
+        candidates: () => {
+          const ctx = scopeContextForEntity(entity, this.plugin.store.getProjects());
+          const inScope = ctx ? filterToScope(entities, ctx) : entities;
+          return inScope.filter((e) => e.path !== entity.path);
+        },
+        typeLabel: (id) => this.label(id),
+        tagPrefix: "codex",
+        // Plain fields save quietly; links re-render the panes (the list shows them).
+        saveValue: (value, structural) => void (structural ? saveAndRefresh(value) : save(value)),
+        // Lists apply against the rendered value, as the panel always has.
+        updateList: (transform) => {
+          const cur = profile[field.key];
+          void saveAndRefresh(transform(Array.isArray(cur) ? cur : []));
+        },
+      })
     );
-
-    if (field.single) {
-      const cur = profile[field.key] ? linkTarget(profile[field.key] as string) : "";
-      const sel = control.createEl("select", { cls: "dropdown" });
-      tagField(sel, `codex:${field.key}`);
-      sel.createEl("option", { text: "— none —", value: "" });
-      for (const c of candidates) sel.createEl("option", { text: c.name, value: c.name });
-      sel.value = candidates.some((c) => c.name === cur) ? cur : "";
-      sel.onchange = () => saveAndRefresh(sel.value ? toLink(sel.value) : "");
-      return;
-    }
-
-    const current = (profile[field.key] as string[]) ?? [];
-    const chips = control.createDiv({ cls: "inkswell-inspector__chips" });
-    for (const link of current) {
-      const target = linkTarget(link);
-      const chip = chips.createSpan({ cls: "inkswell-chip" });
-      chip.createSpan({ cls: "inkswell-codex__linktarget", text: target });
-      if (field.labeled) {
-        // The label lives in the wikilink alias ([[Anna|sister]]). Edited via a
-        // prompt rather than an inline input: the chip is rebuilt on save, and
-        // a modal sidesteps both focus-preservation and Android IME Enter quirks.
-        const alias = linkAlias(link);
-        const lab = chip.createSpan({
-          cls: "inkswell-codex__linklabel",
-          text: alias ? `· ${alias}` : "+ label",
-        });
-        if (!alias) lab.addClass("is-empty");
-        lab.setAttribute("aria-label", alias ? `Change the “${alias}” label` : "Add a label");
-        lab.onclick = () => {
-          void (async () => {
-            const v = await promptText(this.app, {
-              title: `Relationship to ${target}`,
-              value: alias ?? "",
-              multiline: false,
-              cta: "Save",
-            });
-            if (v === null) return; // cancelled; "" clears the label
-            saveAndRefresh(current.map((c) => (c === link ? toLink(target, v) : c)));
-          })();
-        };
-      }
-      const x = chip.createSpan({ cls: "inkswell-chip__x", text: "×" });
-      x.onclick = () => saveAndRefresh(current.filter((c) => c !== link));
-    }
-    const remaining = candidates.filter(
-      (c) => !current.some((link) => linkTarget(link) === c.name)
-    );
-    if (remaining.length > 0) {
-      const add = control.createEl("select", { cls: "dropdown" });
-      tagField(add, `codex:${field.key}-add`);
-      add.createEl("option", { text: `+ add ${field.label.toLowerCase()}`, value: "" });
-      for (const c of remaining) add.createEl("option", { text: c.name, value: c.name });
-      add.value = "";
-      add.onchange = () => {
-        if (add.value) saveAndRefresh([...current, toLink(add.value)]);
-      };
-    } else if (candidates.length === 0) {
-      const cat = field.linkCategory ? this.label(field.linkCategory).toLowerCase() : "entity";
-      control.createSpan({ cls: "inkswell-stats__muted", text: `No ${cat} entries in codex.` });
-    }
   }
 
   private field(parent: HTMLElement, label: string, build: (host: HTMLElement) => void): void {

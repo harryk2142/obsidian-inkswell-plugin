@@ -11,6 +11,7 @@ import { Project } from "../projects/types";
 import { openScene } from "./scene-actions";
 import { renderSceneMetaFields } from "./scene-meta-form";
 import { inspectorFields, sceneStatuses } from "./scene-meta";
+import { sceneFieldExtras } from "./scene-template-io";
 import type InkswellPlugin from "../../main";
 
 export class EditSceneModal extends Modal {
@@ -44,7 +45,8 @@ export class EditSceneModal extends Modal {
       (path) => this.plugin?.selfWrites.mark(path),
       this.plugin?.store.getProjects() ?? (this.project ? [this.project] : []),
       sceneStatuses(this.plugin?.settings.listOverrides["scene.status"]),
-      inspectorFields(this.plugin?.settings.listOverrides["scene.fields"])
+      inspectorFields(this.plugin?.settings.listOverrides["scene.fields"]),
+      this.plugin ? sceneFieldExtras(this.app, this.plugin.settings) : {}
     );
 
     new Setting(contentEl)

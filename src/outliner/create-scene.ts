@@ -12,6 +12,8 @@ import { ProjectStore } from "../projects/project-store";
 import { Project, isMultiScene } from "../projects/types";
 import { SceneMeta, defaultNewSceneStatus, writeSceneMeta } from "../scenes/scene-meta";
 import { sceneTemplateCandidates } from "../scenes/scene-template";
+import { SCENE_FIELDS_KEY } from "../scenes/scene-fields";
+import { FIELDS_KEY } from "../codex/profile-schema";
 import { FolderSettings, sanitizeSegment } from "../settings/folders";
 import type { ListOverrideSettings } from "../settings/overridable-lists";
 import { applyTemplateVars } from "../lib/template";
@@ -67,7 +69,12 @@ export async function createSceneFile(
   // The app never writes a status the writer hid (Customize → Scene statuses):
   // with `idea` hidden, a new scene simply starts without one.
   const defaultStatus = defaultNewSceneStatus(settings.listOverrides?.["scene.status"]);
-  await writeSceneMeta(app, file, patch, defaultStatus ? { status: defaultStatus } : {});
+  // The template's field definitions are template-only — never copy them into
+  // a scene (a custom codex type labelled "Scene" shares this note too).
+  await writeSceneMeta(app, file, patch, defaultStatus ? { status: defaultStatus } : {}, [
+    SCENE_FIELDS_KEY,
+    FIELDS_KEY,
+  ]);
   return file;
 }
 

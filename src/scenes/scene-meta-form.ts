@@ -8,6 +8,9 @@ import { App, Platform, TFile } from "obsidian";
 import { tryFileOp } from "../lib/notify";
 import { tagField } from "../lib/focus-preserve";
 import { autosizeTextarea } from "../lib/form-fields";
+import { readProfile, writeProfile } from "../codex/codex-profile";
+import type { ProfileField } from "../codex/profile-schema";
+import { renderProfileFieldControl } from "../codex/profile-field-controls";
 import { linkTarget, toLink } from "../codex/codex";
 import { featureEnabled } from "../features";
 import { getCodexEntities } from "../codex/codex-store";
@@ -115,7 +118,9 @@ export function renderSceneMetaFields(
   /** Effective statuses (`sceneStatuses(override)`); shipped by default. */
   statuses: readonly StatusDef[] = sceneStatuses(),
   /** Effective field layout (`inspectorFields(override)`); shipped by default. */
-  fields: readonly InspectorFieldDef[] = inspectorFields()
+  fields: readonly InspectorFieldDef[] = inspectorFields(),
+  /** The writer's own fields (#52) and a codex-type labeller for their link pickers. */
+  extra: { customFields?: readonly ProfileField[]; typeLabel?: (id: string) => string } = {}
 ): void {
   const meta = readSceneMeta(app, file);
   const save = (patch: Partial<SceneMeta>) => {
@@ -353,6 +358,41 @@ export function renderSceneMetaFields(
           : `${label} (excluded from compile & stats)`,
     });
   });
+
+  // The writer's own fields (#52): rendered with the codex field controls,
+  // stored as plain frontmatter keys. Lists/links apply as deltas against the
+  // file's current value (gotcha 10); every write is marked as our own.
+  render.custom = () => {
+    const custom = extra.customFields ?? [];
+    if (custom.length === 0) return;
+    const profile = readProfile(app, file, [...custom]);
+    for (const cf of custom) {
+      field(container, cf.label, (control) =>
+        renderProfileFieldControl(control, {
+          app,
+          field: cf,
+          value: profile[cf.key],
+          candidates: () => entities.map((e) => ({ name: e.name, category: e.category })),
+          typeLabel: extra.typeLabel ?? ((id) => id),
+          tagPrefix: "scene:x",
+          saveValue: (value) => {
+            markWrite?.(file.path);
+            void tryFileOp(
+              () => writeProfile(app, file, [cf], { [cf.key]: value }),
+              "Couldn't save the scene change."
+            );
+          },
+          updateList: (transform) => {
+            markWrite?.(file.path);
+            void tryFileOp(
+              () => updateSceneList(app, file, cf.key, transform),
+              "Couldn't save the scene change."
+            );
+          },
+        })
+      );
+    }
+  };
 
   for (const f of fields) if (!f.hidden) render[f.id](f.label);
 }

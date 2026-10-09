@@ -60,19 +60,22 @@ export async function writeTemplateBody(app: App, file: TFile, body: string): Pr
 /**
  * Write `spec` as the template's `codex-fields` (an empty spec DELETES the key →
  * the type falls back to Inkswell's shipped fields). Returns the normalized spec
- * as the parser will read it — render from this, not from the cache.
+ * as the parser will read it — render from this, not from the cache. The scene
+ * template's `scene-fields` goes through here too, with its own key + reserved set.
  */
 export async function writeTemplateFields(
   app: App,
   file: TFile,
-  spec: readonly FieldSpec[]
+  spec: readonly FieldSpec[],
+  key: string = FIELDS_KEY,
+  reserved?: ReadonlySet<string>
 ): Promise<FieldSpec[]> {
-  const value = spec.length > 0 ? serializeFieldSpec(spec) : null;
+  const value = spec.length > 0 ? serializeFieldSpec(spec, reserved) : null;
   await app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
-    if (value === null) delete fm[FIELDS_KEY];
-    else fm[FIELDS_KEY] = value;
+    if (value === null) delete fm[key];
+    else fm[key] = value;
   });
-  return value === null ? [] : parseFieldSpec(value) ?? [];
+  return value === null ? [] : parseFieldSpec(value, reserved) ?? [];
 }
 
 /**

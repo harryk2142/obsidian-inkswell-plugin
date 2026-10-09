@@ -56,6 +56,7 @@ Flat top-level keys on each scene file. Field names match StoryLine where they o
 | `plotlines` | string[] | Plotlines this scene advances — plain titles matching `inkswell.plotlines` entries (like `act`/`chapter` strings, NOT wikilinks) |
 | `targetWords` | number | Per-scene word-count target |
 | `notes` | string (multiline) | Free-form working notes shown in the Scene Inspector (since 1.19) — e.g. an outline to draft against. Only a string is read or written; a non-text `notes` value from another tool is left untouched and the field is shown disabled. |
+| *writer-defined* | per its kind | **Your own scene fields** (since 1.20, #52): any key listed in the vault-wide scene template note's `scene-fields` (Customize → Scene inspector fields → Your fields). Same format as a codex template's `codex-fields`: an ordered map of `key → type hint` or `{type, label}`, with kinds `text` · `textarea` · `number` · `list` · `links[:type][:labeled]` · `link[:type]` (no `image`). Values use the codex encoding (links as `"[[Name]]"` strings/lists). Shown only in the Scene Inspector; Board, Grid, compile and the story bible ignore them. Removing a definition never deletes stored values. Reserved (never a custom key): every key above, the `rev*` audit keys, `scene-fields`, `codex-fields`, `codex*`, `aliases`, `tags`, `cssclasses`. `scene-fields` itself lives only on the template note and is stripped from new scenes. Source: `src/scenes/scene-fields.ts`. |
 
 ### Scene note — `rev*` revision-audit keys
 
@@ -200,7 +201,7 @@ One optional entry per overridable list id, each a `ListOverride`: `{ hidden?: i
 | `publishing` | the publishing checklist (`inkswell.publishing.checklist`) | `pt` (phases `pg`) | yes (`optional?` extra) | yes |
 | `prompts` | writing prompts (ids = `p` + FNV-1a of `phase\|category\|text`) | `wp` | yes (`phase`, `category`) | — |
 | `scene.status` | the six statuses | — | **no** | — |
-| `scene.fields` | the Scene Inspector rows (`status` · `subtitle` · `synopsis` · `pov` · `characters` · `location` · `structure` · `plotlines` · `targetWords` · `color` · `notes` · `inactive`) — display only, scene keys are untouched | — | **no** | — |
+| `scene.fields` | the Scene Inspector rows (`status` · `subtitle` · `synopsis` · `pov` · `characters` · `location` · `structure` · `plotlines` · `targetWords` · `color` · `custom` (the writer's own fields as one block) · `notes` · `inactive`) — display only, scene keys are untouched | — | **no** | — |
 
 Invariants: hiding never touches stored state and hidden items count toward nothing; renames keep the id; custom ids are minted (`newListItemId`), never derived from labels; stale ids in frontmatter are preserved and ignored; reset = delete the list's key. Frontmatter keys above accept custom ids additively — no existing key changes meaning.
 
