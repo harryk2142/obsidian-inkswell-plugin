@@ -57,6 +57,9 @@ export interface InkswellSettings {
   /** The one running writing challenge (a date window + word target), or null.
    *  Edited from Track, never from this tab. */
   challenge: WritingChallenge | null;
+  /** Story bible dialog: the last picked sections + codex types (null = all types).
+   *  UI memory, not a Settings-tab row. */
+  storyBible: { sections: string[]; codexTypes: string[] | null };
   /** The one-time "goals now count project words by category" notice was shown. */
   categoryNoticeSeen: boolean;
   /**
@@ -159,6 +162,7 @@ export const DEFAULT_SETTINGS: InkswellSettings = {
   streakThreshold: 1,
   excludedFromGoals: ["planning", "codex", "other"],
   challenge: null,
+  storyBible: { sections: ["overview", "beats", "outline", "codex"], codexTypes: null },
   categoryNoticeSeen: false,
   codexCountMigrated: false,
   cjkCountMigrated: false,

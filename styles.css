@@ -3462,6 +3462,15 @@ body.inkswell-phone .inkswell-project__right {
   justify-content: space-between;
   gap: var(--size-4-2);
 }
+.inkswell-overview__actions {
+  display: flex;
+  gap: var(--size-4-2);
+  flex-wrap: wrap;
+}
+/* Story bible dialog: per-type codex toggles sit under the Codex toggle. */
+.inkswell-storybible__type {
+  padding-left: var(--size-4-6);
+}
 
 .inkswell-overview__prosetitle {
   font-weight: var(--font-semibold);

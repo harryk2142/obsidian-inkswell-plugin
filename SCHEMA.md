@@ -186,7 +186,7 @@ Types: `text` (default) · `textarea` · `number` (a bare YAML number — the pa
 
 ## E. Plugin-local data (not in any vault note)
 
-For completeness: writing history & baselines, daily word counts, streaks, sprint records, ideas inbox, active project, daily mood, and the writing challenge (`settings.challenge`: `{name, start, end, target}`, dates YYYY-MM-DD inclusive, normalized on load by `normalizeChallenge` in `src/goals/challenge.ts`) live in the plugin's local `data.json`, **not** in vault frontmatter. They are intentionally outside this compatibility contract (machine-local, not synced as note content).
+For completeness: writing history & baselines, daily word counts, streaks, sprint records, ideas inbox, active project, daily mood, and the writing challenge (`settings.challenge`: `{name, start, end, target}`, dates YYYY-MM-DD inclusive, normalized on load by `normalizeChallenge` in `src/goals/challenge.ts`), and the story bible dialog's last picks (`settings.storyBible`: `{sections, codexTypes}`, `codexTypes` null = all types) live in the plugin's local `data.json`, **not** in vault frontmatter. They are intentionally outside this compatibility contract (machine-local, not synced as note content).
 
 ### E.1 List overrides — `settings.listOverrides` (Customize)
 
@@ -217,6 +217,12 @@ Written only when **Settings → Sync writing history across devices** is on: on
 | `updated` | string | ISO timestamp of the last mirror. |
 
 Body: one explanatory paragraph, then a fenced ```json block `{"daily": {…}, "dailyBy": {…}, "sprints": […]}` with the same shapes as `data.json`'s `writingLog` (SCHEMA §E), minus `baselines` (device-local by design) and `mood`/`nextUp` (not merged). Readers (`parseDeviceLog`, `src/tracking/device-log.ts`) tolerate bare/quoted scalars and drop malformed entries; the merge (`mergeLogs`) sums days and category buckets and pools sprints de-duplicated on `start + durationSec`. The tracker classifies these notes as `null` (never counted as words). A note whose device id no longer exists anywhere (site data cleared) keeps merging until the user deletes it.
+
+## G. Story bible note (generated, since 1.20)
+
+**Generate story bible** writes `<index folder>/<Title> — Story bible.md`: plain markdown assembled from the overview, the planning note, the beat sheet, the outline, and the codex (`src/plan/story-bible.ts`, I/O in `story-bible-io.ts`). It carries **no frontmatter contract**. The first line is the marker comment `<!-- inkswell:story-bible -->`. A note with the marker is replaced on the next generation without asking. A note at that path without the marker is replaced only after confirmation, with its text saved to a backup first. No pointer to the note is stored, so after a project rename the next generation writes under the new title.
+
+---
 
 ## Backward-compatibility allowances
 

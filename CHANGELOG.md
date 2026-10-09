@@ -11,6 +11,8 @@ time the version bump renames that section to the new version and date.
 ## [Unreleased]
 
 ### Added
+- **Generate a story bible to share.** Plan → Overview → **Story bible…** (or the **Generate story bible** command) writes one readable note next to your project, which you can share or export to PDF with Obsidian's own export. Choose what goes in: overview & synopsis, beat sheet, outline (acts › chapters › scenes, with POV and synopses), and codex entries by type. Pick only what a reader should see; alpha readers needn't get the outline's spoilers. Links show as plain names, and archived scenes and your private scene notes are left out. Regenerating replaces the note. Requested in [#50](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/50).
+- **Codex → Copy as text.** Right-click a codex entry (or tap ⋯) to copy its profile as plain, readable text, ready to paste into a chat or email. Requested in [#50](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/50).
 - **Open any scene in a regular Obsidian tab with one click.** Ctrl/Cmd-click or middle-click a scene to open it in a normal tab, like a wikilink, without leaving what you're doing in Inkswell. It works in Home, Write's scene list, the Outline, Board, Plot grid, Beats, Search, To-dos and the codex's *Appears in* list. Scene menus now say **Open in new tab**, and Home's scene menu has it too, so phones and tablets get it from the ⋯ menu. Suggested in [#53](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/53).
 
 ## [1.19.0] - 2026-10-05

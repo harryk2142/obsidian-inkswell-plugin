@@ -43,6 +43,8 @@ import {
 } from "./codex-scope";
 import { sanitizeSegment } from "../settings/folders";
 import { tryFileOp } from "../lib/notify";
+import { codexEntryText } from "../plan/story-bible";
+import { codexEntryData } from "../plan/story-bible-io";
 import { readProfile, resolveProfileFields, writeProfile } from "./codex-profile";
 import { Profile, ProfileField } from "./profile-schema";
 import {
@@ -346,6 +348,9 @@ export class CodexPanel {
         i.setTitle("Open note").setIcon("file-text").onClick(() => openScene(this.app, file))
       );
       menu.addItem((i) =>
+        i.setTitle("Copy as text").setIcon("copy").onClick(() => this.copyAsText(entity))
+      );
+      menu.addItem((i) =>
         i.setTitle("Rename…").setIcon("pencil").onClick(() => this.rename(file))
       );
       menu.addSeparator();
@@ -354,6 +359,17 @@ export class CodexPanel {
       );
       return menu;
     });
+  }
+
+  /** Put the entry's profile on the clipboard as plain readable text (#50) —
+   *  for pasting a character profile into a chat or email. */
+  private copyAsText(entity: CodexEntity): void {
+    const data = codexEntryData(this.plugin, entity);
+    if (!data) return;
+    void navigator.clipboard.writeText(codexEntryText(data, { title: true })).then(
+      () => new Notice(`Copied ${entity.name}`),
+      () => new Notice("Couldn't copy to the clipboard.")
+    );
   }
 
   /** Render the profile editor for the selected entity (or a placeholder). */

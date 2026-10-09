@@ -50,6 +50,7 @@ import {
 } from "./src/settings/settings";
 import { normalizeListOverrides } from "./src/settings/overridable-lists";
 import { ChallengeModal } from "./src/goals/challenge-modal";
+import { StoryBibleModal } from "./src/plan/story-bible-modal";
 import {
   ChallengeProgress,
   challengeProgress,
@@ -308,6 +309,16 @@ export default class InkswellPlugin extends Plugin {
       name: "Set up writing challenge",
       checkCallback: (checking) =>
         this.featureCommand(checking, "tracking", () => this.openChallengeModal()),
+    });
+    this.addCommand({
+      id: "generate-story-bible",
+      name: "Generate story bible",
+      checkCallback: (checking) => {
+        const project = resolveActive(this.store.getProjects(), this.activeProject.get());
+        if (!project) return false;
+        if (!checking) this.openStoryBible(project);
+        return true;
+      },
     });
     this.addCommand({
       id: "new-scene",
@@ -611,6 +622,11 @@ export default class InkswellPlugin extends Plugin {
     await this.saveSettings();
     this.logSync.setEnabled(on);
     this.refreshView();
+  }
+
+  /** Pick sections and write the project's story bible note (#50). */
+  openStoryBible(project: Project): void {
+    new StoryBibleModal(this.app, this, project).open();
   }
 
   /** Set up / edit / clear the writing challenge. */

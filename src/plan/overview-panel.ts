@@ -29,7 +29,7 @@ import {
 } from "./planning-note";
 import type InkswellPlugin from "../../main";
 
-const FIELDS: { key: keyof ProjectOverview; label: string; placeholder: string }[] = [
+export const OVERVIEW_FIELDS: { key: keyof ProjectOverview; label: string; placeholder: string }[] = [
   { key: "logline", label: "Logline", placeholder: "One sentence: who wants what, against what odds…" },
   { key: "theme", label: "Theme", placeholder: "The deeper meaning / life lesson…" },
   { key: "genre", label: "Genre", placeholder: "e.g. Epic fantasy" },
@@ -94,7 +94,7 @@ export class OverviewPanel {
     const overview = project.inkswell?.overview ?? {};
     const indexFile = this.indexFile(project);
     const grid = root.createDiv({ cls: "inkswell-overview__fields" });
-    for (const f of FIELDS) {
+    for (const f of OVERVIEW_FIELDS) {
       const row = grid.createDiv({ cls: "inkswell-overview__field" });
       row.createDiv({ cls: "inkswell-overview__label", text: f.label });
       const input = row.createEl("input", { type: "text", cls: "inkswell-overview__input" });
@@ -118,7 +118,13 @@ export class OverviewPanel {
     const sec = root.createDiv({ cls: "inkswell-overview__prose" });
     const head = sec.createDiv({ cls: "inkswell-overview__prosehead" });
     head.createSpan({ cls: "inkswell-overview__prosetitle", text: "Planning note" });
-    const open = head.createEl("button", { text: "Open planning note" });
+    const actions = head.createDiv({ cls: "inkswell-overview__actions" });
+    const bible = actions.createEl("button", { text: "Story bible…" });
+    bible.setAttribute("aria-label", "Write a shareable story bible note");
+    // The focused draft, not the base: beats and outline are per draft.
+    bible.onclick = () =>
+      this.plugin.openStoryBible(resolveActive(this.store.getProjects(), this.active.get()) ?? project);
+    const open = actions.createEl("button", { text: "Open planning note" });
     open.setAttribute("aria-label", "Open the planning note in an editor tab");
     open.onclick = async () => {
       const file = await tryFileOp(async () => {
