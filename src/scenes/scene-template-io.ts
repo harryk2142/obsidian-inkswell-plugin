@@ -30,6 +30,7 @@ export function resolveVaultSceneTemplate(app: App, settings: FolderSettings): T
 export function resolveSceneFields(app: App, settings: FolderSettings): ProfileField[] {
   const template = resolveVaultSceneTemplate(app, settings);
   if (!template) return [];
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- cast tames Obsidian's `any`-typed frontmatter
   const fm = app.metadataCache.getFileCache(template)?.frontmatter as Record<string, unknown> | undefined;
   return sceneFieldsFromSpec(parseSceneFieldSpec(fm?.[SCENE_FIELDS_KEY]));
 }
