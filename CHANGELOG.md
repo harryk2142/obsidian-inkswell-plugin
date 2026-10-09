@@ -10,6 +10,9 @@ time the version bump renames that section to the new version and date.
 
 ## [Unreleased]
 
+### Added
+- **Open any scene in a regular Obsidian tab with one click.** Ctrl/Cmd-click or middle-click a scene to open it in a normal tab, like a wikilink, without leaving what you're doing in Inkswell. It works in Home, Write's scene list, the Outline, Board, Plot grid, Beats, Search, To-dos and the codex's *Appears in* list. Scene menus now say **Open in new tab**, and Home's scene menu has it too, so phones and tablets get it from the ⋯ menu. Suggested in [#53](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/53).
+
 ## [1.19.0] - 2026-10-05
 
 Writing challenges, honest pace, and a round of fixes and requests from #47–#49. Set a word target for a date range (50,000 in November, say) and Track keeps score. The deadline pace badge stops counting only the days you wrote. "Next up" and your settings now carry between devices, and the scene inspector bends to your process with a Notes field and hide/rename/reorder.

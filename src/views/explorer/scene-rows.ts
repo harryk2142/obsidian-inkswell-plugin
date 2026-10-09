@@ -16,7 +16,13 @@ import {
   unindentScene,
 } from "../../projects/scene-tree";
 import { Project } from "../../projects/types";
-import { deleteScene, editSynopsis, renameScene } from "../../scenes/scene-actions";
+import {
+  deleteScene,
+  editSynopsis,
+  openScene,
+  openSceneOnModClick,
+  renameScene,
+} from "../../scenes/scene-actions";
 import { EditSceneModal } from "../../scenes/edit-scene-modal";
 import { readSceneMeta, statusLabel } from "../../scenes/scene-meta";
 import type InkswellPlugin from "../../../main";
@@ -82,13 +88,14 @@ export class SceneRows {
       void this.stats.sceneWords(scene.path).then((w) => wc.setText(`${w}`));
     }
 
-    // Click selects the scene (the host shows it in the Inspector). It no longer
-    // opens the note — use the Inspector's "Open in tab" button for that.
+    // Click selects the scene (the host shows it in the Inspector). Ctrl/Cmd- or
+    // middle-click opens it in a regular tab; so does the menu's first item.
     row.onclick = () => {
       if (!scene.path) return;
       const file = this.app.vault.getAbstractFileByPath(scene.path);
       if (file instanceof TFile) this.onSelectScene(file);
     };
+    openSceneOnModClick(row, this.app, scene.path);
 
     // Right-click (desktop) / "⋯" tap (touch) → scene menu. On touch the menu
     // also carries Move up / Move down (drag-drop doesn't fire on touch).
@@ -105,6 +112,15 @@ export class SceneRows {
     const menu = new Menu();
     const file = this.indexFile(project);
     if (!file) return menu;
+
+    const scene = project.scenes[index];
+    const sceneFile = scene?.path ? this.app.vault.getAbstractFileByPath(scene.path) : null;
+    if (sceneFile instanceof TFile) {
+      menu.addItem((i) =>
+        i.setTitle("Open in new tab").setIcon("file-text").onClick(() => openScene(this.app, sceneFile))
+      );
+      menu.addSeparator();
+    }
 
     menu.addItem((i) =>
       i
@@ -129,10 +145,6 @@ export class SceneRows {
         )
     );
     // Scene-content actions (edit synopsis, rename, delete) when the file exists.
-    const scene = project.scenes[index];
-    const sceneFile = scene?.path
-      ? this.app.vault.getAbstractFileByPath(scene.path)
-      : null;
     if (scene && sceneFile instanceof TFile) {
       menu.addSeparator();
       menu.addItem((i) =>

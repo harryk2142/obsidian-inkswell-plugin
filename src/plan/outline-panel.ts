@@ -19,7 +19,7 @@ import { attachRowMenu } from "../lib/row-menu";
 import { ActiveProject, resolveActive } from "../projects/active-project";
 import { ProjectStore } from "../projects/project-store";
 import { Project, isMultiScene } from "../projects/types";
-import { confirmDelete, openScene, promptText } from "../scenes/scene-actions";
+import { confirmDelete, openScene, openSceneOnModClick, promptText } from "../scenes/scene-actions";
 import { readSceneMeta } from "../scenes/scene-meta";
 import { renderEmptyState, renderEmptyStateAction } from "../views/panel-kit";
 import { applyOutline } from "../outliner/apply-outline";
@@ -283,6 +283,7 @@ export class OutlinePanel {
       name.addClass("is-link");
       // Open the scene in the Write editor (not a plain note tab).
       name.onclick = () => this.plugin.openSceneInWrite(scene.path!);
+      openSceneOnModClick(name, this.app, scene.path);
     }
     this.draggable(row, "scene", scene.title);
     // Scene row accepts scene-reorder — placed above or below this one (by drop
@@ -412,7 +413,7 @@ export class OutlinePanel {
     if (scene.path) {
       // The row click already opens the scene in Write; offer the plain note here.
       menu.addItem((i) =>
-        i.setTitle("Open note").setIcon("file-text").onClick(() => {
+        i.setTitle("Open in new tab").setIcon("file-text").onClick(() => {
           const f = this.app.vault.getAbstractFileByPath(scene.path!);
           if (f instanceof TFile) openScene(this.app, f);
         })

@@ -7,6 +7,7 @@
 
 import { App, MarkdownView, Menu, Modal, Notice, Setting, TFile, normalizePath } from "obsidian";
 import { FormModal } from "../lib/form-modal";
+import { attachOpenInTab } from "../lib/row-menu";
 import { renameSceneInIndex, updateScenes } from "../projects/index-writer";
 import { expectInAppRename } from "../projects/rename-heal";
 import { removeScene } from "../projects/scene-tree";
@@ -130,6 +131,17 @@ export function openScene(app: App, file: TFile): void {
   void leaf.openFile(file, { active: true });
 }
 
+/** Ctrl/Cmd-click or middle-click on `el` opens the scene at `path` in a
+ *  regular tab, instead of the element's own click (#53). The file is resolved
+ *  at click time, so a rename since render can't open a stale path. */
+export function openSceneOnModClick(el: HTMLElement, app: App, path: string | null | undefined): void {
+  if (!path) return;
+  attachOpenInTab(el, () => {
+    const file = app.vault.getAbstractFileByPath(path);
+    if (file instanceof TFile) openScene(app, file);
+  });
+}
+
 export async function editSynopsis(
   app: App,
   file: TFile,
@@ -247,7 +259,7 @@ export function addSceneMenuItems(
   const mark = (p: string): void => opts.plugin?.selfWrites.mark(p);
   if (opts.includeOpen) {
     menu.addItem((i) =>
-      i.setTitle("Open").setIcon("file-text").onClick(() => openScene(app, file))
+      i.setTitle("Open in new tab").setIcon("file-text").onClick(() => openScene(app, file))
     );
   }
   menu.addItem((i) =>

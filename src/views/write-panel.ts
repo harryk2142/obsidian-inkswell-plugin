@@ -52,7 +52,7 @@ import { isPhone } from "../lib/platform";
 import { attachHideMenu } from "../lib/hide-menu";
 import { nearestIndexOf } from "../lib/text-locate";
 import { attachRowMenu } from "../lib/row-menu";
-import { addSceneMenuItems } from "../scenes/scene-actions";
+import { addSceneMenuItems, openSceneOnModClick } from "../scenes/scene-actions";
 import { promptNewScene } from "../outliner/create-scene";
 import { PromptModal } from "../ideation/prompt-modal";
 import { writingPrompts } from "../ideation/prompts";
@@ -966,6 +966,9 @@ export class WritePanel implements HoverParent {
         return menu;
       });
     }
+    // Ctrl/Cmd- or middle-click: open in a regular tab and leave Write's
+    // selection alone (the handler stops the event before onclick runs).
+    openSceneOnModClick(row, this.app, scene.path);
     row.onclick = () => {
       if (!scene.path) return;
       // Re-clicking the open scene must NOT rebuild the editor — the old

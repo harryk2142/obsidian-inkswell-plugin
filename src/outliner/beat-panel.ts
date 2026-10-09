@@ -19,7 +19,7 @@ import { tryFileOp } from "../lib/notify";
 import { ProjectStore } from "../projects/project-store";
 import { Project } from "../projects/types";
 import { EditSceneModal } from "../scenes/edit-scene-modal";
-import { addSceneMenuItems } from "../scenes/scene-actions";
+import { addSceneMenuItems, openSceneOnModClick } from "../scenes/scene-actions";
 import { readSceneMeta, statusLabel } from "../scenes/scene-meta";
 import { renderEmptyStateAction } from "../views/panel-kit";
 import { BeatSheet, DEFAULT_TEMPLATE } from "./beat-templates";
@@ -245,6 +245,7 @@ export class BeatPanel {
 
       // Status badge for the linked scene.
       const file = this.sceneFile(project, t);
+      openSceneOnModClick(label, this.app, file?.path);
       if (file) {
         const status = readSceneMeta(this.app, file).status;
         if (status) {

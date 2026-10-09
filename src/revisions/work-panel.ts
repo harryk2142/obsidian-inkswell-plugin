@@ -21,6 +21,7 @@ import { Project } from "../projects/types";
 import { decisionsOf, filterDecisions } from "./decisions";
 import { persistRevisions } from "./revisions";
 import { RevisionModal } from "./revision-modal";
+import { openSceneOnModClick } from "../scenes/scene-actions";
 import { DecisionRowContext, renderRevisionGroupItems } from "./revision-rows";
 import {
   WorkFilter,
@@ -239,6 +240,7 @@ export class RevisionWorkPanel {
         header.setAttribute("aria-label", `Open "${g.title}" in Write`);
         title.addClass("inkswell-revision__scenelink");
         header.onclick = () => this.onOpenInWrite(path);
+        openSceneOnModClick(header, this.app, path);
       }
       renderRevisionGroupItems(list, project, g, ctx, (path, from, to) =>
         this.onOpenInWrite(path, { from, to })

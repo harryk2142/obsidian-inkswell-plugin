@@ -15,7 +15,7 @@ import { ProjectStore } from "../projects/project-store";
 import { Project } from "../projects/types";
 import { tryFileOp } from "../lib/notify";
 import { tagScroller } from "../lib/scroll-preserve";
-import { addSceneMenuItems } from "../scenes/scene-actions";
+import { addSceneMenuItems, openSceneOnModClick } from "../scenes/scene-actions";
 import { promptNewScene } from "./create-scene";
 import { EditSceneModal } from "../scenes/edit-scene-modal";
 import { readSceneMeta, sceneStatuses, statusLabel, writeSceneMeta } from "../scenes/scene-meta";
@@ -193,6 +193,7 @@ export class BoardPanel {
       // modal carries "Open in tab" / "Open in Write" for explicit navigation.
       if (file instanceof TFile) new EditSceneModal(this.app, file, project, this.plugin).open();
     };
+    openSceneOnModClick(card, this.app, it.path);
     const file = this.app.vault.getAbstractFileByPath(it.path);
     if (file instanceof TFile) {
       attachRowMenu(card, head, () => {

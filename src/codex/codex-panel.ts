@@ -15,6 +15,7 @@ import { autosizeTextarea } from "../lib/form-fields";
 import {
   confirmDelete,
   openScene,
+  openSceneOnModClick,
   promptText,
 } from "../scenes/scene-actions";
 import {
@@ -480,6 +481,7 @@ export class CodexPanel {
             }
             ref.setAttribute("aria-label", hint);
             ref.onclick = () => void this.openReferencingScene(s.file, entity);
+            openSceneOnModClick(ref, this.app, s.file.path);
           }
         }
         if (books.some((b) => b.linkedCount > 0 && b.linkedCount < b.scenes.length)) {
