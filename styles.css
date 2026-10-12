@@ -31,6 +31,32 @@
   margin-top: auto;
 }
 
+/* The writer's two rail sections (#55): the divider between them hides when a
+   section is empty, and reappears as a drop zone while arranging. */
+.inkswell-rail__separator.is-empty {
+  display: none;
+}
+.inkswell-rail.is-arranging .inkswell-rail__separator:not(.inkswell-rail__separator--push) {
+  display: block;
+  height: 8px;
+  margin: var(--size-2-1) 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  border: 1px dashed var(--background-modifier-border);
+}
+.inkswell-rail.is-arranging .inkswell-rail__separator.is-drop-target {
+  border-color: var(--interactive-accent);
+}
+.inkswell-rail__item.is-dragging {
+  opacity: 0.4;
+}
+.inkswell-rail__item.is-drop-before {
+  box-shadow: inset 0 2px 0 var(--interactive-accent);
+}
+.inkswell-rail__item.is-drop-after {
+  box-shadow: inset 0 -2px 0 var(--interactive-accent);
+}
+
 .inkswell-rail__item {
   display: flex;
   flex-direction: column;

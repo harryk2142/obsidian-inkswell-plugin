@@ -21,29 +21,34 @@ export function attachHideMenu(
   el.addEventListener("contextmenu", (e) => {
     e.preventDefault();
     const menu = new Menu();
-    menu.addItem((i) =>
-      i
-        .setTitle(`Hide ${label}`)
-        .setIcon("eye-off")
-        .onClick(() => {
-          void plugin.setFeatureEnabled(feature, false);
-          const sentence = label.charAt(0).toUpperCase() + label.slice(1);
-          // A fragment (not `noticeEl`/`messageEl`, deprecated / above the API
-          // floor) carries the Undo link. Long enough to reach it; Undo dismisses.
-          let notice: Notice | null = null;
-          const body = createFragment((frag) => {
-            frag.appendText(`${sentence} hidden. `);
-            const undo = frag.createEl("a", { text: "Undo" });
-            undo.onclick = (ev) => {
-              ev.preventDefault();
-              void plugin.setFeatureEnabled(feature, true);
-              notice?.hide();
-            };
-            frag.appendText(" — or turn it back on under Customize → Features.");
-          });
-          notice = new Notice(body, 8000);
-        })
-    );
+    addHideItem(menu, plugin, feature, label);
     menu.showAtMouseEvent(e);
   });
+}
+
+/** The "Hide <feature>" item (with its Undo toast), for menus that carry other items too. */
+export function addHideItem(menu: Menu, plugin: InkswellPlugin, feature: FeatureId, label: string): void {
+  menu.addItem((i) =>
+    i
+      .setTitle(`Hide ${label}`)
+      .setIcon("eye-off")
+      .onClick(() => {
+        void plugin.setFeatureEnabled(feature, false);
+        const sentence = label.charAt(0).toUpperCase() + label.slice(1);
+        // A fragment (not `noticeEl`/`messageEl`, deprecated / above the API
+        // floor) carries the Undo link. Long enough to reach it; Undo dismisses.
+        let notice: Notice | null = null;
+        const body = createFragment((frag) => {
+          frag.appendText(`${sentence} hidden. `);
+          const undo = frag.createEl("a", { text: "Undo" });
+          undo.onclick = (ev) => {
+            ev.preventDefault();
+            void plugin.setFeatureEnabled(feature, true);
+            notice?.hide();
+          };
+          frag.appendText(" — or turn it back on under Customize → Features.");
+        });
+        notice = new Notice(body, 8000);
+      })
+  );
 }

@@ -51,6 +51,7 @@ import {
 import { normalizeListOverrides } from "./src/settings/overridable-lists";
 import { ChallengeModal } from "./src/goals/challenge-modal";
 import { StoryBibleModal } from "./src/plan/story-bible-modal";
+import { isDefaultRailLayout, resolveRailLayout } from "./src/views/nav-model";
 import {
   ChallengeProgress,
   challengeProgress,
@@ -97,6 +98,10 @@ function readSettings(stored: Partial<InkswellSettings> | undefined): InkswellSe
   settings.customBeatTemplates = normalizeCustomBeatTemplates(settings.customBeatTemplates);
   settings.listOverrides = normalizeListOverrides(settings.listOverrides);
   settings.challenge = normalizeChallenge(settings.challenge);
+  if (settings.railLayout) {
+    const rail = resolveRailLayout(settings.railLayout);
+    settings.railLayout = isDefaultRailLayout(rail) ? null : rail;
+  }
   return settings;
 }
 

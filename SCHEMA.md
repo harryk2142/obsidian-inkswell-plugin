@@ -187,7 +187,7 @@ Types: `text` (default) · `textarea` · `number` (a bare YAML number — the pa
 
 ## E. Plugin-local data (not in any vault note)
 
-For completeness: writing history & baselines, daily word counts, streaks, sprint records, ideas inbox, active project, daily mood, and the writing challenge (`settings.challenge`: `{name, start, end, target}`, dates YYYY-MM-DD inclusive, normalized on load by `normalizeChallenge` in `src/goals/challenge.ts`), and the story bible dialog's last picks (`settings.storyBible`: `{sections, codexTypes}`, `codexTypes` null = all types) live in the plugin's local `data.json`, **not** in vault frontmatter. They are intentionally outside this compatibility contract (machine-local, not synced as note content).
+For completeness: writing history & baselines, daily word counts, streaks, sprint records, ideas inbox, active project, daily mood, and the writing challenge (`settings.challenge`: `{name, start, end, target}`, dates YYYY-MM-DD inclusive, normalized on load by `normalizeChallenge` in `src/goals/challenge.ts`), the story bible dialog's last picks (`settings.storyBible`: `{sections, codexTypes}`, `codexTypes` null = all types), and the rail arrangement (`settings.railLayout`: `{upper, lower}` destination ids either side of the rail's divider; null = shipped order; normalized by `resolveRailLayout` in `src/views/nav-model.ts`) live in the plugin's local `data.json`, **not** in vault frontmatter. They are intentionally outside this compatibility contract (machine-local, not synced as note content).
 
 ### E.1 List overrides — `settings.listOverrides` (Customize)
 

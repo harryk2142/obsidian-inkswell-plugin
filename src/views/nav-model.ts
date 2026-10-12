@@ -223,3 +223,117 @@ export function resolveSubtab(
   if (remembered && enabled.some((s) => s.id === remembered)) return remembered;
   return enabled[0]?.id;
 }
+
+// --- The writer's rail arrangement (#55) -------------------------------------
+// Home stays first and the tools footer stays at the bottom. Everything between
+// (the pipeline + insight destinations) lives in two sections split by one
+// divider, and the writer may reorder within and move between them (drag on
+// desktop, Move up/down in the item menu). The default is the shipped grouping:
+// pipeline above the divider, Codex · Track below it.
+
+export interface RailLayout {
+  upper: InkswellMode[];
+  lower: InkswellMode[];
+}
+
+export type RailSection = keyof RailLayout;
+
+const UPPER_GROUP: RailGroup = "pipeline";
+const LOWER_GROUP: RailGroup = "insight";
+
+/** Whether a destination can be rearranged (Home and the footer are fixed). */
+export function isRailMovable(id: InkswellMode): boolean {
+  const g = DESTINATIONS.find((d) => d.id === id)?.group;
+  return g === UPPER_GROUP || g === LOWER_GROUP;
+}
+
+export function defaultRailLayout(): RailLayout {
+  return {
+    upper: DESTINATIONS.filter((d) => d.group === UPPER_GROUP).map((d) => d.id),
+    lower: DESTINATIONS.filter((d) => d.group === LOWER_GROUP).map((d) => d.id),
+  };
+}
+
+/**
+ * Sanitize a stored layout: unknown, fixed, and duplicate ids are dropped, and a
+ * movable destination missing from it (one added in a later release) is
+ * appended to its default section. Anything unreadable → the default.
+ */
+export function resolveRailLayout(raw: unknown): RailLayout {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return defaultRailLayout();
+  const rec = raw as Record<string, unknown>;
+  const seen = new Set<string>();
+  const take = (v: unknown): InkswellMode[] =>
+    (Array.isArray(v) ? v : []).filter((id): id is InkswellMode => {
+      if (typeof id !== "string" || seen.has(id) || !isRailMovable(id as InkswellMode)) return false;
+      seen.add(id);
+      return true;
+    });
+  const upper = take(rec["upper"]);
+  const lower = take(rec["lower"]);
+  for (const d of DESTINATIONS) {
+    if (seen.has(d.id) || !isRailMovable(d.id)) continue;
+    (d.group === UPPER_GROUP ? upper : lower).push(d.id);
+  }
+  return { upper, lower };
+}
+
+export function isDefaultRailLayout(layout: RailLayout): boolean {
+  const def = defaultRailLayout();
+  return (
+    layout.upper.join("|") === def.upper.join("|") && layout.lower.join("|") === def.lower.join("|")
+  );
+}
+
+/** Move `id` to position `index` of `section` (index counted without `id` itself). */
+export function moveRailItem(
+  layout: RailLayout,
+  id: InkswellMode,
+  section: RailSection,
+  index: number
+): RailLayout {
+  if (!isRailMovable(id)) return layout;
+  const next: RailLayout = {
+    upper: layout.upper.filter((x) => x !== id),
+    lower: layout.lower.filter((x) => x !== id),
+  };
+  const list = next[section];
+  list.splice(Math.max(0, Math.min(index, list.length)), 0, id);
+  return next;
+}
+
+/**
+ * One step up (-1) or down (+1) past the next VISIBLE item, crossing the
+ * divider: down from the last upper item lands first in the lower section, up
+ * from the first lower item lands last in the upper. No-op at either end.
+ */
+export function nudgeRailItem(
+  layout: RailLayout,
+  id: InkswellMode,
+  dir: -1 | 1,
+  isVisible: (id: InkswellMode) => boolean = () => true
+): RailLayout {
+  // One flat sequence with the divider as a marker between the sections.
+  const DIV = "|divider|";
+  const flat: string[] = [...layout.upper, DIV, ...layout.lower];
+  const from = flat.indexOf(id);
+  if (from < 0) return layout;
+  flat.splice(from, 1);
+  // Walk past hidden items; crossing the divider counts as the step.
+  let at = from;
+  if (dir === 1) {
+    while (at < flat.length && flat[at] !== DIV && !isVisible(flat[at] as InkswellMode)) at++;
+    if (at >= flat.length) return layout;
+    at += 1;
+  } else {
+    at -= 1;
+    while (at >= 0 && flat[at] !== DIV && !isVisible(flat[at] as InkswellMode)) at--;
+    if (at < 0) return layout;
+  }
+  flat.splice(at, 0, id);
+  const div = flat.indexOf(DIV);
+  return {
+    upper: flat.slice(0, div) as InkswellMode[],
+    lower: flat.slice(div + 1) as InkswellMode[],
+  };
+}

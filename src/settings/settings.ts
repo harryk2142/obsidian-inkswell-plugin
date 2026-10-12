@@ -12,6 +12,7 @@ import type InkswellPlugin from "../../main";
 import { OutputFormat } from "../compile/types";
 import { WeekStart } from "../goals/goals";
 import type { WritingChallenge } from "../goals/challenge";
+import type { RailLayout } from "../views/nav-model";
 import { WORD_CATEGORIES, WordCategory } from "../tracking/types";
 import { CategoryDef, CategoryOverrides } from "../codex/types";
 import { BeatTemplateDef } from "../outliner/custom-templates";
@@ -60,6 +61,9 @@ export interface InkswellSettings {
   /** Story bible dialog: the last picked sections + codex types (null = all types).
    *  UI memory, not a Settings-tab row. */
   storyBible: { sections: string[]; codexTypes: string[] | null };
+  /** The writer's rail arrangement (#55), or null for the shipped one. Edited by
+   *  dragging the rail / its item menu — never a Settings-tab row. */
+  railLayout: RailLayout | null;
   /** The one-time "goals now count project words by category" notice was shown. */
   categoryNoticeSeen: boolean;
   /**
@@ -163,6 +167,7 @@ export const DEFAULT_SETTINGS: InkswellSettings = {
   excludedFromGoals: ["planning", "codex", "other"],
   challenge: null,
   storyBible: { sections: ["overview", "beats", "outline", "codex"], codexTypes: null },
+  railLayout: null,
   categoryNoticeSeen: false,
   codexCountMigrated: false,
   cjkCountMigrated: false,
