@@ -84,3 +84,20 @@ describe("WritingTracker attribution (#44: disk events never count as typing)", 
     expect(log.daily).toEqual({});
   });
 });
+
+describe("noteMovedContent (Split scene, #54)", () => {
+  it("moving text out of a scene re-baselines it without logging a negative day", async () => {
+    const { log, tracker, deltas } = setup({ "Book/Scene.md": words(100) });
+    await tracker.warmBaselines(["Book/Scene.md"]);
+    tracker.noteLiveContent("Book/Scene.md", words(120)); // 20 typed today
+    expect(log.daily[TODAY]).toBe(20);
+
+    tracker.noteMovedContent("Book/Scene.md", words(70)); // 50 moved to a new scene
+    expect(log.baselines["Book/Scene.md"]).toBe(70);
+    expect(log.daily[TODAY]).toBe(20); // not 20 − 50
+    expect(deltas).toEqual([20]);
+
+    tracker.noteLiveContent("Book/Scene.md", words(75)); // typing continues from the new baseline
+    expect(log.daily[TODAY]).toBe(25);
+  });
+});

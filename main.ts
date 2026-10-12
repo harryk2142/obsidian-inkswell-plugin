@@ -436,6 +436,26 @@ export default class InkswellPlugin extends Plugin {
       });
     }
     this.addCommand({
+      id: "split-scene",
+      name: "Split scene at cursor (Write editor)",
+      checkCallback: (checking) => {
+        const view = this.inkswellView();
+        if (!view || !view.canFormat()) return false;
+        if (!checking) view.splitScene("cursor");
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "move-selection-to-new-scene",
+      name: "Move selection to new scene (Write editor)",
+      checkCallback: (checking) => {
+        const view = this.inkswellView();
+        if (!view || !view.canFormat()) return false;
+        if (!checking) view.splitScene("selection");
+        return true;
+      },
+    });
+    this.addCommand({
       id: "quick-codex",
       name: "Create Codex entry from selection (Write editor)",
       checkCallback: (checking) => {

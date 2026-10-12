@@ -572,6 +572,11 @@ export class InkswellView extends ItemView {
     this.write.promptInsertTodo();
   }
 
+  /** Split the scene in the active Write editor (#54). */
+  splitScene(mode: "cursor" | "selection"): void {
+    void this.write.splitScene(mode);
+  }
+
   /** True when Write is active with a live editor (gates the toggle-* commands). */
   canFormat(): boolean {
     return this.mode === "write" && this.write.hasEditor();

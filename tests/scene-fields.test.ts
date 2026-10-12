@@ -126,6 +126,30 @@ describe("scene template I/O", () => {
   });
 });
 
+describe("createSceneFile with moved prose (Split scene, #54)", () => {
+  it("uses the given prose instead of the template body, keeping template properties", async () => {
+    const app = new FakeApp({
+      "Inkswell/Templates/Scene.md":
+        "---\nmood: tense\nscene-fields:\n  crisis: textarea\n---\n# {{title}}\nTemplate body.\n",
+    });
+    const file = await createSceneFile(
+      app.asApp(),
+      SETTINGS,
+      {},
+      "Book/Scenes/Split.md",
+      "Split",
+      { chapter: "One" },
+      "She ran.\n"
+    );
+    const raw = app.vault.raw(file.path);
+    expect(raw).toContain("mood: tense");
+    expect(raw).toContain("chapter: One");
+    expect(raw).toContain("She ran.");
+    expect(raw).not.toContain("Template body.");
+    expect(raw).not.toContain("scene-fields");
+  });
+});
+
 describe("custom list fields write as deltas", () => {
   const SCENE = "Book/Scenes/Alpha.md";
 
