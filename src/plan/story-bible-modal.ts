@@ -1,5 +1,5 @@
 /**
- * "Generate story bible" dialog (#50): pick what goes in — alpha readers and
+ * "Export story bible" dialog (#50): pick what goes in — alpha readers and
  * editors want different things (spoilers) — then write one note and open it.
  * The picks are remembered in `settings.storyBible`.
  */
@@ -26,7 +26,7 @@ export class StoryBibleModal extends FormModal {
     private project: Project
   ) {
     super(app);
-    this.cta = "Generate";
+    this.cta = "Export";
     const disabled = plugin.settings.disabledFeatures;
     this.groups = codexGroups(plugin, project).map((g) => ({
       id: g.id,

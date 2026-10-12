@@ -221,7 +221,7 @@ Body: one explanatory paragraph, then a fenced ```json block `{"daily": {…}, "
 
 ## G. Story bible note (generated, since 1.20)
 
-**Generate story bible** writes `<index folder>/<Title> — Story bible.md`: plain markdown assembled from the overview, the planning note, the beat sheet, the outline, and the codex (`src/plan/story-bible.ts`, I/O in `story-bible-io.ts`). It carries **no frontmatter contract**. The first line is the marker comment `<!-- inkswell:story-bible -->`. A note with the marker is replaced on the next generation without asking. A note at that path without the marker is replaced only after confirmation, with its text saved to a backup first. No pointer to the note is stored, so after a project rename the next generation writes under the new title.
+**Export story bible** writes `<index folder>/<Title> — Story bible.md`: plain markdown assembled from the overview, the planning note, the beat sheet, the outline, and the codex (`src/plan/story-bible.ts`, I/O in `story-bible-io.ts`). It carries **no frontmatter contract**. The first line is the marker comment `<!-- inkswell:story-bible -->`. A note with the marker is replaced on the next generation without asking. A note at that path without the marker is replaced only after confirmation, with its text saved to a backup first. No pointer to the note is stored, so after a project rename the next generation writes under the new title.
 
 ---
 

@@ -71,6 +71,15 @@ export class CompilePanel {
       return;
     }
 
+    // Compile ships the manuscript; planning material goes out as a story bible (#50).
+    const bible = container.createDiv({ cls: "inkswell-stats__muted inkswell-compile__bible" });
+    bible.appendText("Sharing your planning rather than the manuscript? ");
+    const link = bible.createEl("a", { text: "Export a story bible…", href: "#" });
+    link.onclick = (e) => {
+      e.preventDefault();
+      this.plugin.openStoryBible(project);
+    };
+
     const config = this.configFor(project);
 
     // Pandoc availability (cached probe; kick it off once and re-render on result).

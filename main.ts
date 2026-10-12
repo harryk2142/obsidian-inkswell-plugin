@@ -316,8 +316,8 @@ export default class InkswellPlugin extends Plugin {
         this.featureCommand(checking, "tracking", () => this.openChallengeModal()),
     });
     this.addCommand({
-      id: "generate-story-bible",
-      name: "Generate story bible",
+      id: "export-story-bible",
+      name: "Export story bible",
       checkCallback: (checking) => {
         const project = resolveActive(this.store.getProjects(), this.activeProject.get());
         if (!project) return false;

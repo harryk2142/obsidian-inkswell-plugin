@@ -387,14 +387,15 @@ export class InkswellView extends ItemView {
 
     const menuBtn = this.header.createEl("button", {
       cls: "inkswell-host__draftsmenu",
-      attr: { "aria-label": "Drafts" },
+      attr: { "aria-label": "Project actions" },
     });
     menuBtn.type = "button";
     setIcon(menuBtn, "ellipsis");
     menuBtn.onclick = (e) => this.openDraftsMenu(e, activeStory, activeDraft);
   }
 
-  /** Drafts management menu (New / Rename / Delete) for the active story. */
+  /** Project actions for the active story — rename, export, drafts. The
+   *  header shows on every destination, so this is Inkswell's "File" menu. */
   private openDraftsMenu(e: MouseEvent, story: Story, active: Project): void {
     const menu = new Menu();
     menu.addItem((i) =>
@@ -402,6 +403,12 @@ export class InkswellView extends ItemView {
         .setTitle("Rename project")
         .setIcon("text-cursor-input")
         .onClick(() => this.plugin.renameProject(active))
+    );
+    menu.addItem((i) =>
+      i
+        .setTitle("Export story bible…")
+        .setIcon("file-output")
+        .onClick(() => this.plugin.openStoryBible(active))
     );
     menu.addSeparator();
     menu.addItem((i) =>

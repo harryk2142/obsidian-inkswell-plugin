@@ -118,13 +118,7 @@ export class OverviewPanel {
     const sec = root.createDiv({ cls: "inkswell-overview__prose" });
     const head = sec.createDiv({ cls: "inkswell-overview__prosehead" });
     head.createSpan({ cls: "inkswell-overview__prosetitle", text: "Planning note" });
-    const actions = head.createDiv({ cls: "inkswell-overview__actions" });
-    const bible = actions.createEl("button", { text: "Story bible…" });
-    bible.setAttribute("aria-label", "Write a shareable story bible note");
-    // The focused draft, not the base: beats and outline are per draft.
-    bible.onclick = () =>
-      this.plugin.openStoryBible(resolveActive(this.store.getProjects(), this.active.get()) ?? project);
-    const open = actions.createEl("button", { text: "Open planning note" });
+    const open = head.createEl("button", { text: "Open planning note" });
     open.setAttribute("aria-label", "Open the planning note in an editor tab");
     open.onclick = async () => {
       const file = await tryFileOp(async () => {
