@@ -14,7 +14,7 @@
  * cache reports the note re-indexed.
  */
 
-import { App, Menu, Notice, Setting, setIcon } from "obsidian";
+import { Menu, Notice, setIcon } from "obsidian";
 import {
   deleteCustomCategory,
   openCategoryEditor,
@@ -27,42 +27,27 @@ import {
   getCodexEntities,
   resolveCodexTemplate,
 } from "../../codex/codex-store";
+import { ensureCodexTemplate, readTemplateBody, writeTemplateBody } from "../../codex/codex-template-io";
 import {
-  awaitCacheUpdate,
-  ensureCodexTemplate,
-  readTemplateBody,
-  writeTemplateBody,
-  writeTemplateFields,
-} from "../../codex/codex-template-io";
-import { knownFieldsCatalog } from "../../codex/profile-schema";
+  FIELDS_KEY,
+  RESERVED_FIELD_KEYS,
+  defaultFieldLabel,
+  knownFieldsCatalog,
+} from "../../codex/profile-schema";
 import {
   CategoryDef,
   allCategories,
   defaultBuiltinDef,
   isBuiltinCategory,
 } from "../../codex/types";
-import { FormModal } from "../../lib/form-modal";
-import { renderListEditor } from "../../lib/list-editor";
 import { tryFileOp } from "../../lib/notify";
 import { attachRowMenu } from "../../lib/row-menu";
-import { confirmDelete, openScene } from "../../scenes/scene-actions";
+import { openScene } from "../../scenes/scene-actions";
 import { resolveTemplateFolder } from "../../settings/folders";
-import { taggedInput, taggedSelect } from "../../views/panel-kit";
-import {
-  FIELD_KINDS,
-  FIELD_KIND_LABELS,
-  FieldKind,
-  FieldRow,
-  isValidNewKey,
-  keyFromLabel,
-  rowsFromFields,
-  rowsToSpec,
-} from "../field-spec";
+import { FIELD_KINDS } from "../field-spec";
+import { renderFieldSpecEditor } from "../field-spec-editor";
 import type { CustomizeSection, SectionCtx } from "../section";
 import { renderTemplateBodyEditor } from "../template-body-editor";
-
-/** The spec we just wrote, rendered until the metadata cache catches up. */
-let pending: { path: string; rows: FieldRow[] } | null = null;
 
 const CARD = { detailsCls: "inkswell-customize__card", bodyCls: "inkswell-customize__cardbody" };
 
@@ -266,8 +251,6 @@ function renderFields(body: HTMLElement, ctx: SectionCtx, cat: CategoryDef): voi
   const { app, plugin } = ctx;
   const settings: CodexSettings = plugin.settings;
   const { fields, template } = resolveProfileFields(app, settings, cat.id);
-  const rows =
-    pending && template && pending.path === template.path ? pending.rows : rowsFromFields(fields);
 
   const src = body.createDiv({ cls: "inkswell-stats__muted inkswell-customize__fieldsrc" });
   if (template) {
@@ -285,206 +268,35 @@ function renderFields(body: HTMLElement, ctx: SectionCtx, cat: CategoryDef): voi
     );
   }
 
-  const save = async (next: FieldRow[]): Promise<void> => {
-    const file =
-      template ??
-      (await tryFileOp(
-        () => ensureCodexTemplate(app, settings, cat),
-        "Couldn't create the template note."
-      ));
-    if (!file) return;
-    ctx.markSelfWrite(file.path);
-    const written = await tryFileOp(
-      () => writeTemplateFields(app, file, rowsToSpec(next, cat.id)),
-      "Couldn't save the fields."
-    );
-    if (written === null) return;
-    pending = { path: file.path, rows: next };
-    ctx.rerender();
-    void awaitCacheUpdate(app, file).then(() => {
-      if (pending?.path === file.path) pending = null;
-      ctx.rerender();
-    });
-  };
-  const update = (index: number, patch: Partial<FieldRow>): void => {
-    void save(rows.map((r, i) => (i === index ? { ...r, ...patch } : r)));
-  };
-  const prefix = `customize:fields:${cat.id}`;
-
-  renderListEditor<FieldRow>(body, {
-    items: rows,
-    keyPrefix: prefix,
-    dragType: "inkswell/customize-fields",
+  const typeLabels: Record<string, string> = Object.fromEntries(categories(ctx).map((c) => [c.id, c.label]));
+  renderFieldSpecEditor(body, ctx, {
+    keyPrefix: `customize:fields:${cat.id}`,
+    template,
+    fields,
+    ensureTemplate: () => ensureCodexTemplate(app, settings, cat),
+    specKey: FIELDS_KEY,
+    reserved: RESERVED_FIELD_KEYS,
+    defaultLabel: (key) => defaultFieldLabel(cat.id, key),
+    kinds: FIELD_KINDS,
     emptyText: "No fields yet — add one below.",
-    renderRow(el, row, index) {
-      const label = taggedInput(el, `${prefix}:label:${row.key}`, { type: "text" });
-      label.value = row.label;
-      label.placeholder = "Label";
-      label.setAttribute("aria-label", `Label for ${row.key}`);
-      label.onchange = () => update(index, { label: label.value });
-
-      el.createSpan({ cls: "inkswell-customize__key", text: row.key });
-
-      const kind = taggedSelect(el, `${prefix}:kind:${row.key}`, { cls: "dropdown" });
-      for (const k of FIELD_KINDS) kind.createEl("option", { text: FIELD_KIND_LABELS[k], value: k });
-      kind.value = row.kind;
-      kind.setAttribute("aria-label", `Type of ${row.key}`);
-      kind.onchange = () => {
-        const next = kind.value as FieldKind;
-        const patch: Partial<FieldRow> = { kind: next };
-        if (next !== "links" && next !== "link") {
-          patch.linkCategory = undefined;
-          patch.labeled = undefined;
-        }
-        if (next !== "links") patch.labeled = undefined;
-        update(index, patch);
-      };
-
-      if (row.kind === "links" || row.kind === "link") {
-        const restrict = taggedSelect(el, `${prefix}:cat:${row.key}`, { cls: "dropdown" });
-        restrict.createEl("option", { text: "Any type", value: "" });
-        for (const c of categories(ctx)) restrict.createEl("option", { text: c.label, value: c.id });
-        restrict.value = row.linkCategory ?? "";
-        restrict.setAttribute("aria-label", `Restrict ${row.key} to a type`);
-        restrict.onchange = () => update(index, { linkCategory: restrict.value || undefined });
-      }
-      if (row.kind === "links") {
-        const wrap = el.createEl("label", { cls: "inkswell-customize__check" });
-        const cb = wrap.createEl("input", { type: "checkbox" });
-        cb.checked = !!row.labeled;
-        cb.onchange = () => update(index, { labeled: cb.checked || undefined });
-        wrap.appendText(" Per-link labels");
-      }
+    reset: {
+      label: "Reset to shipped fields",
+      confirm:
+        `Use Inkswell's shipped fields for ${cat.label}? This removes the codex-fields ` +
+        `property from ${template?.basename ?? "the template"} — existing entries keep their frontmatter.`,
     },
-    onReorder: (next) => save(next),
-    onRemove: (item) => save(rows.filter((r) => r.id !== item.id)),
     add: {
-      label: "Add field…",
-      action: () =>
-        new AddFieldModal(app, {
-          category: cat.id,
-          existingKeys: rows.map((r) => r.key),
-          typeLabels: Object.fromEntries(categories(ctx).map((c) => [c.id, c.label])),
-          onAdd: (row) => void save([...rows, row]),
-        }).open(),
+      labelDesc: "What the Codex panel shows. The stored key is derived from it.",
+      catalog: (taken) =>
+        knownFieldsCatalog()
+          .filter(({ field }) => !taken.has(field.key))
+          .map(({ field, source }) => ({
+            value: `${source}|${field.key}`,
+            label:
+              field.label +
+              (source === "all" ? "" : source === "generic" ? " (custom types)" : ` (${typeLabels[source] ?? source})`),
+            field,
+          })),
     },
-    reset: template
-      ? {
-          label: "Reset to shipped fields",
-          action: () =>
-            void confirmDelete(
-              app,
-              `Use Inkswell's shipped fields for ${cat.label}? This removes the codex-fields ` +
-                `property from ${template.basename} — existing entries keep their frontmatter.`
-            ).then(async (ok) => {
-              if (!ok) return;
-              ctx.markSelfWrite(template.path);
-              const done = await tryFileOp(
-                () => writeTemplateFields(app, template, []),
-                "Couldn't reset the fields."
-              );
-              if (done === null) return;
-              pending = null;
-              ctx.rerender();
-              void awaitCacheUpdate(app, template).then(() => ctx.rerender());
-            }),
-        }
-      : undefined,
   });
-}
-
-// ---------------------------------------------------------------------------
-// Add-field dialog
-// ---------------------------------------------------------------------------
-
-interface AddFieldOptions {
-  category: string;
-  existingKeys: string[];
-  /** Type id → label, for the "add a built-in field" menu's source annotation. */
-  typeLabels: Record<string, string>;
-  onAdd: (row: FieldRow) => void;
-}
-
-class AddFieldModal extends FormModal {
-  private label = "";
-  private kind: FieldKind = "text";
-  /** `source|key` of a shipped field picked from the menu ("" = none). */
-  private builtin = "";
-  private keyLine: HTMLElement | null = null;
-
-  constructor(
-    app: App,
-    private opts: AddFieldOptions
-  ) {
-    super(app);
-    this.cta = "Add";
-  }
-
-  protected renderForm(contentEl: HTMLElement): void {
-    contentEl.createEl("h3", { text: "Add field" });
-    new Setting(contentEl)
-      .setName("Label")
-      .setDesc("What the Codex panel shows. The stored key is derived from it.")
-      .addText((t) =>
-        t.setPlaceholder("e.g. Birth date").onChange((v) => {
-          this.label = v;
-          this.refreshKeyLine();
-        })
-      );
-    this.keyLine = contentEl.createDiv({ cls: "setting-item-description" });
-    this.refreshKeyLine();
-    new Setting(contentEl)
-      .setName("Kind")
-      .addDropdown((d) => {
-        for (const k of FIELD_KINDS) d.addOption(k, FIELD_KIND_LABELS[k]);
-        d.setValue(this.kind).onChange((v) => (this.kind = v as FieldKind));
-      });
-
-    const taken = new Set(this.opts.existingKeys);
-    const options = knownFieldsCatalog().filter(({ field }) => !taken.has(field.key));
-    if (options.length > 0) {
-      new Setting(contentEl)
-        .setName("Or add one of Inkswell's built-in fields")
-        .setDesc("Keeps its label and picker — a bestiary can borrow Relationships, for example.")
-        .addDropdown((d) => {
-          d.addOption("", "—");
-          for (const { field, source } of options) {
-            const where =
-              source === "all" ? "" : source === "generic" ? " (custom types)" : ` (${this.opts.typeLabels[source] ?? source})`;
-            d.addOption(`${source}|${field.key}`, `${field.label}${where}`);
-          }
-          d.setValue("").onChange((v) => (this.builtin = v));
-        });
-    }
-  }
-
-  private refreshKeyLine(): void {
-    if (!this.keyLine) return;
-    const key = keyFromLabel(this.label);
-    // A non-blank label that derives no key starts with a digit or symbol —
-    // say so live rather than on submit.
-    this.keyLine.setText(
-      key ? `Stored as ${key}` : this.label.trim() ? "Start the label with a letter." : ""
-    );
-  }
-
-  protected submit(): boolean {
-    if (this.builtin) {
-      const [, key] = this.builtin.split("|");
-      const hit = knownFieldsCatalog().find(({ field }) => field.key === key);
-      if (hit) {
-        const row = rowsFromFields([hit.field])[0];
-        this.opts.onAdd(row);
-        return true;
-      }
-    }
-    const key = keyFromLabel(this.label);
-    const check = isValidNewKey(key, this.opts.existingKeys, this.label);
-    if (!check.ok) {
-      new Notice(check.reason);
-      return false;
-    }
-    this.opts.onAdd({ id: key, key, label: this.label.trim(), kind: this.kind });
-    return true;
-  }
 }

@@ -186,6 +186,18 @@ export class WritingTracker extends Component {
     this.applyText(path, text);
   }
 
+  /**
+   * Move a file's baseline to `text`'s count WITHOUT attributing words — for an
+   * edit that relocates prose rather than writing or deleting it (Split scene,
+   * #54: the moved text leaves this scene and arrives in a new file, whose
+   * creation is baseline-only too). Without it the removal reads as typing and
+   * today's count drops by every word moved.
+   */
+  noteMovedContent(path: string, text: string): void {
+    const count = this.countFor(text, this.classify(path));
+    if (noteBaseline(this.log, path, count)) this.save();
+  }
+
   /** Disk event: move the file's baseline to its current count, attribute nothing. */
   private async handleFile(file: TAbstractFile): Promise<void> {
     if (!(file instanceof TFile) || file.extension !== "md") return;

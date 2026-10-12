@@ -13,7 +13,7 @@
  * contextmenu handler on the same row, it would be clobbered.
  */
 
-import { Menu, setIcon } from "obsidian";
+import { Keymap, Menu, Platform, setIcon } from "obsidian";
 
 export function attachRowMenu(row: HTMLElement, host: HTMLElement, build: () => Menu): void {
   const open = (e: MouseEvent) => {
@@ -31,4 +31,44 @@ export function attachRowMenu(row: HTMLElement, host: HTMLElement, build: () => 
   setIcon(btn, "more-vertical");
   btn.setAttribute("aria-label", "More actions");
   btn.onclick = open;
+}
+
+/**
+ * Ctrl/Cmd-click or middle-click on `el` runs `open` (a scene → a regular
+ * Obsidian tab, like Ctrl/Cmd-clicking a wikilink) INSTEAD of the element's
+ * own click (#53). A plain click is untouched.
+ *
+ * The modifier check is a capture-phase listener that stops the event, so the
+ * row's own `onclick` (select / open in Write / edit dialog) never runs.
+ * `Keymap.isModEvent` is Cmd on macOS, where Ctrl-click stays the context menu.
+ * A mod-click without pointer movement never starts a drag, so draggable rows
+ * are fine. Middle-click fires `auxclick`, not `click`; its mousedown is
+ * cancelled so Windows doesn't enter autoscroll. Touch has no modifier — the
+ * row menu's "Open in new tab" is the equivalent there.
+ */
+export function attachOpenInTab(el: HTMLElement, open: () => void): void {
+  el.addEventListener(
+    "click",
+    (e) => {
+      if (!Keymap.isModEvent(e)) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      open();
+    },
+    { capture: true }
+  );
+  el.addEventListener("mousedown", (e) => {
+    if (e.button === 1) e.preventDefault();
+  });
+  el.addEventListener("auxclick", (e) => {
+    if (e.button !== 1) return;
+    e.preventDefault();
+    e.stopPropagation();
+    open();
+  });
+  if (!Platform.isMobile) {
+    const hint = "Ctrl/Cmd-click to open in a new tab";
+    const label = el.getAttribute("aria-label");
+    el.setAttribute("aria-label", label ? `${label} · ${hint}` : hint);
+  }
 }

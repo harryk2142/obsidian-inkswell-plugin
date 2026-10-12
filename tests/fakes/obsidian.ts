@@ -187,9 +187,17 @@ export class Setting {
 
 export function setIcon(_el: unknown, _icon: string): void {}
 
+/** Obsidian's platform modifier check, approximated (Ctrl or Cmd). */
+export class Keymap {
+  static isModEvent(evt?: { ctrlKey?: boolean; metaKey?: boolean } | null): boolean {
+    return !!evt && (!!evt.ctrlKey || !!evt.metaKey);
+  }
+}
+
 /** Mutable so tests can flip form-factor flags (reset them in afterEach). */
 export const Platform = {
   isDesktopApp: true,
+  isMobile: false,
   isMobileApp: false,
   isPhone: false,
   isTablet: false,

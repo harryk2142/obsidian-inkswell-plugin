@@ -215,14 +215,18 @@ export const RESERVED_FIELD_KEYS = new Set([
  * Returns null when the value is absent or not one of those shapes — callers
  * then use the shipped fields — and [] for an empty list (also = shipped).
  */
-export function parseFieldSpec(raw: unknown): FieldSpec[] | null {
+export function parseFieldSpec(
+  raw: unknown,
+  /** Keys that may not become fields — the codex set by default; scenes pass theirs. */
+  reserved: ReadonlySet<string> = RESERVED_FIELD_KEYS
+): FieldSpec[] | null {
   if (raw === undefined || raw === null) return null;
   const out: FieldSpec[] = [];
   const seen = new Set<string>();
   const push = (keyRaw: unknown, hintRaw?: unknown): void => {
     if (typeof keyRaw !== "string") return;
     const key = keyRaw.trim();
-    if (!key || RESERVED_FIELD_KEYS.has(key) || seen.has(key)) return;
+    if (!key || reserved.has(key) || seen.has(key)) return;
     seen.add(key);
     const spec: FieldSpec = { key };
     if (typeof hintRaw === "string") {
@@ -338,13 +342,14 @@ export type FieldSpecValue = string | { type?: string; label?: string } | null;
  * dropped first, matching the parser.
  */
 export function serializeFieldSpec(
-  spec: readonly FieldSpec[]
+  spec: readonly FieldSpec[],
+  reserved: ReadonlySet<string> = RESERVED_FIELD_KEYS
 ): Record<string, FieldSpecValue> | Record<string, FieldSpecValue>[] {
   const entries: [string, FieldSpecValue][] = [];
   const seen = new Set<string>();
   for (const s of spec) {
     const key = s.key.trim();
-    if (!key || RESERVED_FIELD_KEYS.has(key) || seen.has(key)) continue;
+    if (!key || reserved.has(key) || seen.has(key)) continue;
     seen.add(key);
     const type = s.type?.trim() || undefined;
     const label = s.label?.trim() || undefined;

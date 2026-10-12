@@ -9,7 +9,7 @@
  * change; panels are created once and keep their own state across switches.
  */
 
-import { ItemView, Menu, Notice, TFile, WorkspaceLeaf, setIcon } from "obsidian";
+import { ItemView, Menu, Notice, Platform, TFile, WorkspaceLeaf, setIcon } from "obsidian";
 import { isMobileApp, isPhone, renderPhoneRedirect } from "../lib/platform";
 import { preserveFocus } from "../lib/focus-preserve";
 import { preserveScroll, preserveUi, tagScroller } from "../lib/scroll-preserve";
@@ -41,18 +41,25 @@ import { SearchPanel } from "./search-panel";
 import { SceneInspector } from "../scenes/scene-inspector";
 import { HelpPanel } from "../help/help-panel";
 import { CustomizePanel } from "../customize/customize-panel";
-import { attachHideMenu } from "../lib/hide-menu";
+import { addHideItem, attachHideMenu } from "../lib/hide-menu";
 import { renderHint } from "../help/hint";
 import { hintKey } from "../help/help-content";
 import { PhoneShell } from "./phone/phone-shell";
 import { openMoreSheet } from "./phone/more-sheet";
 import {
   DESTINATIONS,
+  Destination,
   InkswellMode,
   PHONE_REDIRECTED,
   RAIL_FOOTER_GROUP,
+  RailLayout,
+  RailSection,
   destinationEnabled,
   enabledSubtabs,
+  isDefaultRailLayout,
+  moveRailItem,
+  nudgeRailItem,
+  resolveRailLayout,
   resolveSubtab,
 } from "./nav-model";
 import type InkswellPlugin from "../../main";
@@ -89,6 +96,10 @@ export class InkswellView extends ItemView {
   /** Phone-only single-column drill-down target per destination (null = list). */
   private detail: Partial<Record<InkswellMode, string | null>> = {};
   private rail!: HTMLElement;
+  /** The layout the rail was last built from (rebuild when settings change it). */
+  private railSig = "";
+  /** The destination being dragged on the rail (dataTransfer is unreadable in dragover). */
+  private railDragId: InkswellMode | null = null;
   private header!: HTMLElement;
   private body!: HTMLElement;
   /** Phone bottom-bar chrome (built once, hidden on wider screens via CSS). */
@@ -202,29 +213,7 @@ export class InkswellView extends ItemView {
     root.addClass("inkswell-host");
 
     this.rail = root.createDiv({ cls: "inkswell-rail" });
-    // Draw a divider whenever the group changes between consecutive destinations
-    // (groups are contiguous runs in DESTINATIONS). The divider that begins the
-    // footer group gets `--push` so CSS floats that group to the bottom. Sprint
-    // is intentionally absent — it's an action, not a destination (reachable from
-    // the Write topbar, the status bar, and the command palette).
-    let prevGroup: string | null = null;
-    for (const dest of DESTINATIONS) {
-      if (prevGroup !== null && dest.group !== prevGroup) {
-        const sep = this.rail.createDiv({ cls: "inkswell-rail__separator" });
-        if (dest.group === RAIL_FOOTER_GROUP) sep.addClass("inkswell-rail__separator--push");
-      }
-      prevGroup = dest.group;
-      const item = this.rail.createDiv({ cls: "inkswell-rail__item" });
-      setIcon(item.createSpan({ cls: "inkswell-rail__icon" }), dest.icon);
-      item.createSpan({ cls: "inkswell-rail__label", text: dest.label });
-      item.dataset.dest = dest.id;
-      item.setAttribute("aria-label", dest.label);
-      item.onclick = () => this.setMode(dest.id);
-      // A feature-gated destination (Track) can be hidden in place like a sub-tab;
-      // visibility itself is applied per render (renderActive) since the rail is
-      // built once.
-      if (dest.feature) attachHideMenu(item, this.plugin, dest.feature, dest.label);
-    }
+    this.buildRail();
 
     // Right of the rail: a persistent header (project selector) above the body.
     // The header lives OUTSIDE the body so renderActive()'s body.empty() never
@@ -398,14 +387,15 @@ export class InkswellView extends ItemView {
 
     const menuBtn = this.header.createEl("button", {
       cls: "inkswell-host__draftsmenu",
-      attr: { "aria-label": "Drafts" },
+      attr: { "aria-label": "Project actions" },
     });
     menuBtn.type = "button";
     setIcon(menuBtn, "ellipsis");
     menuBtn.onclick = (e) => this.openDraftsMenu(e, activeStory, activeDraft);
   }
 
-  /** Drafts management menu (New / Rename / Delete) for the active story. */
+  /** Project actions for the active story — rename, export, drafts. The
+   *  header shows on every destination, so this is Inkswell's "File" menu. */
   private openDraftsMenu(e: MouseEvent, story: Story, active: Project): void {
     const menu = new Menu();
     menu.addItem((i) =>
@@ -413,6 +403,12 @@ export class InkswellView extends ItemView {
         .setTitle("Rename project")
         .setIcon("text-cursor-input")
         .onClick(() => this.plugin.renameProject(active))
+    );
+    menu.addItem((i) =>
+      i
+        .setTitle("Export story bible…")
+        .setIcon("file-output")
+        .onClick(() => this.plugin.openStoryBible(active))
     );
     menu.addSeparator();
     menu.addItem((i) =>
@@ -583,6 +579,11 @@ export class InkswellView extends ItemView {
     this.write.promptInsertTodo();
   }
 
+  /** Split the scene in the active Write editor (#54). */
+  splitScene(mode: "cursor" | "selection"): void {
+    void this.write.splitScene(mode);
+  }
+
   /** True when Write is active with a live editor (gates the toggle-* commands). */
   canFormat(): boolean {
     return this.mode === "write" && this.write.hasEditor();
@@ -658,12 +659,10 @@ export class InkswellView extends ItemView {
     if (current && !destinationEnabled(current, disabled)) this.mode = "home";
 
     // Rail highlight (desktop/tablet) + bottom-bar highlight (phone). The rail
-    // is built once in onOpen, so feature-gated visibility is applied here.
-    this.rail.querySelectorAll<HTMLElement>(".inkswell-rail__item").forEach((b) => {
-      b.toggleClass("is-active", b.dataset.dest === this.mode);
-      const dest = DESTINATIONS.find((d) => d.id === b.dataset.dest);
-      b.toggleClass("is-hidden", !!dest && !destinationEnabled(dest, disabled));
-    });
+    // is rebuilt only when its arrangement changed (e.g. synced from another
+    // device); feature-gated visibility is applied on every render.
+    if (JSON.stringify(this.railLayout()) !== this.railSig) this.buildRail();
+    this.syncRail();
     if (isPhone()) {
       this.phone.setActive(this.mode);
       this.phone.alignAboveNavbar();
@@ -737,6 +736,169 @@ export class InkswellView extends ItemView {
    *  its position only when it re-renders that same screen. */
   private contentScrollKey(): string {
     return `content:${this.mode}:${this.effectiveSubtab(this.mode) ?? ""}:${this.detail[this.mode] ?? ""}`;
+  }
+
+  // --- Rail ----------------------------------------------------------------
+  // Home first, the tools footer pinned to the bottom; between them the writer's
+  // two sections (#55), split by one divider, rearranged by dragging (desktop)
+  // or the item menu's Move up / Move down (everywhere).
+
+  private railLayout(): RailLayout {
+    return resolveRailLayout(this.plugin.settings.railLayout);
+  }
+
+  private buildRail(): void {
+    const rail = this.rail;
+    rail.empty();
+    const layout = this.railLayout();
+    this.railSig = JSON.stringify(layout);
+    const byId = (id: InkswellMode) => DESTINATIONS.find((d) => d.id === id);
+    for (const d of DESTINATIONS.filter((x) => x.group === "hub")) this.railItem(d, null);
+    this.railSeparator("upper");
+    for (const id of layout.upper) {
+      const d = byId(id);
+      if (d) this.railItem(d, "upper");
+    }
+    this.railSeparator("lower");
+    for (const id of layout.lower) {
+      const d = byId(id);
+      if (d) this.railItem(d, "lower");
+    }
+    // The divider that begins the footer floats it to the bottom (CSS --push).
+    rail.createDiv({ cls: "inkswell-rail__separator inkswell-rail__separator--push" });
+    for (const d of DESTINATIONS.filter((x) => x.group === RAIL_FOOTER_GROUP)) this.railItem(d, null);
+  }
+
+  /** Active/hidden state + the divider, which only shows when both sections
+   *  have a visible destination. */
+  private syncRail(): void {
+    const disabled = this.plugin.settings.disabledFeatures;
+    const visible = (id: string | undefined) => {
+      const dest = DESTINATIONS.find((d) => d.id === id);
+      return !!dest && destinationEnabled(dest, disabled);
+    };
+    this.rail.querySelectorAll<HTMLElement>(".inkswell-rail__item").forEach((b) => {
+      b.toggleClass("is-active", b.dataset.dest === this.mode);
+      b.toggleClass("is-hidden", !visible(b.dataset.dest));
+    });
+    const layout = this.railLayout();
+    const divider = this.rail.querySelector<HTMLElement>('.inkswell-rail__separator[data-section="lower"]');
+    divider?.toggleClass("is-empty", !(layout.upper.some(visible) && layout.lower.some(visible)));
+  }
+
+  /** A section boundary; while arranging, dropping on it puts the item first in `section`. */
+  private railSeparator(section: RailSection): void {
+    const sep = this.rail.createDiv({ cls: "inkswell-rail__separator" });
+    sep.dataset.section = section;
+    sep.addEventListener("dragover", (e) => {
+      if (!this.railDragId) return;
+      e.preventDefault();
+      sep.addClass("is-drop-target");
+    });
+    sep.addEventListener("dragleave", () => sep.removeClass("is-drop-target"));
+    sep.addEventListener("drop", (e) => {
+      e.preventDefault();
+      const id = this.railDragId;
+      if (id) this.saveRail(moveRailItem(this.railLayout(), id, section, 0));
+    });
+  }
+
+  private railItem(dest: Destination, section: RailSection | null): void {
+    const item = this.rail.createDiv({ cls: "inkswell-rail__item" });
+    setIcon(item.createSpan({ cls: "inkswell-rail__icon" }), dest.icon);
+    item.createSpan({ cls: "inkswell-rail__label", text: dest.label });
+    item.dataset.dest = dest.id;
+    item.setAttribute("aria-label", dest.label);
+    item.onclick = () => this.setMode(dest.id);
+    if (!section) {
+      // Fixed items (Home, the footer) only offer Hide, when gated by a feature.
+      if (dest.feature) attachHideMenu(item, this.plugin, dest.feature, dest.label);
+      return;
+    }
+
+    // Right-click / long-press: arrange, reset, and (Track) hide in place.
+    item.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      const menu = new Menu();
+      const disabled = this.plugin.settings.disabledFeatures;
+      const isVisible = (id: InkswellMode) => {
+        const d = DESTINATIONS.find((x) => x.id === id);
+        return !!d && destinationEnabled(d, disabled);
+      };
+      const layout = this.railLayout();
+      const steps: [string, string, -1 | 1][] = [
+        ["Move up", "arrow-up", -1],
+        ["Move down", "arrow-down", 1],
+      ];
+      for (const [title, icon, dir] of steps) {
+        const next = nudgeRailItem(layout, dest.id, dir, isVisible);
+        if (JSON.stringify(next) === JSON.stringify(layout)) continue;
+        menu.addItem((i) => i.setTitle(title).setIcon(icon).onClick(() => this.saveRail(next)));
+      }
+      if (this.plugin.settings.railLayout) {
+        menu.addItem((i) =>
+          i
+            .setTitle("Reset rail order")
+            .setIcon("rotate-ccw")
+            .onClick(() => this.saveRail(resolveRailLayout(null)))
+        );
+      }
+      if (dest.feature) {
+        menu.addSeparator();
+        addHideItem(menu, this.plugin, dest.feature, dest.label);
+      }
+      menu.showAtMouseEvent(e);
+    });
+
+    // Drag to arrange (desktop; touch reaches the same moves through the menu).
+    if (Platform.isMobile) return;
+    item.draggable = true;
+    const clearMarks = () => item.removeClass("is-drop-before", "is-drop-after");
+    const after = (e: DragEvent) => {
+      const r = item.getBoundingClientRect();
+      return e.clientY > r.top + r.height / 2;
+    };
+    item.addEventListener("dragstart", (e) => {
+      this.railDragId = dest.id;
+      e.dataTransfer?.setData("text/plain", dest.id);
+      if (e.dataTransfer) e.dataTransfer.effectAllowed = "move";
+      this.rail.addClass("is-arranging");
+      item.addClass("is-dragging");
+    });
+    item.addEventListener("dragend", () => {
+      this.railDragId = null;
+      this.rail.removeClass("is-arranging");
+      item.removeClass("is-dragging");
+      this.rail
+        .querySelectorAll(".is-drop-before, .is-drop-after, .is-drop-target")
+        .forEach((el) => el.removeClass("is-drop-before", "is-drop-after", "is-drop-target"));
+    });
+    item.addEventListener("dragover", (e) => {
+      if (!this.railDragId || this.railDragId === dest.id) return;
+      e.preventDefault();
+      const a = after(e);
+      item.toggleClass("is-drop-after", a);
+      item.toggleClass("is-drop-before", !a);
+    });
+    item.addEventListener("dragleave", clearMarks);
+    item.addEventListener("drop", (e) => {
+      e.preventDefault();
+      const id = this.railDragId;
+      if (!id || id === dest.id) return;
+      const layout = this.railLayout();
+      const list = layout[section].filter((x) => x !== id);
+      const at = list.indexOf(dest.id) + (after(e) ? 1 : 0);
+      this.saveRail(moveRailItem(layout, id, section, at));
+    });
+  }
+
+  /** Persist an arrangement (null when it's the shipped one) and redraw the rail. */
+  private saveRail(layout: RailLayout): void {
+    this.railDragId = null;
+    this.plugin.settings.railLayout = isDefaultRailLayout(layout) ? null : layout;
+    void this.plugin.saveSettings();
+    this.buildRail();
+    this.syncRail();
   }
 
   /** True while an editable field inside the body has focus. */

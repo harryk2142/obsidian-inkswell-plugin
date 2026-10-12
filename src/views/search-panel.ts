@@ -33,6 +33,7 @@ import {
 import { renderEmptyState } from "./panel-kit";
 import { SceneHighlight } from "./write-panel";
 import { FormModal } from "../lib/form-modal";
+import { openSceneOnModClick } from "../scenes/scene-actions";
 
 /** Host-provided coordination so the panel never reaches into other panels directly. */
 export interface SearchPanelCallbacks {
@@ -508,6 +509,7 @@ export class SearchPanel {
         header.createSpan({ cls: "inkswell-search__badge", text: "archived" });
       }
       header.onclick = () => this.cb.onOpenInWrite(g.path);
+      openSceneOnModClick(header, this.app, g.path);
 
       for (const m of g.matches) {
         const row = this.listEl.createDiv({ cls: "inkswell-search__hit" });
@@ -525,6 +527,7 @@ export class SearchPanel {
             this.cb.onOpenInWrite(g.path, { from: m.from, to: m.to, verify: m.text });
           }
         };
+        openSceneOnModClick(row, this.app, g.path);
       }
     }
   }

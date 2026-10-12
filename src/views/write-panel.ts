@@ -52,8 +52,12 @@ import { isPhone } from "../lib/platform";
 import { attachHideMenu } from "../lib/hide-menu";
 import { nearestIndexOf } from "../lib/text-locate";
 import { attachRowMenu } from "../lib/row-menu";
-import { addSceneMenuItems } from "../scenes/scene-actions";
-import { promptNewScene } from "../outliner/create-scene";
+import {
+  addSceneMenuItems,
+  openSceneOnModClick,
+  promptText as promptForText,
+} from "../scenes/scene-actions";
+import { createScene, promptNewScene } from "../outliner/create-scene";
 import { PromptModal } from "../ideation/prompt-modal";
 import { writingPrompts } from "../ideation/prompts";
 import { RevisionModal } from "../revisions/revision-modal";
@@ -198,6 +202,9 @@ export class WritePanel implements HoverParent {
    *  a save → store-refresh → panel rebuild that destroys the editor mid-insert.
    *  See {@link openInsertMenu}. */
   private suppressBlurSave = false;
+  /** Set around a Split-scene edit: the removed text moved to another scene,
+   *  so it must re-baseline the tracker instead of counting as deleted words. */
+  private movedEdit = false;
   /** A token to scroll-to + flash once the editor finishes loading (Todos / Search). */
   private pendingHighlight: SceneHighlight | null = null;
 
@@ -343,6 +350,19 @@ export class WritePanel implements HoverParent {
     menu.addSeparator();
     menu.addItem((item) =>
       item
+        .setTitle("Split scene here…")
+        .setIcon("scissors")
+        .onClick(() => void this.splitScene("cursor"))
+    );
+    menu.addItem((item) =>
+      item
+        .setTitle("Move selection to new scene…")
+        .setIcon("file-output")
+        .onClick(() => void this.splitScene("selection"))
+    );
+    menu.addSeparator();
+    menu.addItem((item) =>
+      item
         .setTitle("New Codex entry from selection…")
         .setIcon("book-user")
         .onClick(() => this.quickCodex())
@@ -422,6 +442,80 @@ export class WritePanel implements HoverParent {
    * — and a rebuilt editor means the link is NOT inserted (we say so) rather
    * than landing in the wrong place.
    */
+  /**
+   * Split scene (#54). "cursor": everything from the cursor to the end moves
+   * to a new scene; "selection": just the selected text does. The new scene
+   * is inserted right after this one (same act/chapter) and opened.
+   *
+   * Order is the safety: the new scene is created FIRST, and the text leaves
+   * this scene only once that file exists and the editor still shows exactly
+   * the text we copied — a failure never loses prose. The removal is an
+   * ordinary editor change (undo restores it here; the new scene stays).
+   */
+  async splitScene(mode: "cursor" | "selection"): Promise<void> {
+    const view = this.editor;
+    const file = this.currentFile;
+    if (!view || !file || view.composing) return;
+    const projects = this.store.getProjects().filter((p) => p.draft.format === "scenes");
+    const project = resolveActive(projects, this.plugin.activeProject.get());
+    const scene = project?.scenes.find((s) => s.path === file.path);
+    if (!project || !scene) return;
+
+    const sel = view.state.selection.main;
+    const doc = view.state.doc.toString();
+    const range = mode === "selection" ? { from: sel.from, to: sel.to } : { from: sel.head, to: doc.length };
+    const text = doc.slice(range.from, range.to);
+    if (!text.trim()) {
+      new Notice(
+        mode === "selection" ? "Select the text to move first." : "There's nothing after the cursor to split off."
+      );
+      return;
+    }
+
+    const token = this.editorToken;
+    this.suppressBlurSave = true;
+    let title: string | null;
+    try {
+      title = await promptForText(this.app, {
+        title: mode === "selection" ? "Move selection to a new scene" : "Split scene here",
+        value: "",
+        multiline: false,
+        cta: "Create scene",
+      });
+    } finally {
+      this.suppressBlurSave = false;
+    }
+    if (!title?.trim()) return;
+
+    // 1. The new scene, carrying the text (leading blank lines dropped).
+    const meta = readSceneMeta(this.app, file);
+    const seed: Partial<SceneMeta> = {};
+    if (meta.act) seed.act = meta.act;
+    if (meta.chapter) seed.chapter = meta.chapter;
+    const created = await createScene(this.app, this.store, this.plugin.settings, project, {
+      title,
+      afterTitle: scene.title,
+      meta: seed,
+      body: text.replace(/^\s*\n/, ""),
+    });
+    if (!created) return; // createScene already said why (name taken / write failed)
+
+    // 2. Remove it here — only if this is still the same editor showing the same text.
+    if (this.editor !== view || token !== this.editorToken || view.state.doc.sliceString(range.from, range.to) !== text) {
+      new Notice(`Created “${created.basename}”, but the scene changed meanwhile — the text was left in place too.`);
+      return;
+    }
+    this.movedEdit = true;
+    view.dispatch({ changes: { from: range.from, to: range.to, insert: "" }, userEvent: "delete.split" });
+    this.movedEdit = false; // consumed by onEditorChange; never leak to the next edit
+    await this.session?.save();
+
+    // 3. Continue in the new scene.
+    new Notice(`Moved ${countWords(text).toLocaleString()} words to “${created.basename}”.`);
+    this.selectedScene = created.path;
+    this.rerender();
+  }
+
   quickCodex(): void {
     const view = this.editor;
     const file = this.currentFile;
@@ -966,6 +1060,9 @@ export class WritePanel implements HoverParent {
         return menu;
       });
     }
+    // Ctrl/Cmd- or middle-click: open in a regular tab and leave Write's
+    // selection alone (the handler stops the event before onclick runs).
+    openSceneOnModClick(row, this.app, scene.path);
     row.onclick = () => {
       if (!scene.path) return;
       // Re-clicking the open scene must NOT rebuild the editor — the old
@@ -1241,6 +1338,18 @@ export class WritePanel implements HoverParent {
    *  to the tracker, and (re)arm the session's autosave — typed text reaches
    *  disk within ~2s even if the editor is never blurred again. */
   private onEditorChange(): void {
+    // A Split-scene edit relocated prose to another scene: move the baseline,
+    // don't log the removal as deleted words (#54).
+    if (this.movedEdit && this.editor && this.currentFile) {
+      this.movedEdit = false;
+      this.plugin.tracker.noteMovedContent(
+        this.currentFile.path,
+        (this.session?.loadedFrontmatter ?? "") + this.editor.state.doc.toString()
+      );
+      this.updateCount();
+      this.session?.noteChange();
+      return;
+    }
     // Report first so the count's "today" figure includes this edit.
     this.reportLiveCount();
     this.updateCount();

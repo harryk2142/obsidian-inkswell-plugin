@@ -50,6 +50,8 @@ import {
 } from "./src/settings/settings";
 import { normalizeListOverrides } from "./src/settings/overridable-lists";
 import { ChallengeModal } from "./src/goals/challenge-modal";
+import { StoryBibleModal } from "./src/plan/story-bible-modal";
+import { isDefaultRailLayout, resolveRailLayout } from "./src/views/nav-model";
 import {
   ChallengeProgress,
   challengeProgress,
@@ -96,6 +98,10 @@ function readSettings(stored: Partial<InkswellSettings> | undefined): InkswellSe
   settings.customBeatTemplates = normalizeCustomBeatTemplates(settings.customBeatTemplates);
   settings.listOverrides = normalizeListOverrides(settings.listOverrides);
   settings.challenge = normalizeChallenge(settings.challenge);
+  if (settings.railLayout) {
+    const rail = resolveRailLayout(settings.railLayout);
+    settings.railLayout = isDefaultRailLayout(rail) ? null : rail;
+  }
   return settings;
 }
 
@@ -310,6 +316,16 @@ export default class InkswellPlugin extends Plugin {
         this.featureCommand(checking, "tracking", () => this.openChallengeModal()),
     });
     this.addCommand({
+      id: "export-story-bible",
+      name: "Export story bible",
+      checkCallback: (checking) => {
+        const project = resolveActive(this.store.getProjects(), this.activeProject.get());
+        if (!project) return false;
+        if (!checking) this.openStoryBible(project);
+        return true;
+      },
+    });
+    this.addCommand({
       id: "new-scene",
       name: "New scene",
       checkCallback: (checking) => {
@@ -419,6 +435,26 @@ export default class InkswellPlugin extends Plugin {
         },
       });
     }
+    this.addCommand({
+      id: "split-scene",
+      name: "Split scene at cursor (Write editor)",
+      checkCallback: (checking) => {
+        const view = this.inkswellView();
+        if (!view || !view.canFormat()) return false;
+        if (!checking) view.splitScene("cursor");
+        return true;
+      },
+    });
+    this.addCommand({
+      id: "move-selection-to-new-scene",
+      name: "Move selection to new scene (Write editor)",
+      checkCallback: (checking) => {
+        const view = this.inkswellView();
+        if (!view || !view.canFormat()) return false;
+        if (!checking) view.splitScene("selection");
+        return true;
+      },
+    });
     this.addCommand({
       id: "quick-codex",
       name: "Create Codex entry from selection (Write editor)",
@@ -611,6 +647,11 @@ export default class InkswellPlugin extends Plugin {
     await this.saveSettings();
     this.logSync.setEnabled(on);
     this.refreshView();
+  }
+
+  /** Pick sections and write the project's story bible note (#50). */
+  openStoryBible(project: Project): void {
+    new StoryBibleModal(this.app, this, project).open();
   }
 
   /** Set up / edit / clear the writing challenge. */

@@ -56,6 +56,7 @@ Flat top-level keys on each scene file. Field names match StoryLine where they o
 | `plotlines` | string[] | Plotlines this scene advances — plain titles matching `inkswell.plotlines` entries (like `act`/`chapter` strings, NOT wikilinks) |
 | `targetWords` | number | Per-scene word-count target |
 | `notes` | string (multiline) | Free-form working notes shown in the Scene Inspector (since 1.19) — e.g. an outline to draft against. Only a string is read or written; a non-text `notes` value from another tool is left untouched and the field is shown disabled. |
+| *writer-defined* | per its kind | **Your own scene fields** (since 1.20, #52): any key listed in the vault-wide scene template note's `scene-fields` (Customize → Scene inspector fields → Your fields). Same format as a codex template's `codex-fields`: an ordered map of `key → type hint` or `{type, label}`, with kinds `text` · `textarea` · `number` · `list` · `links[:type][:labeled]` · `link[:type]` (no `image`). Values use the codex encoding (links as `"[[Name]]"` strings/lists). Shown only in the Scene Inspector; Board, Grid, compile and the story bible ignore them. Removing a definition never deletes stored values. Reserved (never a custom key): every key above, the `rev*` audit keys, `scene-fields`, `codex-fields`, `codex*`, `aliases`, `tags`, `cssclasses`. `scene-fields` itself lives only on the template note and is stripped from new scenes. Source: `src/scenes/scene-fields.ts`. |
 
 ### Scene note — `rev*` revision-audit keys
 
@@ -186,7 +187,7 @@ Types: `text` (default) · `textarea` · `number` (a bare YAML number — the pa
 
 ## E. Plugin-local data (not in any vault note)
 
-For completeness: writing history & baselines, daily word counts, streaks, sprint records, ideas inbox, active project, daily mood, and the writing challenge (`settings.challenge`: `{name, start, end, target}`, dates YYYY-MM-DD inclusive, normalized on load by `normalizeChallenge` in `src/goals/challenge.ts`) live in the plugin's local `data.json`, **not** in vault frontmatter. They are intentionally outside this compatibility contract (machine-local, not synced as note content).
+For completeness: writing history & baselines, daily word counts, streaks, sprint records, ideas inbox, active project, daily mood, and the writing challenge (`settings.challenge`: `{name, start, end, target}`, dates YYYY-MM-DD inclusive, normalized on load by `normalizeChallenge` in `src/goals/challenge.ts`), the story bible dialog's last picks (`settings.storyBible`: `{sections, codexTypes}`, `codexTypes` null = all types), and the rail arrangement (`settings.railLayout`: `{upper, lower}` destination ids either side of the rail's divider; null = shipped order; normalized by `resolveRailLayout` in `src/views/nav-model.ts`) live in the plugin's local `data.json`, **not** in vault frontmatter. They are intentionally outside this compatibility contract (machine-local, not synced as note content).
 
 ### E.1 List overrides — `settings.listOverrides` (Customize)
 
@@ -200,7 +201,7 @@ One optional entry per overridable list id, each a `ListOverride`: `{ hidden?: i
 | `publishing` | the publishing checklist (`inkswell.publishing.checklist`) | `pt` (phases `pg`) | yes (`optional?` extra) | yes |
 | `prompts` | writing prompts (ids = `p` + FNV-1a of `phase\|category\|text`) | `wp` | yes (`phase`, `category`) | — |
 | `scene.status` | the six statuses | — | **no** | — |
-| `scene.fields` | the Scene Inspector rows (`status` · `subtitle` · `synopsis` · `pov` · `characters` · `location` · `structure` · `plotlines` · `targetWords` · `color` · `notes` · `inactive`) — display only, scene keys are untouched | — | **no** | — |
+| `scene.fields` | the Scene Inspector rows (`status` · `subtitle` · `synopsis` · `pov` · `characters` · `location` · `structure` · `plotlines` · `targetWords` · `color` · `custom` (the writer's own fields as one block) · `notes` · `inactive`) — display only, scene keys are untouched | — | **no** | — |
 
 Invariants: hiding never touches stored state and hidden items count toward nothing; renames keep the id; custom ids are minted (`newListItemId`), never derived from labels; stale ids in frontmatter are preserved and ignored; reset = delete the list's key. Frontmatter keys above accept custom ids additively — no existing key changes meaning.
 
@@ -217,6 +218,12 @@ Written only when **Settings → Sync writing history across devices** is on: on
 | `updated` | string | ISO timestamp of the last mirror. |
 
 Body: one explanatory paragraph, then a fenced ```json block `{"daily": {…}, "dailyBy": {…}, "sprints": […]}` with the same shapes as `data.json`'s `writingLog` (SCHEMA §E), minus `baselines` (device-local by design) and `mood`/`nextUp` (not merged). Readers (`parseDeviceLog`, `src/tracking/device-log.ts`) tolerate bare/quoted scalars and drop malformed entries; the merge (`mergeLogs`) sums days and category buckets and pools sprints de-duplicated on `start + durationSec`. The tracker classifies these notes as `null` (never counted as words). A note whose device id no longer exists anywhere (site data cleared) keeps merging until the user deletes it.
+
+## G. Story bible note (generated, since 1.20)
+
+**Export story bible** writes `<index folder>/<Title> — Story bible.md`: plain markdown assembled from the overview, the planning note, the beat sheet, the outline, and the codex (`src/plan/story-bible.ts`, I/O in `story-bible-io.ts`). It carries **no frontmatter contract**. The first line is the marker comment `<!-- inkswell:story-bible -->`. A note with the marker is replaced on the next generation without asking. A note at that path without the marker is replaced only after confirmation, with its text saved to a backup first. No pointer to the note is stored, so after a project rename the next generation writes under the new title.
+
+---
 
 ## Backward-compatibility allowances
 

@@ -12,9 +12,12 @@ import { ProjectStore } from "../projects/project-store";
 import { Project, isMultiScene } from "../projects/types";
 import { SceneMeta, defaultNewSceneStatus, writeSceneMeta } from "../scenes/scene-meta";
 import { sceneTemplateCandidates } from "../scenes/scene-template";
+import { SCENE_FIELDS_KEY } from "../scenes/scene-fields";
+import { FIELDS_KEY } from "../codex/profile-schema";
 import { FolderSettings, sanitizeSegment } from "../settings/folders";
 import type { ListOverrideSettings } from "../settings/overridable-lists";
 import { applyTemplateVars } from "../lib/template";
+import { splitFrontmatter } from "../lib/frontmatter";
 import { tryFileOp } from "../lib/notify";
 
 export interface CreateSceneOptions {
@@ -27,6 +30,8 @@ export interface CreateSceneOptions {
   meta?: Partial<SceneMeta>;
   /** Indent for the new entry when not derived from afterTitle. */
   indent?: number;
+  /** Prose for the new scene instead of the template's body (Split scene). */
+  body?: string;
 }
 
 /**
@@ -57,17 +62,26 @@ export async function createSceneFile(
   draft: { sceneTemplate?: string | null },
   path: string,
   title: string,
-  patch: Partial<SceneMeta> = {}
+  patch: Partial<SceneMeta> = {},
+  /** Prose for the new scene in place of the template's body (Split scene,
+   *  #54). The template's frontmatter still applies. */
+  prose?: string
 ): Promise<TFile> {
   const template = resolveSceneTemplate(app, settings, draft);
-  const body = template
+  const scaffold = template
     ? applyTemplateVars(await app.vault.cachedRead(template), { title })
     : "";
+  const body = prose === undefined ? scaffold : splitFrontmatter(scaffold).frontmatter + prose;
   const file = await app.vault.create(path, body);
   // The app never writes a status the writer hid (Customize → Scene statuses):
   // with `idea` hidden, a new scene simply starts without one.
   const defaultStatus = defaultNewSceneStatus(settings.listOverrides?.["scene.status"]);
-  await writeSceneMeta(app, file, patch, defaultStatus ? { status: defaultStatus } : {});
+  // The template's field definitions are template-only — never copy them into
+  // a scene (a custom codex type labelled "Scene" shares this note too).
+  await writeSceneMeta(app, file, patch, defaultStatus ? { status: defaultStatus } : {}, [
+    SCENE_FIELDS_KEY,
+    FIELDS_KEY,
+  ]);
   return file;
 }
 
@@ -107,7 +121,7 @@ export async function createScene(
   }
 
   return tryFileOp(async () => {
-    const file = await createSceneFile(app, settings, draft, path, title, opts.meta ?? {});
+    const file = await createSceneFile(app, settings, draft, path, title, opts.meta ?? {}, opts.body);
 
     await updateScenes(app, indexFile, (scenes) => {
       if (scenes.some((s) => s.title === title)) return scenes;

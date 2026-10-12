@@ -36,7 +36,7 @@ import { updatePlotlines } from "../projects/index-writer";
 import { ProjectStore } from "../projects/project-store";
 import { Project, isMultiScene } from "../projects/types";
 import { EditSceneModal } from "../scenes/edit-scene-modal";
-import { addSceneMenuItems, confirmDelete, promptText } from "../scenes/scene-actions";
+import { addSceneMenuItems, confirmDelete, openSceneOnModClick, promptText } from "../scenes/scene-actions";
 import { SceneMeta, readSceneMeta, statusLabel, writeSceneMeta } from "../scenes/scene-meta";
 import { COLORS } from "../scenes/scene-meta-form";
 import { EmptyStateAction, renderEmptyState, renderEmptyStateAction } from "../views/panel-kit";
@@ -385,6 +385,7 @@ export class PlotGridPanel {
       if (scene?.path) {
         name.addClass("is-link");
         name.onclick = () => this.plugin.openSceneInWrite(scene.path!);
+        openSceneOnModClick(name, this.app, scene.path);
       }
     } else {
       const chev = label.createSpan({ cls: "inkswell-plotgrid__chev" });
@@ -441,6 +442,7 @@ export class PlotGridPanel {
         if (scene.path) {
           name.addClass("is-link");
           name.onclick = () => this.plugin.openSceneInWrite(scene.path!);
+          openSceneOnModClick(name, this.app, scene.path);
         }
         if (scene.status) {
           sub.createSpan({
@@ -501,6 +503,7 @@ export class PlotGridPanel {
         new EditSceneModal(this.app, file, this.project, this.plugin).open();
       }
     };
+    openSceneOnModClick(chip, this.app, scene.path);
     const file = this.app.vault.getAbstractFileByPath(scene.path);
     if (file instanceof TFile && this.project) {
       attachRowMenu(chip, chip, () => this.chipMenu(scene, col, file));
