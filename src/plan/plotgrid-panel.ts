@@ -13,10 +13,13 @@
  */
 
 import { App, Menu, Notice, TFile, setIcon } from "obsidian";
+import { numberRepeats } from "../lib/labels";
 import { tryFileOp } from "../lib/notify";
 import { tagScroller } from "../lib/scroll-preserve";
 import { attachRowMenu } from "../lib/row-menu";
+import { applyOutline, currentOutline } from "../outliner/apply-outline";
 import { promptNewScene } from "../outliner/create-scene";
+import { moveScene } from "../outliner/outline";
 import {
   PlotGrid,
   PlotGridRow,
@@ -399,8 +402,8 @@ export class PlotGridPanel {
         this.rerender();
       };
     }
-    // Dropping a chip on a row label changes the scene's chapter only.
-    if (row.chapterTitle !== undefined) this.chapterDropZone(label, row);
+    // Dropping a chip on a row label moves the scene into that chapter only.
+    if (row.chapterId !== undefined) this.chapterDropZone(label, row);
 
     if (isSceneRow) {
       const scene = row.scenes[0];
@@ -521,12 +524,16 @@ export class PlotGridPanel {
           if (!this.project) return;
           // The plan-a-future-beat flow: an idea-status stub lands in the right
           // chapter and plotline in one step (works in planned chapters too).
+          // A planned chapter's first scene goes where the chapter sits and
+          // becomes its anchor, so it can't fold into a same-named one (#58).
+          const empty = row.scenes.length === 0;
           promptNewScene(this.app, this.store, this.plugin.settings, this.project, {
-            afterTitle: row.scenes[row.scenes.length - 1]?.title,
+            afterTitle: empty ? row.slotAfter : row.scenes[row.scenes.length - 1]?.title,
             meta: {
               chapter: row.chapterTitle || undefined,
               plotlines: [col.title],
             },
+            anchorChapter: empty && row.chapterId ? row.chapterId : undefined,
           });
         })
       );
@@ -569,15 +576,16 @@ export class PlotGridPanel {
     }
     if (this.grid?.byChapter) {
       menu.addSeparator();
-      const rows = this.grid.groups.flatMap((g) => g.rows);
-      for (const r of rows) {
-        if (r.chapterTitle === undefined || r.chapterTitle === (scene.chapter ?? "")) continue;
+      const rows = this.grid.groups.flatMap((g) => g.rows).filter((r) => r.chapterId !== undefined);
+      const labels = numberRepeats(rows.map((r) => r.label)); // chapters may share a name (#58)
+      rows.forEach((r, k) => {
+        if (r.scenes.some((s) => s.path === scene.path)) return;
         menu.addItem((i) =>
-          i.setTitle(`Move to chapter: ${r.label}`).onClick(() => {
-            void this.moveMembership(scene.path!, null, null, r.chapterTitle!);
+          i.setTitle(`Move to chapter: ${labels[k]}`).onClick(() => {
+            void this.moveMembership(scene.path!, null, null, r);
           })
         );
-      }
+      });
     }
     return menu;
   }
@@ -610,11 +618,11 @@ export class PlotGridPanel {
       if (!payload) return;
       e.preventDefault();
       e.stopPropagation();
-      void this.moveMembership(payload.path, payload.from, col.title, row?.chapterTitle ?? null);
+      void this.moveMembership(payload.path, payload.from, col.title, row);
     });
   }
 
-  /** Row labels accept chips: change the scene's chapter only. */
+  /** Row labels accept chips: move the scene into that chapter only. */
   private chapterDropZone(label: HTMLElement, row: PlotGridRow): void {
     label.addEventListener("dragover", (e) => {
       if (!e.dataTransfer?.types.includes("inkswell/plotgrid-scene")) return;
@@ -627,7 +635,7 @@ export class PlotGridPanel {
       const payload = this.scenePayload(e);
       if (!payload) return;
       e.preventDefault();
-      void this.moveMembership(payload.path, null, null, row.chapterTitle ?? null);
+      void this.moveMembership(payload.path, null, null, row);
     });
   }
 
@@ -666,14 +674,16 @@ export class PlotGridPanel {
 
   /**
    * The single scene-write path for all grid interactions: drop `fromCol`
-   * membership (when set), add `toCol` membership (when set), and change the
-   * chapter (when `toChapter` differs; "" clears). One combined frontmatter write.
+   * membership (when set), add `toCol` membership (when set), and move the scene
+   * into `toRow`'s chapter when it isn't already there. Plotline tags are one
+   * frontmatter write; the chapter move is an outline move (as on the Board),
+   * so the manuscript reorders and chapters stay runs (#58).
    */
   private async moveMembership(
     path: string,
     fromCol: string | null,
     toCol: string | null,
-    toChapter: string | null
+    toRow: PlotGridRow | null
   ): Promise<void> {
     const file = this.app.vault.getAbstractFileByPath(path);
     if (!(file instanceof TFile)) return;
@@ -699,12 +709,27 @@ export class PlotGridPanel {
       }
       if (changed) patch.plotlines = tags;
     }
-    if (toChapter !== null && toChapter !== (meta.chapter ?? "")) {
-      patch.chapter = toChapter || undefined;
+    const intoChapter =
+      toRow !== null && toRow.chapterId !== undefined && !toRow.scenes.some((s) => s.path === path)
+        ? toRow.chapterId
+        : undefined;
+    if (Object.keys(patch).length > 0) {
+      this.mark(file.path);
+      await tryFileOp(() => writeSceneMeta(this.app, file, patch), "Couldn't move the scene.");
     }
-    if (Object.keys(patch).length === 0) return;
-    this.mark(file.path);
-    await tryFileOp(() => writeSceneMeta(this.app, file, patch), "Couldn't move the scene.");
+    if (intoChapter !== undefined) await this.moveToChapter(path, intoChapter);
+  }
+
+  /** Move a scene to the end of chapter `chapterId` (null = no chapter). */
+  private async moveToChapter(path: string, chapterId: string | null): Promise<void> {
+    const project = this.project;
+    const indexFile = this.indexFile();
+    const title = project?.scenes.find((s) => s.path === path)?.title;
+    if (!project || !indexFile || !title) return;
+    const tree = currentOutline(this.app, project);
+    const next = moveScene(tree, title, chapterId);
+    if (next === tree) return;
+    await applyOutline(this.app, indexFile, project, next, (p) => this.mark(p));
   }
 
   private async addPlotline(): Promise<void> {

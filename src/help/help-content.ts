@@ -205,7 +205,7 @@ export const HINTS: Record<string, HintEntry> = {
       p(el, "Every entry has a scope that controls where it shows up:");
       steps(el, [
         "Global (default) — available in every project.",
-        "Project — set codex-project on the note; only that book sees it. Pick Books in the Scope field and tap the book pills to share an entry between some books of a series without making it series-wide.",
+        "Project — set codex-project on the note; only that book sees it. Under Scope, click Change…, choose Books and tick the books to share an entry between some books of a series without making it series-wide.",
         "Series — set codex-series; shared across the books in a series.",
       ]);
       p(
@@ -216,6 +216,13 @@ export const HINTS: Record<string, HintEntry> = {
           "finds its scenes with no tagging step. Filled chips are linked scenes (the " +
           "writer put the entry there); outlined chips are text-only mentions (someone " +
           "talks about them). The per-book line counts both, plus POV scenes."
+      );
+      p(
+        el,
+        "An image you upload as an entry's portrait is saved where Obsidian puts new " +
+          "attachments (Settings → Files and links → Default location for new attachments). " +
+          "Choose “In subfolder under current folder” to keep each entry's images in a " +
+          "folder beside it."
       );
     },
   },

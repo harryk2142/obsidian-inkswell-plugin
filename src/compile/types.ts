@@ -15,6 +15,9 @@ export interface CompileScene {
   contents: string;
   /** Scene's `chapter` frontmatter, if any (used by the group-by-chapter step). */
   chapter?: string;
+  /** True on the first scene of a chapter (from the outline's chapter runs) —
+   *  lets two same-named chapters side by side get a heading each (#58). */
+  chapterStart?: boolean;
 }
 
 /** Options bag passed to a step instance (step-specific shape). */

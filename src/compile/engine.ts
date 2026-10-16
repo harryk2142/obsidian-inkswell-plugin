@@ -16,6 +16,7 @@ import {
   normalizePath,
 } from "obsidian";
 import { Project, isMultiScene } from "../projects/types";
+import { chapterRuns } from "../outliner/outline";
 import { readSceneMeta } from "../scenes/scene-meta";
 import { sanitizeSegment } from "../settings/folders";
 import { assembleManuscript } from "./assemble";
@@ -132,14 +133,31 @@ async function loadScenes(app: App, project: Project): Promise<CompileScene[]> {
     return [{ title: project.draft.title, indent: 0, contents }];
   }
 
+  // Chapter boundaries come from the outline's runs, not from the chapter
+  // string alone: two same-named chapters side by side are still two (#58).
+  const files = project.scenes.map((scene) => {
+    const f = scene.path ? app.vault.getAbstractFileByPath(scene.path) : null;
+    return f instanceof TFile ? f : null;
+  });
+  const chapters = files.map((f) => (f ? readSceneMeta(app, f).chapter : undefined));
+  const { runs } = chapterRuns(
+    project.scenes.map((s, i) => ({ title: s.title, chapter: chapters[i] })),
+    project.inkswell?.chapters
+  );
+  const starts = new Set(runs.map((r) => r.indices[0]));
+
   const out: CompileScene[] = [];
-  for (const scene of project.scenes) {
-    if (!scene.path) continue; // missing scene file — skip
-    const file = app.vault.getAbstractFileByPath(scene.path);
-    if (!(file instanceof TFile)) continue;
+  for (const [i, scene] of project.scenes.entries()) {
+    const file = files[i];
+    if (!file) continue; // missing scene file — skip
     const contents = await app.vault.cachedRead(file);
-    const chapter = readSceneMeta(app, file).chapter;
-    out.push({ title: scene.title, indent: scene.indent, contents, chapter });
+    out.push({
+      title: scene.title,
+      indent: scene.indent,
+      contents,
+      chapter: chapters[i],
+      ...(starts.has(i) ? { chapterStart: true } : {}),
+    });
   }
   return out;
 }

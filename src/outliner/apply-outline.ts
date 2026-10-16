@@ -15,7 +15,21 @@ import { tryFileOp } from "../lib/notify";
 import { persistOutline } from "../projects/index-writer";
 import { Project } from "../projects/types";
 import { SceneMeta, readSceneMeta, writeSceneMeta } from "../scenes/scene-meta";
-import { OutlineTree, serializeOutline } from "./outline";
+import { OutlineTree, buildOutline, serializeOutline } from "./outline";
+
+/**
+ * The outline as the vault has it NOW — scene strings read from the metadata
+ * cache at call time. Build write-side moves from this, never from a panel's
+ * render-time tree (which the host's editing guard can keep stale).
+ */
+export function currentOutline(app: App, project: Project): OutlineTree {
+  const scenes = project.scenes.map((s) => {
+    const f = s.path ? app.vault.getAbstractFileByPath(s.path) : null;
+    const m: Partial<SceneMeta> = f instanceof TFile ? readSceneMeta(app, f) : {};
+    return { title: s.title, path: s.path, indent: s.indent, chapter: m.chapter, act: m.act };
+  });
+  return buildOutline(project.inkswell?.acts, project.inkswell?.chapters, scenes);
+}
 
 /**
  * `mark` (when given) records each path as a self-write right before it's

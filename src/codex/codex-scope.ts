@@ -235,3 +235,90 @@ export function remapScopeProjects(
   if (!books.some((b) => lookup.has(normKey(b)))) return null;
   return { ...scope, projects: dedupe(books.map((b) => lookup.get(normKey(b)) ?? b)) };
 }
+
+// --- The Scope editor (#57) -------------------------------------------------
+
+/** One story as the Scope editor offers it. */
+export interface ScopeBook {
+  /** Story title (what the writer sees). */
+  label: string;
+  /** What a new pick writes: the base draft's identity key (`projectKey`). */
+  value: string;
+  /** Every draft of the story — a stored value naming any of them names the book. */
+  drafts: Project[];
+  /** The story's series, if any (the editor groups by it). */
+  series: string | null;
+}
+
+/** The pickable stories, one per story, alphabetical by title. */
+export function scopeBooks(projects: Project[]): ScopeBook[] {
+  return groupIntoStories(projects)
+    .map((s) => {
+      const base = baseDraft(s);
+      return {
+        label: s.title,
+        value: projectKey(base, projects),
+        drafts: s.drafts,
+        series: projectSeries(base)?.name ?? null,
+      };
+    })
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+/** Does stored value `v` name this story (any draft, either identity form)? */
+export function namesBook(v: string, book: ScopeBook): boolean {
+  return book.drafts.some((d) => bookMatches(v, d));
+}
+
+/**
+ * Turn a book off: drop every stored value naming it. A legacy ambiguous value
+ * (`[[Index]]` shared by two books) also named OTHER books that were on —
+ * re-pin those with their unambiguous keys so they don't vanish too.
+ */
+export function withoutBook(cur: readonly string[], target: ScopeBook, books: readonly ScopeBook[]): string[] {
+  const kept = cur.filter((v) => !namesBook(v, target));
+  for (const other of books) {
+    if (other === target) continue;
+    if (cur.some((v) => namesBook(v, other)) && !kept.some((v) => namesBook(v, other))) kept.push(other.value);
+  }
+  return kept;
+}
+
+/**
+ * The editor's book picks as a delta on the CURRENT stored list (gotcha 10 —
+ * never a snapshot): remove books, drop stale values, add books not yet named.
+ */
+export function applyBookPicks(
+  cur: readonly string[],
+  books: readonly ScopeBook[],
+  picks: { add: readonly ScopeBook[]; remove: readonly ScopeBook[]; dropValues: readonly string[] }
+): string[] {
+  let next = [...cur];
+  for (const b of picks.remove) next = withoutBook(next, b, books);
+  const drop = new Set(picks.dropValues.map(normKey));
+  next = next.filter((v) => !drop.has(normKey(v)));
+  for (const b of picks.add) if (!next.some((v) => namesBook(v, b))) next.push(b.value);
+  return next;
+}
+
+/**
+ * One line saying where an entry is visible — the codex detail pane shows this
+ * instead of the full editor (#57). `seriesBooks` gives a series' book count,
+ * or null when no series has that name.
+ */
+export function scopeSummary(
+  scope: EntityScope,
+  books: readonly ScopeBook[],
+  seriesBooks: (name: string) => number | null
+): string {
+  if (scope.series) {
+    const n = seriesBooks(scope.series);
+    if (n === null) return `Series · ${scope.series} (not found)`;
+    return `Series · ${scope.series}${n ? ` (${n} book${n === 1 ? "" : "s"})` : ""}`;
+  }
+  const list = scope.projects ?? [];
+  if (list.length === 0) return "Global · every project";
+  const names = dedupe(list.map((v) => books.find((b) => namesBook(v, b))?.label ?? `${v} (not found)`));
+  const shown = names.slice(0, 2).join(", ");
+  return `Books · ${shown}${names.length > 2 ? ` +${names.length - 2}` : ""}`;
+}

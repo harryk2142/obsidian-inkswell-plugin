@@ -12,6 +12,10 @@ import {
   remapScopeProjects,
   scopeContextForEntity,
   scopeContextForProject,
+  applyBookPicks,
+  scopeBooks,
+  scopeSummary,
+  withoutBook,
 } from "../src/codex/codex-scope";
 import { CodexEntity, EntityScope } from "../src/codex/types";
 import { Project, SeriesInfo } from "../src/projects/types";
@@ -379,5 +383,54 @@ describe("book identity when index notes share a basename (#44)", () => {
   it("new entries default to the unambiguous key", () => {
     expect(defaultScopeForProject(A, all)).toEqual({ projects: ["Books/Alpha/Index"] });
     expect(defaultScopeForProject(SOLO, all)).toEqual({ projects: ["Solo"] });
+  });
+});
+
+describe("Scope editor helpers (#57)", () => {
+  const all = [
+    project("Ash", { name: "Saga", order: 1 }),
+    project("Ember", { name: "Saga", order: 2 }),
+    project("Solo"),
+    // Two stories whose index notes share a basename (#44): written by path.
+    project("Left", null, "Left/Index.md"),
+    project("Right", null, "Right/Index.md"),
+  ];
+  const books = scopeBooks(all);
+  const book = (label: string) => books.find((b) => b.label === label)!;
+
+  it("lists one book per story, alphabetical, with its series and write key", () => {
+    expect(books.map((b) => [b.label, b.value, b.series])).toEqual([
+      ["Ash", "Ash", "Saga"],
+      ["Ember", "Ember", "Saga"],
+      ["Left", "Left/Index", null],
+      ["Right", "Right/Index", null],
+      ["Solo", "Solo", null],
+    ]);
+  });
+
+  it("summarizes each kind on one line", () => {
+    const count = (n: string) => (n === "Saga" ? 2 : null);
+    expect(scopeSummary({}, books, count)).toBe("Global · every project");
+    expect(scopeSummary({ series: "Saga" }, books, count)).toBe("Series · Saga (2 books)");
+    expect(scopeSummary({ series: "Gone" }, books, count)).toBe("Series · Gone (not found)");
+    expect(scopeSummary({ projects: ["Ash"] }, books, count)).toBe("Books · Ash");
+    expect(scopeSummary({ projects: ["Ash", "Ember", "Solo", "Left/Index"] }, books, count)).toBe(
+      "Books · Ash, Ember +2"
+    );
+    expect(scopeSummary({ projects: ["Lost"] }, books, count)).toBe("Books · Lost (not found)");
+  });
+
+  it("turning off one of two books an ambiguous legacy value named re-pins the other", () => {
+    // `Index` names BOTH Left and Right; turning Left off must keep Right.
+    expect(withoutBook(["Index"], book("Left"), books)).toEqual(["Right/Index"]);
+  });
+
+  it("applies picks as a delta on the CURRENT list", () => {
+    // The dialog saw [Ash, Lost]; meanwhile another write added Solo.
+    const current = ["Ash", "Lost", "Solo"];
+    const next = applyBookPicks(current, books, { add: [book("Ember")], remove: [book("Ash")], dropValues: ["lost"] });
+    expect(next).toEqual(["Solo", "Ember"]);
+    // Adding a book already named is a no-op.
+    expect(applyBookPicks(["Ash"], books, { add: [book("Ash")], remove: [], dropValues: [] })).toEqual(["Ash"]);
   });
 });

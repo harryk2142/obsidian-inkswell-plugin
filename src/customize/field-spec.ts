@@ -11,13 +11,14 @@ import {
   defaultFieldLabel,
 } from "../codex/profile-schema";
 
-/** The seven kinds a writer picks from (single link is its own kind for clarity). */
-export type FieldKind = "text" | "textarea" | "number" | "list" | "image" | "links" | "link";
+/** The kinds a writer picks from (single link is its own kind for clarity). */
+export type FieldKind = "text" | "textarea" | "number" | "date" | "list" | "image" | "links" | "link";
 
 export const FIELD_KIND_LABELS: Record<FieldKind, string> = {
   text: "Text",
   textarea: "Long text",
   number: "Number",
+  date: "Date",
   list: "List",
   image: "Image",
   links: "Links",
@@ -25,7 +26,7 @@ export const FIELD_KIND_LABELS: Record<FieldKind, string> = {
 };
 
 /** Dropdown order. Kept in sync with FIELD_KIND_LABELS by a test. */
-export const FIELD_KINDS: FieldKind[] = ["text", "textarea", "number", "list", "image", "links", "link"];
+export const FIELD_KINDS: FieldKind[] = ["text", "textarea", "number", "date", "list", "image", "links", "link"];
 
 export interface FieldRow {
   /** = key (the list editor needs an id). */

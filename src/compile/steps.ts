@@ -151,9 +151,10 @@ const prependTitle: SceneStep = {
 /**
  * Group scenes into chapters by their `chapter` frontmatter: emit one chapter
  * heading per run of same-chapter scenes, with a scene-break glyph between scenes
- * inside a chapter. Scenes with no chapter pass through unheaded. This is the
- * alternative to `prepend-title` for multi-scene-per-chapter manuscripts — enable
- * one or the other, not both.
+ * inside a chapter. A scene flagged `chapterStart` opens a new chapter even when
+ * the one before it has the same name (#58). Scenes with no chapter pass through
+ * unheaded. This is the alternative to `prepend-title` for
+ * multi-scene-per-chapter manuscripts — enable one or the other, not both.
  */
 const groupByChapter: SceneStep = {
   id: "group-by-chapter",
@@ -171,7 +172,7 @@ const groupByChapter: SceneStep = {
     for (const s of scenes) {
       const ch = s.chapter?.trim() || undefined;
       const last = groups[groups.length - 1];
-      if (last && ch !== undefined && last.chapter === ch) last.scenes.push(s);
+      if (last && ch !== undefined && last.chapter === ch && !s.chapterStart) last.scenes.push(s);
       else groups.push({ chapter: ch, scenes: [s] });
     }
 

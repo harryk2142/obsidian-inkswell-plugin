@@ -22,7 +22,16 @@ import { ProjectStats } from "../../projects/project-stats";
 import { ProjectStore } from "../../projects/project-store";
 import { Project, isMultiScene } from "../../projects/types";
 import { baseDraftFor, groupIntoStories, representativeDrafts } from "../../projects/stories";
-import { Series, ShelfBook, groupIntoSeries, projectSeries, shelfMetaText } from "../../series/series";
+import {
+  Series,
+  ShelfBook,
+  groupIntoSeries,
+  orderSeries,
+  projectSeries,
+  renameInOrder,
+  shelfMetaText,
+} from "../../series/series";
+import { ReorderSeriesModal } from "../../series/series-actions";
 import { promptNewScene } from "../../outliner/create-scene";
 import { sortProjectByChapter } from "../../outliner/sort-actions";
 import { BookCardContext, renderBookCard, renderCoverThumb } from "./book-card";
@@ -73,6 +82,13 @@ export class ExplorerPanel {
       newProject: (preset) => plugin.newProject(preset),
       activePath: () => plugin.activeProject.get(),
       markSelfWrite: (p) => plugin.selfWrites.mark(p),
+      reorderSeries: () => this.reorderSeries(),
+      seriesRenamed: (from, to) => {
+        const next = renameInOrder(plugin.settings.seriesOrder, from, to);
+        if (!next) return;
+        plugin.settings.seriesOrder = next;
+        void plugin.saveSettings();
+      },
     });
     this.sceneRows = new SceneRows(app, plugin, stats, onSelectScene);
   }
@@ -125,7 +141,9 @@ export class ExplorerPanel {
     this.storyCounts = new Map(stories.map((s) => [s.title, s.drafts.length]));
     const representatives = representativeDrafts(projects, activePath);
 
-    const { series, standalone } = groupIntoSeries(representatives);
+    const grouped = groupIntoSeries(representatives);
+    const series = orderSeries(grouped.series, this.plugin.settings.seriesOrder);
+    const standalone = grouped.standalone;
 
     // Project focus: with a project selected (shared activeProject — also the
     // header dropdown), Home narrows to just that book. With nothing selected,
@@ -175,24 +193,42 @@ export class ExplorerPanel {
     this.renderGrid(sec, books, series);
   }
 
-  /** The card grid; a series shelf ends with a "+ Add book" ghost card. */
+  /**
+   * The card grid, ending with a "+ Add book" ghost card: on a series shelf it
+   * offers a new book in the series or an existing project; on Standalone (or
+   * the plain grid when there are no series) it opens New project (#57).
+   */
   private renderGrid(parent: HTMLElement, books: Project[], series: Series | null): void {
     const grid = parent.createDiv({ cls: "inkswell-shelf__grid" });
     const ctx = this.cardContext();
     for (const book of books) renderBookCard(grid, book, ctx);
-    if (series) {
-      const ghost = grid.createDiv({ cls: "inkswell-card inkswell-card--ghost", text: "+ Add book" });
-      ghost.setAttribute("role", "button");
-      ghost.tabIndex = 0;
-      ghost.setAttribute("aria-label", `Add a book to ${series.name}`);
-      ghost.onclick = (e) => this.seriesMenu.seriesMenu(series).showAtMouseEvent(e);
-      ghost.onkeydown = (e) => {
-        if (e.key !== "Enter" && e.key !== " ") return;
-        e.preventDefault();
-        const r = ghost.getBoundingClientRect();
-        this.seriesMenu.seriesMenu(series).showAtPosition({ x: r.left, y: r.bottom });
-      };
-    }
+    const ghost = grid.createDiv({ cls: "inkswell-card inkswell-card--ghost", text: "+ Add book" });
+    ghost.setAttribute("role", "button");
+    ghost.tabIndex = 0;
+    ghost.setAttribute("aria-label", series ? `Add a book to ${series.name}` : "Start a new book");
+    const activate = (at: { x: number; y: number }): void => {
+      if (series) this.seriesMenu.addBookMenu(series).showAtPosition(at);
+      else this.plugin.newProject();
+    };
+    ghost.onclick = (e) => activate({ x: e.clientX, y: e.clientY });
+    ghost.onkeydown = (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      const r = ghost.getBoundingClientRect();
+      activate({ x: r.left, y: r.bottom });
+    };
+  }
+
+  /** Reorder Home's series shelves (#57); saved to settings, which sync. */
+  private reorderSeries(): void {
+    const projects = this.store.getProjects();
+    const reps = representativeDrafts(projects, this.plugin.activeProject.get());
+    const names = orderSeries(groupIntoSeries(reps).series, this.plugin.settings.seriesOrder).map((s) => s.name);
+    new ReorderSeriesModal(this.app, names, (next) => {
+      this.plugin.settings.seriesOrder = next;
+      void this.plugin.saveSettings();
+      this.plugin.refreshView();
+    }).open();
   }
 
   private cardContext(): BookCardContext {

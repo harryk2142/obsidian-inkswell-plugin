@@ -14,7 +14,7 @@
  */
 
 import type { SceneStatus } from "../scenes/scene-meta";
-import { buildOutline } from "./outline";
+import { buildOutline, sceneSlotForChapter } from "./outline";
 import { StructureGroup, distinctInOrder } from "./structure";
 
 export interface Plotline {
@@ -171,8 +171,15 @@ export interface PlotGridRow {
   key: string;
   label: string;
   kind: "chapter" | "planned" | "unassigned" | "scene";
-  /** The `chapter` string a drop on this row writes ("" clears; undefined for scene rows). */
+  /** The `chapter` string a new scene in this row gets ("" for none; undefined for scene rows). */
   chapterTitle?: string;
+  /** Outline chapter this row IS — a drop moves the scene into it (null = the
+   *  "No chapter" row; undefined for scene rows). Chapters may share a title
+   *  (#58), so moves go by id, never by `chapterTitle`. */
+  chapterId?: string | null;
+  /** Where a new scene for this row goes in the manuscript (after this title;
+   *  undefined = append). */
+  slotAfter?: string;
   /** All scenes in this row, manuscript order (drives expanded per-scene sub-rows). */
   scenes: PlotGridScene[];
   /** Aligned to `grid.columns`: this row's scenes tagged with each column's title. */
@@ -257,6 +264,8 @@ export function buildPlotGrid(
         label: title,
         kind: rowScenes.length ? "chapter" : "planned",
         chapterTitle: title,
+        chapterId: id,
+        slotAfter: sceneSlotForChapter(tree, id),
         scenes: rowScenes,
         cells: cellsFor(rowScenes),
       };
@@ -276,6 +285,7 @@ export function buildPlotGrid(
         label: "No chapter",
         kind: "unassigned",
         chapterTitle: "",
+        chapterId: null,
         scenes: rowScenes,
         cells: cellsFor(rowScenes),
       });

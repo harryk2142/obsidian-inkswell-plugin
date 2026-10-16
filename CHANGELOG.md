@@ -10,6 +10,23 @@ time the version bump renames that section to the new version and date.
 
 ## [Unreleased]
 
+## [1.21.0] - 2026-10-16
+
+Your book, your names. Chapters can share a name, so chapters named for their point-of-view character (Alice, Bob, Alice) each stay their own. Your scene and codex fields can hold a real date. Home puts your series in the order you choose, and a codex entry's Scope stays out of the way in a vault with many books.
+
+### Added
+- **Chapters can share a name.** Name chapters after their point-of-view character (Alice, Bob, Alice…) and each stays its own chapter, with its own word target and act, in the Tree, Board, Plot grid, Track, Write's scene list, compile and the story bible, even two "Alice" chapters in a row. Requested in [#58](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/58).
+- **Date fields.** Your own scene fields (Customize → Scene inspector fields → Your fields), and the fields of a codex type, can now be a **Date**: pick it from a calendar, and it's saved as `YYYY-MM-DD`, the format Obsidian uses for date properties, so it's ready for Bases and Dataview. Switching an existing field to Date keeps anything that isn't a calendar date (say, "Spring 1204") visible as text until you change it. Requested in [#59](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/59).
+- **Put your series in your own order on Home.** Right-click a series shelf (or tap ⋯) → **Reorder series…** and drag the shelves where you want them; the project switcher follows the same order. The order syncs with your vault, and a renamed series keeps its place. Requested in [#57](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/57).
+
+### Changed
+- **A codex entry's Scope is one line now.** It says where the entry shows up ("Books · Ash, Ember +3") and **Change…** opens a tidy list of your books grouped by series, so a vault with many books no longer pushes the entry's own fields down the page. Help → Codex also explains where uploaded portrait images are saved (Obsidian's attachment setting) and how to keep them beside each entry. [#57](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/57)
+- **Standalone books get a "+ Add book" card too**, like a series shelf, which starts a new project. On a series shelf, the card now offers just the two ways to add a book. [#57](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/57)
+- **The Tree shows scenes where they are in the manuscript.** A scene tagged with a chapter name but sitting elsewhere in your book now shows as its own chapter at that spot, as compile and Write's scene list already treated it, instead of being pulled into the earlier chapter. To move a scene into a chapter, drag it in the Tree, Board or Plot grid. Dropping a scene on a Plot grid row now moves it into that chapter, as on the Board.
+
+### Fixed
+- **Adding or renaming a chapter to a name already in use no longer merges it into the first one** or replaces that chapter's word target and act. [#58](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/58)
+
 ## [1.20.0] - 2026-10-12
 
 Sharing and shaping. Generate a story bible to hand to alpha readers or an editor, add your own fields to the scene inspector, split a scene without cut-and-paste, open any scene in a regular Obsidian tab with one click, and arrange the rail the way you work.
@@ -415,7 +432,8 @@ First community-store release — the full local-first writer's suite.
 - Drop-in compatibility with Longform's `longform` frontmatter (zero migration);
   Inkswell-only data lives under a separate `inkswell` key.
 
-[Unreleased]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.20.0...HEAD
+[Unreleased]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.21.0...HEAD
+[1.21.0]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.20.0...1.21.0
 [1.20.0]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.19.0...1.20.0
 [1.19.0]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.18.1...1.19.0
 [1.18.1]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.18.0...1.18.1

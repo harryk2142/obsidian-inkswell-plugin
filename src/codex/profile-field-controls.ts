@@ -1,6 +1,6 @@
 /**
- * Editable controls for one profile field — text, long text, number, list, and
- * codex links (multi, labeled, or single). Shared by the Codex detail pane and
+ * Editable controls for one profile field — text, long text, number, date,
+ * list, and codex links (multi, labeled, or single). Shared by the Codex detail pane and
  * the Scene Inspector's writer-defined fields (#52), so both get the same
  * behavior (Android-safe list input, labeled-link prompt, focus tags).
  *
@@ -10,6 +10,7 @@
  */
 
 import { App } from "obsidian";
+import { isDateKey, normalizeDate } from "../lib/date-key";
 import { tagField } from "../lib/focus-preserve";
 import { autosizeTextarea } from "../lib/form-fields";
 import { promptText } from "../scenes/scene-actions";
@@ -27,7 +28,7 @@ export interface ProfileFieldDeps {
   /** Focus-tag prefix: `<prefix>:<key>` (`codex`, `scene:x`). */
   tagPrefix: string;
   /**
-   * Persist a scalar (text / textarea / number / single link; "" clears).
+   * Persist a scalar (text / textarea / number / date / single link; "" clears).
    * `structural` marks edits other UI shows too (a link), so the caller may
    * re-render more than the field.
    */
@@ -105,7 +106,65 @@ export function renderProfileFieldControl(control: HTMLElement, deps: ProfileFie
     addBtn.onclick = commit;
     return;
   }
-  renderLinkControl(control, deps);
+  if (field.type === "date") {
+    renderDateControl(control, deps, tag);
+    return;
+  }
+  if (field.type === "links") {
+    renderLinkControl(control, deps);
+    return;
+  }
+  // A type this build doesn't know (a newer device's spec): plain text keeps
+  // the value visible and editable, never a link picker that would rewrite it.
+  const t = control.createEl("input", { type: "text" });
+  tagField(t, tag);
+  t.value = typeof value === "string" || typeof value === "number" ? String(value) : "";
+  t.onchange = () => deps.saveValue(t.value, false);
+}
+
+/**
+ * A calendar date: `<input type="date">`, saved as a `YYYY-MM-DD` key.
+ *
+ * Desktop commits on blur or Enter, NOT on every `change`: Chromium fires
+ * `change` as each segment of a typed date completes, and a save mid-typing
+ * rebuilds the inspector, which drops the cursor back to the first segment.
+ * Touch devices have no segment typing — the native picker is the only input —
+ * so a `change` there commits at once, as does one that lands while the input
+ * isn't focused.
+ *
+ * A stored value that isn't a calendar date ("Spring 1204") shows as editable
+ * text with a hint: never hidden, never overwritten until the writer edits it.
+ */
+function renderDateControl(control: HTMLElement, deps: ProfileFieldDeps, tag: string): void {
+  const stored = typeof deps.value === "string" ? deps.value.trim() : "";
+  if (stored && !isDateKey(stored)) {
+    const t = control.createEl("input", { type: "text" });
+    tagField(t, tag);
+    t.value = stored;
+    t.onchange = () => deps.saveValue(normalizeDate(t.value) ?? t.value, false);
+    control.createDiv({
+      cls: "inkswell-stats__muted inkswell-inspector__hint",
+      text: "Not a calendar date. Clear it to use the date picker.",
+    });
+    return;
+  }
+  const input = control.createEl("input", { type: "date", cls: "inkswell-inspector__date" });
+  tagField(input, tag);
+  input.value = stored;
+  let committed = stored;
+  const commit = (): void => {
+    const next = input.value; // "" or a complete YYYY-MM-DD
+    if (next === committed || (next !== "" && !isDateKey(next))) return;
+    committed = next;
+    deps.saveValue(next, false);
+  };
+  input.addEventListener("blur", commit);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") commit();
+  });
+  input.addEventListener("change", () => {
+    if (input.doc.activeElement !== input || input.doc.body.classList.contains("is-mobile")) commit();
+  });
 }
 
 function renderLinkControl(control: HTMLElement, deps: ProfileFieldDeps): void {

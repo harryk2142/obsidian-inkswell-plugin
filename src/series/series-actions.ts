@@ -29,8 +29,15 @@ async function applyWrites(app: App, writes: SeriesWrite[]): Promise<void> {
   }
 }
 
-/** Prompt for a new name, then rename `series` across every book and codex entity. */
-export async function promptRenameSeries(app: App, projects: Project[], series: Series): Promise<void> {
+/** Prompt for a new name, then rename `series` across every book and codex
+ *  entity. `onRenamed` runs after a successful rename (e.g. to keep the
+ *  series' place in Home's shelf order). */
+export async function promptRenameSeries(
+  app: App,
+  projects: Project[],
+  series: Series,
+  onRenamed?: (from: string, to: string) => void
+): Promise<void> {
   const name = await promptText(app, {
     title: "Rename series",
     value: series.name,
@@ -38,7 +45,7 @@ export async function promptRenameSeries(app: App, projects: Project[], series: 
     cta: "Rename",
   });
   if (name === null) return;
-  await renameSeries(app, projects, series.name, name);
+  if (await renameSeries(app, projects, series.name, name)) onRenamed?.(series.name, name.trim());
 }
 
 /**
@@ -179,5 +186,52 @@ export class ReorderBooksModal extends FormModal {
     const bases = this.order.map((b) => baseDraftFor(this.projects, b));
     const writes = planReorder(bases, bases.map((b) => b.vaultPath));
     await tryFileOp(() => applyWrites(this.app, writes), "Couldn't reorder the books.");
+  }
+}
+
+/** Drag (or ⋯ → Move up/down) Home's series shelves into order (#57); Save
+ *  hands back every series name in its new order. */
+export class ReorderSeriesModal extends FormModal {
+  private order: string[];
+  private list: HTMLElement | null = null;
+
+  constructor(
+    app: App,
+    names: string[],
+    private onSave: (names: string[]) => void
+  ) {
+    super(app);
+    this.order = [...names];
+  }
+
+  protected renderForm(contentEl: HTMLElement): void {
+    contentEl.createEl("h3", { text: "Reorder series" });
+    contentEl.createEl("p", {
+      cls: "inkswell-stats__muted",
+      text: "Drag to reorder, or use a row's ⋯ menu. Home shows your series in this order, with standalone books last.",
+    });
+    this.list = contentEl.createDiv();
+    this.renderList();
+  }
+
+  private renderList(): void {
+    if (!this.list) return;
+    this.list.empty();
+    renderListEditor(this.list, {
+      items: this.order.map((name) => ({ id: name, name })),
+      renderRow: (body, item) => {
+        body.setText(item.name);
+      },
+      onReorder: (next) => {
+        this.order = next.map((x) => x.name);
+        this.renderList();
+      },
+      dragType: "inkswell/series-order",
+      keyPrefix: "series-order",
+    });
+  }
+
+  protected submit(): void {
+    this.onSave(this.order);
   }
 }

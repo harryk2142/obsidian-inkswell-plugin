@@ -58,6 +58,7 @@ import {
   promptText as promptForText,
 } from "../scenes/scene-actions";
 import { createScene, promptNewScene } from "../outliner/create-scene";
+import { chapterRuns } from "../outliner/outline";
 import { PromptModal } from "../ideation/prompt-modal";
 import { writingPrompts } from "../ideation/prompts";
 import { RevisionModal } from "../revisions/revision-modal";
@@ -164,7 +165,7 @@ export class WritePanel implements HoverParent {
   /** Tracks the project the editor is currently bound to, to reset on change. */
   private lastProject: string | null = null;
   private selectedScene: string | null = null;
-  /** Collapsed navigator chapter groups (by chapter label) — in-memory view
+  /** Collapsed navigator chapter groups (by each run's first scene) — in-memory view
    *  state that survives re-renders, like `activeRightPanel`. */
   private navCollapsed = new Set<string>();
   /** Stable hosts inside the panel, re-rendered in place by {@link update}. */
@@ -933,33 +934,43 @@ export class WritePanel implements HoverParent {
    * impossible to collapse the chapter you're writing in.
    */
   private renderNavRows(nav: HTMLElement, project: Project): void {
-    const selFile =
-      this.selectedScene && this.app.vault.getAbstractFileByPath(this.selectedScene);
-    const selChapter =
-      selFile instanceof TFile ? readSceneMeta(this.app, selFile).chapter ?? "" : "";
-
-    // Contiguous runs of one chapter label (the Tree keeps chapters contiguous).
+    // The outline's chapter runs (not raw chapter strings), so two same-named
+    // chapters side by side stay two groups (#58). Chapterless scenes render
+    // ungrouped, one row each.
     type Row = { scene: Project["scenes"][number]; file: TFile | null };
-    const runs: { chapter: string; rows: Row[] }[] = [];
-    for (const scene of project.scenes) {
-      const sceneFile = scene.path && this.app.vault.getAbstractFileByPath(scene.path);
-      const file = sceneFile instanceof TFile ? sceneFile : null;
-      const chapter = (file ? readSceneMeta(this.app, file).chapter : undefined) ?? "";
-      const last = runs[runs.length - 1];
-      if (last && last.chapter === chapter) last.rows.push({ scene, file });
-      else runs.push({ chapter, rows: [{ scene, file }] });
-    }
-    for (const run of runs) {
-      // A one-scene chapter collapses to a single row carrying the chapter name:
-      // a header plus one child says nothing the row can't say itself (#40).
-      if (run.chapter && run.rows.length === 1) {
-        const { scene, file } = run.rows[0];
-        this.navSceneRow(nav, project, scene, file, run.chapter);
+    const rows: Row[] = project.scenes.map((scene) => {
+      const f = scene.path && this.app.vault.getAbstractFileByPath(scene.path);
+      return { scene, file: f instanceof TFile ? f : null };
+    });
+    const { runs } = chapterRuns(
+      rows.map(({ scene, file }) => ({
+        title: scene.title,
+        chapter: file ? readSceneMeta(this.app, file).chapter : undefined,
+      })),
+      project.inkswell?.chapters
+    );
+    const runAt = new Map(runs.map((r) => [r.indices[0], r] as const));
+    for (let i = 0; i < rows.length; i++) {
+      const run = runAt.get(i);
+      if (!run) {
+        this.navSceneRow(nav, project, rows[i].scene, rows[i].file);
         continue;
       }
-      if (run.chapter) this.navGroupHead(nav, project, run.chapter, run.chapter === selChapter);
-      if (run.chapter && this.navCollapsed.has(run.chapter)) continue;
-      for (const { scene, file } of run.rows) this.navSceneRow(nav, project, scene, file);
+      const members = run.indices.map((k) => rows[k]);
+      i = run.indices[run.indices.length - 1];
+      // A one-scene chapter collapses to a single row carrying the chapter name:
+      // a header plus one child says nothing the row can't say itself (#40).
+      if (members.length === 1) {
+        this.navSceneRow(nav, project, members[0].scene, members[0].file, run.title);
+        continue;
+      }
+      // Collapse state is per chapter run: keyed by its first scene, so
+      // collapsing one "Alice" doesn't fold every chapter named Alice.
+      const key = members[0].scene.title;
+      const holdsSelection = members.some((m) => m.scene.path === this.selectedScene);
+      this.navGroupHead(nav, project, run.title, key, holdsSelection);
+      if (this.navCollapsed.has(key)) continue;
+      for (const { scene, file } of members) this.navSceneRow(nav, project, scene, file);
     }
 
     // Start the next scene without leaving Write (#47): appended at the end of
@@ -991,14 +1002,15 @@ export class WritePanel implements HoverParent {
     });
   }
 
-  /** Collapsible chapter header in the navigator. */
+  /** Collapsible chapter header in the navigator; `key` identifies the run. */
   private navGroupHead(
     nav: HTMLElement,
     project: Project,
     chapter: string,
+    key: string,
     holdsSelection: boolean
   ): void {
-    const collapsed = this.navCollapsed.has(chapter);
+    const collapsed = this.navCollapsed.has(key);
     const head = nav.createDiv({ cls: "inkswell-write__navhead" });
     const chev = head.createSpan({ cls: "inkswell-write__navchev" });
     setIcon(chev, collapsed ? "chevron-right" : "chevron-down");
@@ -1006,8 +1018,8 @@ export class WritePanel implements HoverParent {
     // Hint that the open scene is hidden inside this collapsed group.
     if (collapsed && holdsSelection) head.addClass("has-active");
     head.onclick = () => {
-      if (collapsed) this.navCollapsed.delete(chapter);
-      else this.navCollapsed.add(chapter);
+      if (collapsed) this.navCollapsed.delete(key);
+      else this.navCollapsed.add(key);
       // Rebuild just the list — no reason to touch the live editor.
       if (this.navEl) {
         this.navEl.empty();

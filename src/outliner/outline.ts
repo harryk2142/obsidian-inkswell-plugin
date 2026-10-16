@@ -9,8 +9,10 @@
  *
  * Identity: acts/chapters by stable `id` (from structure.ts); scenes by `title`
  * (a scene's title is its file basename — unique within a project, as Longform
- * requires). Nesting is optional — a chapter may be act-less (loose) and a scene
- * may be chapter-less (unassigned); those live in dedicated buckets.
+ * requires). A chapter is a run of consecutive scenes, NOT every scene with its
+ * title, so chapters may share a name (#58; see `chapterRuns`). Nesting is
+ * optional — a chapter may be act-less (loose) and a scene may be chapter-less
+ * (unassigned); those live in dedicated buckets.
  */
 
 import { IndentedScene } from "../projects/types";
@@ -40,77 +42,194 @@ export interface OutlineTree {
   unassignedScenes: SceneRef[];
 }
 
+/** A chapter as it occurs in the manuscript: a run of consecutive scenes. */
+export interface ChapterRun {
+  /** Stable node id: the paired config entry's id, else derived
+   *  (`c:<title>`, then `c:<title>~2`, `~3`… for further runs of that title). */
+  id: string;
+  title: string;
+  /** Manuscript indices of the run's scenes (consecutive, ascending). */
+  indices: number[];
+  /** The config entry this run is paired with, if any. */
+  cfg?: StructureGroup;
+}
+
+export interface ChapterRunsResult {
+  /** Populated chapters, manuscript order. */
+  runs: ChapterRun[];
+  /** Config entries no run claimed — planned (empty) chapters, config order. */
+  planned: Array<{ id: string; cfg: StructureGroup }>;
+  /** Manuscript indices of scenes with no chapter string. */
+  unassigned: number[];
+}
+
+/**
+ * THE chapter model (#58): split the manuscript into chapters and pair each
+ * with its config entry. Every chapter surface derives from this (directly or
+ * via `buildOutline`) — never group scenes by chapter string with a Map, which
+ * merges two chapters that share a name.
+ *
+ *  - A run is consecutive scenes with the same (trimmed) chapter string. A new
+ *    run also starts at a valid ANCHOR — a scene some config entry names as its
+ *    `firstScene` whose own chapter string equals that entry's title — so two
+ *    same-named chapters side by side stay apart. Blank strings are unassigned
+ *    and break runs.
+ *  - Pairing: an anchored run takes its anchoring entry; every other run takes
+ *    the first unclaimed entry with its title, in config order (projects saved
+ *    before anchors existed behave exactly as before); otherwise its id is
+ *    derived. Entries no run claims are planned chapters.
+ *
+ * Pure and deterministic, so it's unit-testable.
+ */
+export function chapterRuns(
+  scenes: ReadonlyArray<{ title: string; chapter?: string }>,
+  chapters: StructureGroup[] | undefined
+): ChapterRunsResult {
+  const cfgs = (chapters ?? []).filter((c) => c && typeof c.title === "string");
+  const labels = scenes.map((s) => (s.chapter ?? "").trim());
+  const indexOf = new Map<string, number>();
+  scenes.forEach((s, i) => {
+    if (!indexOf.has(s.title)) indexOf.set(s.title, i);
+  });
+
+  // Valid anchors: scene index → the entry it opens (first entry wins).
+  const anchorAt = new Map<number, StructureGroup>();
+  for (const c of cfgs) {
+    if (typeof c.firstScene !== "string") continue;
+    const i = indexOf.get(c.firstScene);
+    if (i === undefined || !labels[i] || labels[i] !== c.title || anchorAt.has(i)) continue;
+    anchorAt.set(i, c);
+  }
+
+  const runs: ChapterRun[] = [];
+  const unassigned: number[] = [];
+  let cur: ChapterRun | null = null;
+  labels.forEach((label, i) => {
+    if (!label) {
+      unassigned.push(i);
+      cur = null;
+      return;
+    }
+    if (cur && cur.title === label && !anchorAt.has(i)) {
+      cur.indices.push(i);
+      return;
+    }
+    cur = { id: "", title: label, indices: [i] };
+    runs.push(cur);
+  });
+
+  // Pair: anchored runs first (exact), then title order for the rest.
+  const claimed = new Set<StructureGroup>();
+  for (const run of runs) {
+    const cfg = anchorAt.get(run.indices[0]);
+    if (cfg) {
+      run.cfg = cfg;
+      claimed.add(cfg);
+    }
+  }
+  for (const run of runs) {
+    if (run.cfg) continue;
+    const cfg = cfgs.find((c) => c.title === run.title && !claimed.has(c));
+    if (cfg) {
+      run.cfg = cfg;
+      claimed.add(cfg);
+    }
+  }
+
+  // Ids: config ids win; derived ids are deterministic and never collide. The
+  // first run of a title derives `c:<title>`; a later run of the same title
+  // (configured or not before it) derives `c:<title>~<n>` — the marker
+  // `serializeOutline` uses to drop it once emptied.
+  const used = new Set<string>();
+  for (const c of cfgs) if (typeof c.id === "string" && c.id) used.add(c.id);
+  const derive = (title: string, occurrence: number): string => {
+    let n = occurrence;
+    let id = n > 1 ? `c:${title}~${n}` : `c:${title}`;
+    while (used.has(id)) id = `c:${title}~${++n}`;
+    used.add(id);
+    return id;
+  };
+  const taken = new Set<string>();
+  const idFor = (cfg: StructureGroup | undefined, title: string, occurrence: number): string => {
+    const own = cfg && typeof cfg.id === "string" && cfg.id && !taken.has(cfg.id) ? cfg.id : null;
+    const id = own ?? derive(title, occurrence);
+    taken.add(id);
+    return id;
+  };
+  const seen = new Map<string, number>();
+  for (const run of runs) {
+    const occurrence = (seen.get(run.title) ?? 0) + 1;
+    seen.set(run.title, occurrence);
+    run.id = idFor(run.cfg, run.title, occurrence);
+  }
+  const planned = cfgs
+    .filter((c) => !claimed.has(c))
+    .map((cfg) => ({ id: idFor(cfg, cfg.title, 1), cfg }));
+
+  return { runs, planned, unassigned };
+}
+
+/** An id `chapterRuns` derived for a second-or-later unconfigured run of a
+ *  title — an artifact of the split, dropped once it empties. */
+export function isDerivedDuplicateId(id: string): boolean {
+  return /^c:.*~\d+$/.test(id);
+}
+
 /**
  * Reconstruct the tree from the stored config arrays + the manuscript scenes.
  *
- * The config arrays are authoritative for id/target/`actId` and for the order of
- * configured entries. But existing projects carry chapter/act *strings* on scenes
- * with little or no config — so we also **adopt** any chapter title or act string
- * that appears on a scene but isn't configured yet: derived chapters get a stable
- * title-based id (`c:<title>`), and a derived chapter's act is *inferred* from its
- * scenes' `act` string (a derived act gets id `a:<title>`). This makes the first
- * render mirror the project's current implicit structure; once the user drags or
- * edits, `applyOutline` persists everything explicitly. Deterministic (no random),
- * so it's unit-testable.
+ * Chapters come from {@link chapterRuns}: config is authoritative for
+ * id/target/`actId` and for the order of planned entries. Existing projects
+ * carry chapter/act *strings* on scenes with little or no config — so a run
+ * with no config entry is **adopted** with a derived id, and its act is
+ * *inferred* from its scenes' `act` string (a derived act gets id `a:<title>`).
+ * This makes the first render mirror the project's current implicit structure;
+ * once the user drags or edits, `applyOutline` persists everything explicitly.
+ * Deterministic (no random), so it's unit-testable.
  *
- * Ordering: chapters sort by their first scene's manuscript position (empty ones
- * last, in config order); acts by config order, then derived acts by first
- * appearance. A scene with no (known) chapter is unassigned.
+ * Ordering: chapters by manuscript position (planned ones last, in config
+ * order); acts by config order, then derived acts by first appearance. A scene
+ * with no chapter is unassigned.
  */
 export function buildOutline(
   acts: StructureGroup[] | undefined,
   chapters: StructureGroup[] | undefined,
   scenes: Array<{ title: string; path: string | null; indent: number; chapter?: string; act?: string }>
 ): OutlineTree {
-  const chapterCfg = chapters ?? [];
   const actCfg = acts ?? [];
-  const cfgByTitle = new Map(chapterCfg.map((c) => [c.title, c] as const));
   const actCfgById = new Map(actCfg.map((a) => [a.id, a] as const));
   const actCfgByTitle = new Map(actCfg.map((a) => [a.title, a] as const));
+  const refs: SceneRef[] = scenes.map((s) => ({ title: s.title, path: s.path, indent: s.indent }));
+  const { runs, planned, unassigned } = chapterRuns(scenes, chapters);
 
-  // 1. Gather chapters: scenes (manuscript order), first index, and an act guess
-  //    from the scenes' act strings (first non-blank wins).
-  interface Agg { scenes: SceneRef[]; firstIdx: number; actGuess?: string }
-  const byChapter = new Map<string, Agg>();
-  const unassignedScenes: SceneRef[] = [];
-  scenes.forEach((s, i) => {
-    const ref: SceneRef = { title: s.title, path: s.path, indent: s.indent };
-    const ch = (s.chapter ?? "").trim();
-    if (!ch) {
-      unassignedScenes.push(ref);
-      return;
-    }
-    const agg = byChapter.get(ch) ?? { scenes: [], firstIdx: i };
-    agg.scenes.push(ref);
-    if (agg.actGuess === undefined && (s.act ?? "").trim()) agg.actGuess = (s.act ?? "").trim();
-    byChapter.set(ch, agg);
-  });
-  // Configured chapters with no scenes yet (planned/empty).
-  for (const c of chapterCfg) {
-    if (!byChapter.has(c.title)) byChapter.set(c.title, { scenes: [], firstIdx: Number.POSITIVE_INFINITY });
-  }
-
-  // 2. Resolve each chapter's node + its act id (config wins; else inferred).
+  // 1. Each chapter's node + its act id (config wins; else inferred from the
+  //    run's scenes' act strings, first non-blank).
   const derivedActId = (title: string) => `a:${title}`;
-  const chapterActId = new Map<string, string | null>();
-  const chapterNode = new Map<string, ChapterNode>();
-  const orderedTitles = [...byChapter.keys()].sort((a, b) => byChapter.get(a)!.firstIdx - byChapter.get(b)!.firstIdx);
-  for (const title of orderedTitles) {
-    const cfg = cfgByTitle.get(title);
-    const agg = byChapter.get(title)!;
+  const resolved: Array<{ node: ChapterNode; actId: string | null }> = [];
+  for (const run of runs) {
+    const cfg = run.cfg;
+    const actGuess = run.indices.map((i) => (scenes[i].act ?? "").trim()).find((a) => a);
     let actId: string | null = null;
     if (cfg?.actId && actCfgById.has(cfg.actId)) actId = cfg.actId;
-    else if (agg.actGuess) actId = actCfgByTitle.get(agg.actGuess)?.id ?? derivedActId(agg.actGuess);
-    chapterActId.set(title, actId);
-    chapterNode.set(title, {
-      id: cfg?.id ?? `c:${title}`,
-      title,
-      ...(cfg?.targetWords ? { targetWords: cfg.targetWords } : {}),
-      scenes: agg.scenes,
+    else if (actGuess) actId = actCfgByTitle.get(actGuess)?.id ?? derivedActId(actGuess);
+    resolved.push({
+      node: {
+        id: run.id,
+        title: run.title,
+        ...(cfg?.targetWords ? { targetWords: cfg.targetWords } : {}),
+        scenes: run.indices.map((i) => refs[i]),
+      },
+      actId,
+    });
+  }
+  for (const { id, cfg } of planned) {
+    resolved.push({
+      node: { id, title: cfg.title, ...(cfg.targetWords ? { targetWords: cfg.targetWords } : {}), scenes: [] },
+      actId: cfg.actId && actCfgById.has(cfg.actId) ? cfg.actId : null,
     });
   }
 
-  // 3. Build the act list: configured acts (array order) + derived acts (by first
+  // 2. Build the act list: configured acts (array order) + derived acts (by first
   //    appearance among chapters), then attach chapters. Chapters with no act are loose.
   const actNodeById = new Map<string, ActNode>();
   const actOrder: ActNode[] = [];
@@ -125,9 +244,7 @@ export function buildOutline(
   };
   for (const a of actCfg) ensureAct(a.id, a.title); // configured acts first, in array order
   const looseChapters: ChapterNode[] = [];
-  for (const title of orderedTitles) {
-    const node = chapterNode.get(title)!;
-    const actId = chapterActId.get(title);
+  for (const { node, actId } of resolved) {
     if (!actId) {
       looseChapters.push(node);
       continue;
@@ -136,7 +253,7 @@ export function buildOutline(
     ensureAct(actId, actTitle).chapters.push(node);
   }
 
-  return { acts: actOrder, looseChapters, unassignedScenes };
+  return { acts: actOrder, looseChapters, unassignedScenes: unassigned.map((i) => refs[i]) };
 }
 
 export interface OutlineWrites {
@@ -157,7 +274,8 @@ export interface OutlineWrites {
  * act→chapter→scene, then loose chapters' scenes, then unassigned scenes. Each
  * scene keeps its own `indent`. Scene strings are denormalized: a scene's
  * `chapter` = its chapter title, its `act` = that chapter's act title (blank when
- * loose/unassigned).
+ * loose/unassigned). Each populated chapter records its `firstScene`, which is
+ * what keeps two same-named chapters apart on the next build.
  */
 export function serializeOutline(tree: OutlineTree): OutlineWrites {
   const order: IndentedScene[] = [];
@@ -167,11 +285,15 @@ export function serializeOutline(tree: OutlineTree): OutlineWrites {
   const chapters: StructureGroup[] = [];
 
   const emitChapter = (c: ChapterNode, actTitle: string, actId: string | undefined) => {
+    // A second same-named run the build split off, now emptied (its scenes were
+    // dragged back where they belong): nothing to keep.
+    if (c.scenes.length === 0 && isDerivedDuplicateId(c.id)) return;
     chapters.push({
       id: c.id,
       title: c.title,
       ...(c.targetWords ? { targetWords: c.targetWords } : {}),
       ...(actId ? { actId } : {}),
+      ...(c.scenes.length > 0 ? { firstScene: c.scenes[0].title } : {}),
     });
     for (const s of c.scenes) {
       order.push({ title: s.title, indent: s.indent });
@@ -318,6 +440,23 @@ export function rebaseSceneOrder(
   const kept = desired.filter((s) => currentTitles.has(s.title));
   const appended = current.filter((s) => !desiredTitles.has(s.title));
   return [...kept, ...appended];
+}
+
+/**
+ * Where a new scene for chapter `chapterId` belongs in the manuscript: after
+ * the chapter's own last scene, else after the last scene of any chapter shown
+ * before it (the order `serializeOutline` writes). `undefined` = nothing comes
+ * before it, so the caller appends. Pair with an anchor write when the chapter
+ * is empty — its first scene then can't fold into a same-named chapter just
+ * before it.
+ */
+export function sceneSlotForChapter(tree: OutlineTree, chapterId: string): string | undefined {
+  let last: string | undefined;
+  for (const c of allChapters(tree)) {
+    if (c.scenes.length > 0) last = c.scenes[c.scenes.length - 1].title;
+    if (c.id === chapterId) return last;
+  }
+  return undefined;
 }
 
 /** A fresh empty chapter node (for "+ Add chapter"). */

@@ -257,8 +257,15 @@
 }
 .inkswell-inspector__control select,
 .inkswell-inspector__control input[type="text"],
+.inkswell-inspector__control input[type="date"],
 .inkswell-inspector__textarea {
   width: 100%;
+}
+/* Under a field whose stored value its control can't show natively
+   (a Date field holding "Spring 1204"). */
+.inkswell-inspector__hint {
+  margin-top: 2px;
+  font-size: var(--font-ui-smaller);
 }
 .inkswell-inspector__textarea {
   resize: vertical;
@@ -3369,14 +3376,21 @@ body.inkswell-phone .inkswell-project__right {
   font-weight: var(--font-bold);
 }
 
-/* Codex Scope field: a kind switcher (Global / Series / Books) above toggle pills
-   for the set. Pills are real <button>s reset to chip geometry; filled = in scope,
-   outlined = not; `.is-unknown` marks a stored name with no matching project. */
-.inkswell-scope {
+/* Codex Scope (#57): the detail pane shows one summary line + "Change…"; the
+   editor is a dialog — a Global / Series / Books switcher above a scrolling
+   list (radio rows for a series, a checklist of books grouped by series). */
+.inkswell-scope__summary {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: var(--size-4-2);
-  align-items: flex-start;
+}
+.inkswell-scope__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.inkswell-scope__kinds {
+  margin-bottom: var(--size-4-3);
 }
 .inkswell-scope__kinds .inkswell-viewswitch__btn {
   font-size: var(--font-ui-small);
@@ -3391,40 +3405,31 @@ body.inkswell-phone .inkswell-project__right {
 .inkswell-scope__kinds .inkswell-viewswitch__btn.is-active:hover {
   background-color: var(--interactive-accent-hover);
 }
-.inkswell-scope__pills {
+.inkswell-scope-modal__list {
+  max-height: 50vh;
+  overflow-y: auto;
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--size-4-1);
+  flex-direction: column;
+  gap: 2px;
 }
-.inkswell-scope__caption {
-  padding-left: 2px;
-}
-.inkswell-chip--toggle {
-  cursor: pointer;
-  height: auto;
-  line-height: normal;
-  box-shadow: none;
-  border: 1px solid var(--background-modifier-border);
-  background: transparent;
+.inkswell-scope-modal__group {
+  margin-top: var(--size-4-2);
+  font-size: var(--font-ui-smaller);
+  font-weight: var(--font-semibold);
   color: var(--text-muted);
 }
-.inkswell-chip--toggle:hover {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
+.inkswell-scope-modal__group:first-child {
+  margin-top: 0;
 }
-.inkswell-chip--toggle.is-active {
-  background: var(--interactive-accent);
-  border-color: var(--interactive-accent);
-  color: var(--text-on-accent);
+.inkswell-scope-modal__row {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+  padding: 2px 0;
+  cursor: pointer;
 }
-.inkswell-chip--toggle.is-active:hover {
-  background: var(--interactive-accent-hover);
-  border-color: var(--interactive-accent-hover);
-}
-.inkswell-chip--toggle.is-unknown {
-  border-style: dashed;
-  background: transparent;
-  color: var(--text-error);
+body.is-mobile .inkswell-scope-modal__row {
+  min-height: 44px;
 }
 
 .inkswell-chip__x:hover {

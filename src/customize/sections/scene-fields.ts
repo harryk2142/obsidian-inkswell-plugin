@@ -26,7 +26,7 @@ import type { CustomizeSection } from "../section";
 const CARD = { detailsCls: "inkswell-customize__card", bodyCls: "inkswell-customize__cardbody" };
 
 /** Scenes have no portrait, so no image kind. */
-const SCENE_FIELD_KINDS: FieldKind[] = ["text", "textarea", "number", "list", "links", "link"];
+const SCENE_FIELD_KINDS: FieldKind[] = ["text", "textarea", "number", "date", "list", "links", "link"];
 
 export const sceneFieldsSection: CustomizeSection = {
   id: "scene-fields",

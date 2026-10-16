@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { groupIntoSeries, projectSeries, readSeriesInfo, shelfMetaText } from "../src/series/series";
+import {
+  groupIntoSeries,
+  normalizeSeriesOrder,
+  orderSeries,
+  projectSeries,
+  readSeriesInfo,
+  renameInOrder,
+  shelfMetaText,
+} from "../src/series/series";
 import { Project, SeriesInfo } from "../src/projects/types";
 
 function project(title: string, series?: Partial<SeriesInfo> | null): Project {
@@ -124,5 +132,35 @@ describe("shelfMetaText", () => {
     expect(
       shelfMetaText([{ words: 30000, target: 60000 }, { words: 30000, target: 60000 }], true)
     ).toBe(`2 books · ${(60000).toLocaleString()} words / ${(120000).toLocaleString()} (50%)`);
+  });
+});
+
+describe("series shelf order (#57)", () => {
+  const s = (...names: string[]) => names.map((name) => ({ name }));
+
+  it("puts saved names first, case-insensitively; the rest keep their order", () => {
+    expect(orderSeries(s("Alpha", "Beta", "Gamma", "Delta"), ["gamma", "Alpha"]).map((x) => x.name)).toEqual([
+      "Gamma",
+      "Alpha",
+      "Beta",
+      "Delta",
+    ]);
+    expect(orderSeries(s("Alpha", "Beta"), []).map((x) => x.name)).toEqual(["Alpha", "Beta"]);
+    // A saved name with no series (all its books left) is simply skipped.
+    expect(orderSeries(s("Beta"), ["Gone", "Beta"]).map((x) => x.name)).toEqual(["Beta"]);
+  });
+
+  it("normalizes the stored list", () => {
+    expect(normalizeSeriesOrder([" Saga ", "saga", "", 3, "Other"])).toEqual(["Saga", "Other"]);
+    expect(normalizeSeriesOrder("Saga")).toEqual([]);
+    expect(normalizeSeriesOrder(undefined)).toEqual([]);
+  });
+
+  it("a rename keeps the slot; a merge drops the old name", () => {
+    expect(renameInOrder(["A", "B", "C"], "B", "Bee")).toEqual(["A", "Bee", "C"]);
+    expect(renameInOrder(["A", "B", "C"], "b", "B2")).toEqual(["A", "B2", "C"]);
+    expect(renameInOrder(["A", "B", "C"], "B", "c")).toEqual(["A", "C"]);
+    expect(renameInOrder(["A", "B"], "B", "b")).toEqual(["A", "b"]); // case-only rename
+    expect(renameInOrder(["A"], "Z", "Y")).toBeNull();
   });
 });

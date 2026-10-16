@@ -26,6 +26,7 @@ import {
 import { ChallengeProgress, WritingChallenge, showEndedResult } from "../goals/challenge";
 import { renderHint } from "../help/hint";
 import { tallyBy } from "../insight/breakdown";
+import { ChapterRunsResult, chapterRuns } from "../outliner/outline";
 import { formatReadTime, heatLevel } from "./format";
 import { resolveActive } from "../projects/active-project";
 import { ProjectStats } from "../projects/project-stats";
@@ -463,25 +464,38 @@ export class StatsPanel {
     this.tallyBars(body, tallyBy(acts, actOrder));
 
     body.createDiv({ cls: "inkswell-stats__muted", text: "By chapter" });
-    const chapters = metas.map((m) => m.chapter);
-    const chapterOrder = [...new Set(chapters.filter((c): c is string => !!c))];
-    this.tallyBars(body, tallyBy(chapters, chapterOrder));
+    // One bar per chapter as it runs through the manuscript, never per chapter
+    // string: two chapters may share a name (#58).
+    const runs = chapterRuns(
+      project.scenes.map((s, i) => ({ title: s.title, chapter: metas[i].chapter })),
+      project.inkswell?.chapters
+    );
+    const chapterTallies = runs.runs.map((r) => ({ key: r.title, count: r.indices.length }));
+    if (runs.unassigned.length > 0) chapterTallies.push({ key: "None", count: runs.unassigned.length });
+    this.tallyBars(body, chapterTallies);
 
     // Read-only mirror of any per-chapter word targets (managed in Plan → Structure).
-    void this.renderChapterTargets(body, project);
+    void this.renderChapterTargets(body, project, runs);
   }
 
   /** Compact per-chapter target progress (only chapters that have a target). */
-  private async renderChapterTargets(body: HTMLElement, project: Project): Promise<void> {
-    const configured = (project.inkswell?.chapters ?? []).filter((g) => g.targetWords);
-    if (configured.length === 0) return;
-    const map = await this.stats.groupWords(project, "chapter");
+  private async renderChapterTargets(
+    body: HTMLElement,
+    project: Project,
+    { runs, planned }: ChapterRunsResult
+  ): Promise<void> {
+    const rows = [
+      ...runs.map((r) => ({ cfg: r.cfg, paths: r.indices.map((i) => project.scenes[i].path) })),
+      ...planned.map((p) => ({ cfg: p.cfg, paths: [] as Array<string | null> })),
+    ].filter((r) => r.cfg?.targetWords);
+    if (rows.length === 0) return;
     body.createDiv({ cls: "inkswell-stats__muted", text: "Chapter targets" });
-    for (const g of configured) {
-      const target = g.targetWords ?? 0;
-      const words = map.get(g.title)?.words ?? 0;
+    for (const { cfg, paths } of rows) {
+      const target = cfg?.targetWords ?? 0;
+      let words = 0;
+      for (const p of paths) words += await this.stats.sceneWords(p);
       const row = body.createDiv({ cls: "inkswell-stats__row" });
-      row.createSpan({ cls: "inkswell-tally__label", text: g.title });
+      row.createSpan({ cls: "inkswell-tally__label", text: cfg?.title ?? "" });
       this.progressBar(row, words, target);
       row.createSpan({
         cls: "inkswell-tally__count",
