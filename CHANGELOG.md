@@ -10,6 +10,10 @@ time the version bump renames that section to the new version and date.
 
 ## [Unreleased]
 
+## [1.21.0] - 2026-10-16
+
+Your book, your names. Chapters can share a name, so chapters named for their point-of-view character (Alice, Bob, Alice) each stay their own. Your scene and codex fields can hold a real date. Home puts your series in the order you choose, and a codex entry's Scope stays out of the way in a vault with many books.
+
 ### Added
 - **Chapters can share a name.** Name chapters after their point-of-view character (Alice, Bob, Alice…) and each stays its own chapter, with its own word target and act, in the Tree, Board, Plot grid, Track, Write's scene list, compile and the story bible, even two "Alice" chapters in a row. Requested in [#58](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/58).
 - **Date fields.** Your own scene fields (Customize → Scene inspector fields → Your fields), and the fields of a codex type, can now be a **Date**: pick it from a calendar, and it's saved as `YYYY-MM-DD`, the format Obsidian uses for date properties, so it's ready for Bases and Dataview. Switching an existing field to Date keeps anything that isn't a calendar date (say, "Spring 1204") visible as text until you change it. Requested in [#59](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/59).
@@ -428,7 +432,8 @@ First community-store release — the full local-first writer's suite.
 - Drop-in compatibility with Longform's `longform` frontmatter (zero migration);
   Inkswell-only data lives under a separate `inkswell` key.
 
-[Unreleased]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.20.0...HEAD
+[Unreleased]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.21.0...HEAD
+[1.21.0]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.20.0...1.21.0
 [1.20.0]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.19.0...1.20.0
 [1.19.0]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.18.1...1.19.0
 [1.18.1]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.18.0...1.18.1
