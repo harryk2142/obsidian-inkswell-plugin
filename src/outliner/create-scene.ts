@@ -14,6 +14,7 @@ import { SceneMeta, defaultNewSceneStatus, writeSceneMeta } from "../scenes/scen
 import { sceneTemplateCandidates } from "../scenes/scene-template";
 import { SCENE_FIELDS_KEY } from "../scenes/scene-fields";
 import { FIELDS_KEY } from "../codex/profile-schema";
+import { StructureGroup } from "./structure";
 import { FolderSettings, sanitizeSegment } from "../settings/folders";
 import type { ListOverrideSettings } from "../settings/overridable-lists";
 import { applyTemplateVars } from "../lib/template";
@@ -32,6 +33,10 @@ export interface CreateSceneOptions {
   indent?: number;
   /** Prose for the new scene instead of the template's body (Split scene). */
   body?: string;
+  /** Id of an EMPTY chapter this scene opens: written as that chapter's
+   *  `firstScene` in the same index transaction, so the scene can't fold into a
+   *  same-named chapter just before it (#58). */
+  anchorChapter?: string;
 }
 
 /**
@@ -85,6 +90,17 @@ export async function createSceneFile(
   return file;
 }
 
+/** Anchor the chapter `chapterId` on `sceneTitle` — only while it's still
+ *  empty (an anchor already set means the chapter gained a scene meanwhile). */
+function anchorChapter(
+  chapters: StructureGroup[] | undefined,
+  chapterId: string,
+  sceneTitle: string
+): StructureGroup[] | null {
+  if (!chapters?.some((c) => c?.id === chapterId && !c.firstScene)) return null;
+  return chapters.map((c) => (c?.id === chapterId ? { ...c, firstScene: sceneTitle } : c));
+}
+
 /**
  * Create one scene and add it to the project. Returns the new TFile, or null if
  * the project isn't multi-scene, the title is empty, or a file of that name
@@ -123,19 +139,24 @@ export async function createScene(
   return tryFileOp(async () => {
     const file = await createSceneFile(app, settings, draft, path, title, opts.meta ?? {}, opts.body);
 
-    await updateScenes(app, indexFile, (scenes) => {
-      if (scenes.some((s) => s.title === title)) return scenes;
-      if (opts.afterTitle) {
-        const at = scenes.findIndex((s) => s.title === opts.afterTitle);
-        if (at >= 0) {
-          const indent = opts.indent ?? scenes[at].indent;
-          const next = scenes.slice();
-          next.splice(at + 1, 0, { title, indent });
-          return next;
+    await updateScenes(
+      app,
+      indexFile,
+      (scenes) => {
+        if (scenes.some((s) => s.title === title)) return scenes;
+        if (opts.afterTitle) {
+          const at = scenes.findIndex((s) => s.title === opts.afterTitle);
+          if (at >= 0) {
+            const indent = opts.indent ?? scenes[at].indent;
+            const next = scenes.slice();
+            next.splice(at + 1, 0, { title, indent });
+            return next;
+          }
         }
-      }
-      return [...scenes, { title, indent: opts.indent ?? 0 }];
-    });
+        return [...scenes, { title, indent: opts.indent ?? 0 }];
+      },
+      opts.anchorChapter ? (cur) => anchorChapter(cur, opts.anchorChapter!, title) : undefined
+    );
 
     return file;
   }, `Couldn't create the scene "${title}".`);
@@ -146,6 +167,8 @@ export interface NewSceneOptions {
   afterTitle?: string;
   /** Seeds the new scene's frontmatter. */
   meta?: Partial<SceneMeta>;
+  /** Id of an empty chapter the new scene opens (see CreateSceneOptions). */
+  anchorChapter?: string;
   /** Called once per scene successfully created (fires repeatedly for "Create another"). */
   onCreated?: (file: TFile) => void;
 }
@@ -200,7 +223,12 @@ class NewSceneModal extends Modal {
       title,
       afterTitle: this.opts.afterTitle,
       meta: this.opts.meta,
+      anchorChapter: this.opts.anchorChapter,
     });
+    // "Create another" adds scenes after this one, inside the chapter it opened.
+    if (file && this.opts.anchorChapter) {
+      this.opts = { ...this.opts, afterTitle: title, anchorChapter: undefined };
+    }
     if (!file) {
       // createScene surfaced the reason (name taken / write failure). Keep the
       // dialog open so the user can adjust and retry instead of losing the title.

@@ -10,6 +10,15 @@ time the version bump renames that section to the new version and date.
 
 ## [Unreleased]
 
+### Added
+- **Chapters can share a name.** Name chapters after their point-of-view character (Alice, Bob, Alice…) and each stays its own chapter, with its own word target and act, in the Tree, Board, Plot grid, Track, Write's scene list, compile and the story bible, even two "Alice" chapters in a row. Requested in [#58](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/58).
+
+### Changed
+- **The Tree shows scenes where they are in the manuscript.** A scene tagged with a chapter name but sitting elsewhere in your book now shows as its own chapter at that spot, as compile and Write's scene list already treated it, instead of being pulled into the earlier chapter. To move a scene into a chapter, drag it in the Tree, Board or Plot grid. Dropping a scene on a Plot grid row now moves it into that chapter, as on the Board.
+
+### Fixed
+- **Adding or renaming a chapter to a name already in use no longer merges it into the first one** or replaces that chapter's word target and act. [#58](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/58)
+
 ## [1.20.0] - 2026-10-12
 
 Sharing and shaping. Generate a story bible to hand to alpha readers or an editor, add your own fields to the scene inspector, split a scene without cut-and-paste, open any scene in a regular Obsidian tab with one click, and arrange the rail the way you work.

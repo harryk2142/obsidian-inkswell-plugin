@@ -7,12 +7,11 @@
 import { App, Menu, TFile } from "obsidian";
 import { attachRowMenu } from "../../lib/row-menu";
 import { tryFileOp } from "../../lib/notify";
-import { updateScenes } from "../../projects/index-writer";
+import { removeSceneFromIndex, updateScenes } from "../../projects/index-writer";
 import { ProjectStats } from "../../projects/project-stats";
 import {
   indentScene,
   moveScene,
-  removeScene,
   unindentScene,
 } from "../../projects/scene-tree";
 import { Project } from "../../projects/types";
@@ -184,7 +183,7 @@ export class SceneRows {
             this.plugin.selfWrites.mark(file.path);
             if (scene.path) this.plugin.selfWrites.mark(scene.path);
             void tryFileOp(
-              () => updateScenes(this.app, file, (s) => removeScene(s, scene.title)),
+              () => removeSceneFromIndex(this.app, file, scene.title),
               "Couldn't remove the scene from the project."
             );
           }

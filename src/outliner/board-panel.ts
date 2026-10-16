@@ -9,6 +9,7 @@
  */
 
 import { App, Menu, Notice, TFile } from "obsidian";
+import { numberRepeats } from "../lib/labels";
 import { attachRowMenu } from "../lib/row-menu";
 import { ActiveProject, resolveActive } from "../projects/active-project";
 import { ProjectStore } from "../projects/project-store";
@@ -224,15 +225,17 @@ export class BoardPanel {
     if (this.columns.length <= 1) return;
     const currentKey = this.currentColumnKey(it);
     menu.addSeparator();
-    for (const col of this.columns) {
-      if (col.key === currentKey) continue;
+    // Two chapter columns may share a name (#58) — number the repeats.
+    const labels = numberRepeats(this.columns.map((c) => c.label));
+    this.columns.forEach((col, k) => {
+      if (col.key === currentKey) return;
       menu.addItem((i) =>
         i
-          .setTitle(`Move to: ${col.label}`)
+          .setTitle(`Move to: ${labels[k]}`)
           .setIcon("corner-up-right")
           .onClick(() => this.assign(it.path, col.key, project))
       );
-    }
+    });
   }
 
   private assign(path: string, key: string, project: Project): void {

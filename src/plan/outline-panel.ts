@@ -15,6 +15,7 @@
 
 import { App, Menu, TFile, setIcon } from "obsidian";
 import { tagField } from "../lib/focus-preserve";
+import { numberRepeats } from "../lib/labels";
 import { attachRowMenu } from "../lib/row-menu";
 import { ActiveProject, resolveActive } from "../projects/active-project";
 import { ProjectStore } from "../projects/project-store";
@@ -36,6 +37,7 @@ import {
   moveScene,
   newActNode,
   newChapterNode,
+  sceneSlotForChapter,
 } from "../outliner/outline";
 import type InkswellPlugin from "../../main";
 
@@ -110,7 +112,8 @@ export class OutlinePanel {
       return;
     }
 
-    // Word/scene counts per chapter (async fill).
+    // Word/scene counts per chapter node (async fill), keyed by chapter id —
+    // two chapters may share a title (#58).
     const fills = new Map<string, (m: { words: number; scenes: number } | undefined) => void>();
 
     for (const act of this.tree.acts) this.renderAct(container, act, fills);
@@ -128,7 +131,7 @@ export class OutlinePanel {
       for (const s of this.tree.unassignedScenes) this.renderScene(box, s, null);
     }
 
-    void this.fillCounts(project, fills);
+    void this.fillCounts(fills);
   }
 
   // --- Build / counts ------------------------------------------------------
@@ -142,12 +145,17 @@ export class OutlinePanel {
     return buildOutline(project.inkswell?.acts, project.inkswell?.chapters, scenes);
   }
 
+  /** Sum each chapter node's own scenes (mtime-cached per scene). */
   private async fillCounts(
-    project: Project,
     fills: Map<string, (m: { words: number; scenes: number } | undefined) => void>
   ): Promise<void> {
-    const map = await this.plugin.stats.groupWords(project, "chapter");
-    for (const [title, fill] of fills) fill(map.get(title));
+    for (const c of this.allChapters()) {
+      const fill = fills.get(c.id);
+      if (!fill) continue;
+      let words = 0;
+      for (const s of c.scenes) words += await this.plugin.stats.sceneWords(s.path);
+      fill({ words, scenes: c.scenes.length });
+    }
   }
 
   private indexFile(): TFile | null {
@@ -260,8 +268,8 @@ export class OutlinePanel {
       for (const s of chapter.scenes) this.renderScene(body, s, chapter.id);
     }
 
-    // Fill counts + progress once groupWords resolves (keyed by chapter title).
-    fills.set(chapter.title, (m) => {
+    // Fill counts + progress once the word counts resolve.
+    fills.set(chapter.id, (m) => {
       const words = m?.words ?? 0;
       const scenes = m?.scenes ?? 0;
       meta.setText(
@@ -420,11 +428,13 @@ export class OutlinePanel {
       );
     }
     menu.addSeparator();
-    for (const c of this.allChapters()) {
+    const chapters = this.allChapters();
+    const labels = numberRepeats(chapters.map((c) => c.title)); // chapters may share a name (#58)
+    chapters.forEach((c, k) => {
       menu.addItem((i) =>
-        i.setTitle(`Move to: ${c.title}`).onClick(() => this.commit(moveScene(this.tree, scene.title, c.id, null)))
+        i.setTitle(`Move to: ${labels[k]}`).onClick(() => this.commit(moveScene(this.tree, scene.title, c.id, null)))
       );
-    }
+    });
     menu.addItem((i) =>
       i.setTitle("Move to: (unassigned)").onClick(() => this.commit(moveScene(this.tree, scene.title, null, null)))
     );
@@ -476,14 +486,21 @@ export class OutlinePanel {
   /**
    * Create a scene without leaving the Tree. With a chapter, the scene is tagged
    * into it and inserted after its last scene (same convention as the Grid's
-   * "New scene here…"); an empty chapter appends at the manuscript's end and the
-   * next outline edit reflows it into place. With null, it lands unassigned.
+   * "New scene here…"). An empty chapter's first scene goes where the chapter
+   * sits and becomes its anchor, so it can't fold into a same-named chapter
+   * just before it (#58). With null, it lands unassigned.
    */
   private addScene(chapter: ChapterNode | null): void {
     if (!this.project) return;
+    const empty = chapter !== null && chapter.scenes.length === 0;
     promptNewScene(this.app, this.store, this.plugin.settings, this.project, {
-      afterTitle: chapter?.scenes[chapter.scenes.length - 1]?.title,
+      afterTitle: chapter
+        ? empty
+          ? sceneSlotForChapter(this.tree, chapter.id)
+          : chapter.scenes[chapter.scenes.length - 1]?.title
+        : undefined,
       meta: chapter ? { chapter: chapter.title } : undefined,
+      anchorChapter: empty ? chapter.id : undefined,
     });
   }
 

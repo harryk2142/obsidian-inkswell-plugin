@@ -24,7 +24,9 @@ import type { BeatAssignment, BeatSheet } from "../outliner/beat-templates";
 import { renameSceneInBeats, setAssignment } from "../outliner/beats";
 import { rebaseSceneOrder } from "../outliner/outline";
 import type { Plotline } from "../outliner/plotgrid";
+import { passChapterAnchors, renameSceneInChapters } from "../outliner/structure";
 import type { StructureGroup } from "../outliner/structure";
+import { removeScene } from "./scene-tree";
 import type { RevisionDecision } from "../revisions/types";
 import type { ChecklistItem, ChecklistTier, RevisionChecklistData } from "../revisions/checklist";
 import { setChecklistItem } from "../revisions/checklist";
@@ -62,17 +64,51 @@ function currentDraft(fm: Record<string, unknown>, indexFile: TFile): Draft | nu
  * a transform computed from a stale panel can therefore mis-position an entry
  * at worst, but can no longer drop scenes created (or resurrect scenes
  * deleted) since the panel rendered. No-op when the index isn't multi-scene.
+ *
+ * `chapters` (optional) transforms the CURRENT `inkswell.chapters` in the same
+ * transaction — given the scene list before and after `transform` — e.g. to
+ * anchor a new scene as its chapter's first; return `null` to leave it as is.
  */
 export async function updateScenes(
   app: App,
   indexFile: TFile,
-  transform: (scenes: IndentedScene[]) => IndentedScene[]
+  transform: (scenes: IndentedScene[]) => IndentedScene[],
+  chapters?: (
+    current: StructureGroup[] | undefined,
+    before: IndentedScene[],
+    after: IndentedScene[]
+  ) => StructureGroup[] | null
 ): Promise<void> {
   await app.fileManager.processFrontMatter(indexFile, (fm: Record<string, unknown>) => {
     const draft = currentDraft(fm, indexFile);
     if (!draft || draft.format !== "scenes") return;
-    writeDraftToFrontmatter(fm, { ...draft, scenes: transform(draft.scenes) });
+    const after = transform(draft.scenes);
+    writeDraftToFrontmatter(fm, { ...draft, scenes: after });
+    if (!chapters) return;
+    const inkswell = { ...asRecord(fm["inkswell"]) };
+    const cur = Array.isArray(inkswell["chapters"]) ? (inkswell["chapters"] as StructureGroup[]) : undefined;
+    const next = chapters(cur, draft.scenes, after);
+    if (!next) return;
+    if (next.length === 0) delete inkswell["chapters"];
+    else inkswell["chapters"] = next;
+    if (Object.keys(inkswell).length === 0) delete fm["inkswell"];
+    else fm["inkswell"] = inkswell;
   });
+}
+
+/**
+ * Drop a scene from the index. A chapter that opened with it passes its anchor
+ * to the next scene in the same transaction (`passChapterAnchors`), so deleting
+ * the first scene of the second of two same-named chapters doesn't fold its
+ * remaining scenes into the first (#58).
+ */
+export async function removeSceneFromIndex(app: App, indexFile: TFile, title: string): Promise<void> {
+  await updateScenes(
+    app,
+    indexFile,
+    (scenes) => removeScene(scenes, title),
+    (cur, before) => passChapterAnchors(cur, before, title)
+  );
 }
 
 /**
@@ -94,7 +130,8 @@ export async function updateDraftFields(
 
 /**
  * Rename a scene everywhere the index refers to it — the `longform.scenes`
- * title and any beat→scene links — in ONE processFrontMatter transaction, all
+ * title, any beat→scene links and chapter `firstScene` anchors — in ONE
+ * processFrontMatter transaction, all
  * computed against current state. Replaces the old two-write sequences
  * (scenes map, then beats), which left a window where a concurrent write could
  * interleave and where beats briefly pointed at a dead title.
@@ -117,10 +154,12 @@ export async function renameSceneInIndex(
     const raw = inkswell["beats"];
     const sheet = raw && typeof raw === "object" ? (raw as BeatSheet) : undefined;
     const next = renameSceneInBeats(sheet, oldTitle, newTitle);
-    if (next) {
-      inkswell["beats"] = next;
-      fm["inkswell"] = inkswell;
-    }
+    if (next) inkswell["beats"] = next;
+    // Chapters anchored on this scene follow it (#58).
+    const chapters = Array.isArray(inkswell["chapters"]) ? (inkswell["chapters"] as StructureGroup[]) : undefined;
+    const anchors = renameSceneInChapters(chapters, oldTitle, newTitle);
+    if (anchors) inkswell["chapters"] = anchors;
+    if (next || anchors) fm["inkswell"] = inkswell;
   });
 }
 

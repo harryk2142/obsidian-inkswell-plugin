@@ -6,12 +6,14 @@
  * config layer stored under `inkswell.chapters` / `inkswell.acts`: a per-group
  * word target and the ability to plan a group before any scene uses it.
  *
- * A group is identified for MEMBERSHIP by its `title` (matching the scene string).
- * Its stable `id` only carries config across a rename. The canonical list/order
- * of *populated* groups is always re-derived from scene/manuscript order — never
- * stored — so this layer never fights the scene data. Two runtime states:
- *   - active  = ≥1 scene's string equals `title` (order from manuscript)
- *   - planned = a config entry whose `title` matches no scene (order from array)
+ * A chapter is a RUN of consecutive scenes carrying its `title` (see
+ * `chapterRuns` in outline.ts), not every scene with that title — so two
+ * chapters may share a name (#58). A chapter's `firstScene` anchors which run is
+ * which; its stable `id` carries config across a rename. The canonical list/order
+ * of *populated* chapters is always re-derived from scene/manuscript order —
+ * never stored — so this layer never fights the scene data. Two runtime states:
+ *   - active  = a run of scenes carries `title` (order from manuscript)
+ *   - planned = a config entry no run claims (order from array)
  * A planned group auto-activates once a scene takes its title (membership derives).
  */
 
@@ -27,6 +29,11 @@ export interface StructureGroup {
   /** Chapters only: the id of the act this chapter belongs to (the explicit
    *  chapter→act link). Absent = not in any act. Ignored on act entries. */
   actId?: string;
+  /** Chapters only: title of the scene that opens this chapter. Lets two
+   *  chapters share a name, even side by side (#58). Written by the outline for
+   *  every populated chapter; absent on planned (empty) ones. An anchor whose
+   *  scene is gone or carries another chapter string is ignored. */
+  firstScene?: string;
 }
 
 /** Split of a kind's groups into manuscript-ordered active vs array-ordered planned. */
@@ -57,6 +64,10 @@ export function distinctInOrder(labels: Array<string | undefined | null>): strin
 }
 
 /**
+ * Title-keyed (one group per distinct label) — fine for acts, NOT the chapter
+ * model: chapters may share a title, so chapter surfaces use `chapterRuns` /
+ * `buildOutline` (outline.ts). Kept for callers that want label buckets.
+ *
  * Merge derived scene labels with the stored config array into display groups:
  *   - `active`: one per derived title (manuscript order), attaching a matching
  *     config entry's `id`/`targetWords` (a synthetic transient id otherwise).
@@ -112,6 +123,7 @@ export function upsertGroup(
     title: group.title,
     ...(targetWords ? { targetWords } : {}),
     ...(actId ? { actId } : {}),
+    ...(existing?.firstScene ? { firstScene: existing.firstScene } : {}),
   };
   if (idx >= 0) list[idx] = next;
   else list.push(next);
@@ -164,4 +176,45 @@ export function sumGroupWords(
     out.set(key, cur);
   }
   return out;
+}
+
+/**
+ * Rewrite chapter `firstScene` anchors after a scene rename. Returns a new
+ * array, or `null` when no anchor named `oldTitle` (so the caller can skip a
+ * redundant write). Mirrors `renameSceneInBeats`.
+ */
+export function renameSceneInChapters(
+  configured: StructureGroup[] | undefined,
+  oldTitle: string,
+  newTitle: string
+): StructureGroup[] | null {
+  if (!Array.isArray(configured) || oldTitle === newTitle) return null;
+  if (!configured.some((g) => g?.firstScene === oldTitle)) return null;
+  return configured.map((g) => (g?.firstScene === oldTitle ? { ...g, firstScene: newTitle } : g));
+}
+
+/**
+ * A scene is leaving the manuscript: a chapter it opened passes its anchor to
+ * the scene that followed it (`order` is the manuscript BEFORE the removal), so
+ * the chapter keeps its scenes instead of merging into a same-named chapter
+ * just before it. When the follower belongs to another chapter, the anchor fails
+ * the label check at build time and is ignored — no worse than having none.
+ * Returns a new array, or `null` when nothing changed.
+ */
+export function passChapterAnchors(
+  configured: StructureGroup[] | undefined,
+  order: ReadonlyArray<{ title: string }>,
+  removedTitle: string
+): StructureGroup[] | null {
+  if (!Array.isArray(configured)) return null;
+  if (!configured.some((g) => g?.firstScene === removedTitle)) return null;
+  const at = order.findIndex((s) => s.title === removedTitle);
+  const next = at >= 0 ? order[at + 1]?.title : undefined;
+  return configured.map((g) => {
+    if (g?.firstScene !== removedTitle) return g;
+    const copy: StructureGroup = { ...g };
+    if (next) copy.firstScene = next;
+    else delete copy.firstScene;
+    return copy;
+  });
 }

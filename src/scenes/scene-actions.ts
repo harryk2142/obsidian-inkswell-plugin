@@ -8,9 +8,8 @@
 import { App, MarkdownView, Menu, Modal, Notice, Setting, TFile, normalizePath } from "obsidian";
 import { FormModal } from "../lib/form-modal";
 import { attachOpenInTab } from "../lib/row-menu";
-import { renameSceneInIndex, updateScenes } from "../projects/index-writer";
+import { removeSceneFromIndex, renameSceneInIndex } from "../projects/index-writer";
 import { expectInAppRename } from "../projects/rename-heal";
-import { removeScene } from "../projects/scene-tree";
 import { Project } from "../projects/types";
 import { tryFileOp } from "../lib/notify";
 import { sanitizeSegment } from "../settings/folders";
@@ -233,7 +232,7 @@ export async function deleteScene(
   await tryFileOp(async () => {
     const indexFile = app.vault.getAbstractFileByPath(project.vaultPath);
     if (indexFile instanceof TFile) {
-      await updateScenes(app, indexFile, (scenes) => removeScene(scenes, title));
+      await removeSceneFromIndex(app, indexFile, title);
     }
     await app.fileManager.trashFile(file);
   }, `Couldn't delete "${title}".`);

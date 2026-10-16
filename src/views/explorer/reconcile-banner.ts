@@ -11,9 +11,14 @@
 
 import { App, TFile } from "obsidian";
 import { tryFileOp } from "../../lib/notify";
-import { renameSceneInIndex, updateDraftFields, updateScenes } from "../../projects/index-writer";
+import {
+  removeSceneFromIndex,
+  renameSceneInIndex,
+  updateDraftFields,
+  updateScenes,
+} from "../../projects/index-writer";
 import { reconcileSuggestions } from "../../projects/rename-heal";
-import { addScene, removeScene } from "../../projects/scene-tree";
+import { addScene } from "../../projects/scene-tree";
 import { Project, isMultiScene } from "../../projects/types";
 
 /** "1 scene" / "2 scenes" — naive count + noun pluralization. */
@@ -99,7 +104,7 @@ export class ReconcileBanner {
     // fingerprint entry of its own) — safe to mark for a soft refresh.
     this.markWrite(file.path);
     await tryFileOp(
-      () => updateScenes(this.app, file, (scenes) => removeScene(scenes, title)),
+      () => removeSceneFromIndex(this.app, file, title),
       "Couldn't remove the scene from the project."
     );
   }
