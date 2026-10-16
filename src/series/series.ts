@@ -70,6 +70,63 @@ export function groupIntoSeries(projects: Project[]): {
   return { series, standalone };
 }
 
+/** A series name as series match it: trimmed, case-insensitive. */
+const seriesKey = (name: string): string => name.trim().toLowerCase();
+
+/**
+ * Home's series order (#57): names in the writer's saved `order` first, then
+ * the rest in the order given (alphabetical, from `groupIntoSeries`). Matched
+ * case-insensitively, like series membership. Pure; returns a new array.
+ */
+export function orderSeries<T extends { name: string }>(series: readonly T[], order: readonly string[]): T[] {
+  const rank = new Map<string, number>();
+  order.forEach((name, i) => {
+    const k = seriesKey(name);
+    if (!rank.has(k)) rank.set(k, i);
+  });
+  const at = (s: T): number => rank.get(seriesKey(s.name)) ?? Number.POSITIVE_INFINITY;
+  return series
+    .map((s, i) => ({ s, i }))
+    .sort((a, b) => {
+      const ra = at(a.s);
+      const rb = at(b.s);
+      if (ra !== rb) return ra < rb ? -1 : 1;
+      return a.i - b.i;
+    })
+    .map((x) => x.s);
+}
+
+/** `settings.seriesOrder` as stored (data.json is hand-editable and synced):
+ *  trimmed non-empty strings, case-insensitive repeats dropped. */
+export function normalizeSeriesOrder(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const v of raw) {
+    if (typeof v !== "string" || !v.trim()) continue;
+    const k = seriesKey(v);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(v.trim());
+  }
+  return out;
+}
+
+/**
+ * A series rename keeps its shelf's place: `from` becomes `to` in the order.
+ * Renaming onto a series already listed (a merge) drops `from` instead.
+ * Returns null when the order doesn't list `from`.
+ */
+export function renameInOrder(order: readonly string[], from: string, to: string): string[] | null {
+  const at = order.findIndex((n) => seriesKey(n) === seriesKey(from));
+  if (at < 0 || !to.trim()) return null;
+  const merges = seriesKey(from) !== seriesKey(to) && order.some((n) => seriesKey(n) === seriesKey(to));
+  if (merges) return order.filter((_, i) => i !== at);
+  const next = [...order];
+  next[at] = to.trim();
+  return next;
+}
+
 /** One book's contribution to a shelf header: its words and (story-level) target, if any. */
 export interface ShelfBook {
   words: number;

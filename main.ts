@@ -11,6 +11,7 @@
 
 import { Notice, Plugin, TFile, WorkspaceLeaf, normalizePath } from "obsidian";
 import { runCompile } from "./src/compile/engine";
+import { normalizeSeriesOrder } from "./src/series/series";
 import { resolveCompileConfig } from "./src/compile/config";
 import { TargetModal } from "./src/goals/target-modal";
 import { Idea, newIdeaId } from "./src/ideation/types";
@@ -102,6 +103,7 @@ function readSettings(stored: Partial<InkswellSettings> | undefined): InkswellSe
     const rail = resolveRailLayout(settings.railLayout);
     settings.railLayout = isDefaultRailLayout(rail) ? null : rail;
   }
+  settings.seriesOrder = normalizeSeriesOrder(settings.seriesOrder);
   return settings;
 }
 

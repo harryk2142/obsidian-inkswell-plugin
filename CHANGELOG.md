@@ -13,8 +13,10 @@ time the version bump renames that section to the new version and date.
 ### Added
 - **Chapters can share a name.** Name chapters after their point-of-view character (Alice, Bob, Alice…) and each stays its own chapter, with its own word target and act, in the Tree, Board, Plot grid, Track, Write's scene list, compile and the story bible, even two "Alice" chapters in a row. Requested in [#58](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/58).
 - **Date fields.** Your own scene fields (Customize → Scene inspector fields → Your fields), and the fields of a codex type, can now be a **Date**: pick it from a calendar, and it's saved as `YYYY-MM-DD`, the format Obsidian uses for date properties, so it's ready for Bases and Dataview. Switching an existing field to Date keeps anything that isn't a calendar date (say, "Spring 1204") visible as text until you change it. Requested in [#59](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/59).
+- **Put your series in your own order on Home.** Right-click a series shelf (or tap ⋯) → **Reorder series…** and drag the shelves where you want them; the project switcher follows the same order. The order syncs with your vault, and a renamed series keeps its place. Requested in [#57](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/57).
 
 ### Changed
+- **Standalone books get a "+ Add book" card too**, like a series shelf, which starts a new project. On a series shelf, the card now offers just the two ways to add a book. [#57](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/57)
 - **The Tree shows scenes where they are in the manuscript.** A scene tagged with a chapter name but sitting elsewhere in your book now shows as its own chapter at that spot, as compile and Write's scene list already treated it, instead of being pulled into the earlier chapter. To move a scene into a chapter, drag it in the Tree, Board or Plot grid. Dropping a scene on a Plot grid row now moves it into that chapter, as on the Board.
 
 ### Fixed

@@ -11,7 +11,7 @@ import { writeSeries } from "../../projects/index-writer";
 import { ProjectStore } from "../../projects/project-store";
 import { baseDraftFor } from "../../projects/stories";
 import { Project, SeriesInfo, isMultiScene } from "../../projects/types";
-import { Series, projectSeries } from "../../series/series";
+import { Series, groupIntoSeries, projectSeries } from "../../series/series";
 import {
   ReorderBooksModal,
   addExistingToSeries,
@@ -30,6 +30,10 @@ export interface SeriesMenuCallbacks {
   activePath(): string | null;
   /** Mark an index path as our own write (softens the resulting refresh). */
   markSelfWrite(path: string): void;
+  /** Open the series-shelf reorder dialog (#57). */
+  reorderSeries(): void;
+  /** A series was renamed (keeps its shelf's place in the saved order). */
+  seriesRenamed(from: string, to: string): void;
 }
 
 export class SeriesMenu {
@@ -96,6 +100,39 @@ export class SeriesMenu {
   seriesMenu(series: Series): Menu {
     const menu = new Menu();
     const projects = this.store.getProjects();
+    this.addBookItems(menu, series, projects);
+    menu.addSeparator();
+    menu.addItem((i) =>
+      i
+        .setTitle("Rename series…")
+        .setIcon("text-cursor-input")
+        .onClick(() => void promptRenameSeries(this.app, projects, series, (from, to) => this.cb.seriesRenamed(from, to)))
+    );
+    menu.addItem((i) =>
+      i
+        .setTitle("Reorder books…")
+        .setIcon("list-ordered")
+        .onClick(() => new ReorderBooksModal(this.app, projects, series).open())
+    );
+    if (groupIntoSeries(projects).series.length > 1) {
+      menu.addItem((i) =>
+        i
+          .setTitle("Reorder series…")
+          .setIcon("arrow-up-down")
+          .onClick(() => this.cb.reorderSeries())
+      );
+    }
+    return menu;
+  }
+
+  /** The "+ Add book" card's menu: just the two ways to add a book. */
+  addBookMenu(series: Series): Menu {
+    const menu = new Menu();
+    this.addBookItems(menu, series, this.store.getProjects());
+    return menu;
+  }
+
+  private addBookItems(menu: Menu, series: Series, projects: Project[]): void {
     menu.addItem((i) =>
       i
         .setTitle("New book in this series…")
@@ -110,20 +147,6 @@ export class SeriesMenu {
         .setIcon("book-copy")
         .onClick(() => addExistingToSeries(this.app, projects, this.cb.activePath(), series))
     );
-    menu.addSeparator();
-    menu.addItem((i) =>
-      i
-        .setTitle("Rename series…")
-        .setIcon("text-cursor-input")
-        .onClick(() => void promptRenameSeries(this.app, projects, series))
-    );
-    menu.addItem((i) =>
-      i
-        .setTitle("Reorder books…")
-        .setIcon("list-ordered")
-        .onClick(() => new ReorderBooksModal(this.app, projects, series).open())
-    );
-    return menu;
   }
 
   private indexFile(project: Project): TFile | null {

@@ -17,7 +17,7 @@ import { MarkKind } from "../lib/inline-format";
 import { KeyboardWatcher } from "./phone/keyboard-watch";
 import { createDraft, deleteDraft, renameDraft } from "../projects/draft-actions";
 import { baseDraft, baseDraftFor, draftLabel, groupIntoStories, Story, storyOf } from "../projects/stories";
-import { groupIntoSeries } from "../series/series";
+import { groupIntoSeries, orderSeries } from "../series/series";
 import { promptText } from "../scenes/scene-actions";
 import { Project } from "../projects/types";
 import { NewDraftModal } from "./drafts-modal";
@@ -342,7 +342,9 @@ export class InkswellView extends ItemView {
     const addStory = (parent: HTMLElement, story: Story) =>
       parent.createEl("option", { text: story.title, value: story.title });
     const storyFor = (p: Project) => stories.find((s) => s.title === p.draft.title);
-    const { series, standalone } = groupIntoSeries(stories.map(baseDraft));
+    const grouped = groupIntoSeries(stories.map(baseDraft));
+    const series = orderSeries(grouped.series, this.plugin.settings.seriesOrder);
+    const standalone = grouped.standalone;
     if (series.length === 0) {
       for (const s of stories) addStory(sel, s);
     } else {
