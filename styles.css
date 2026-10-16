@@ -257,8 +257,15 @@
 }
 .inkswell-inspector__control select,
 .inkswell-inspector__control input[type="text"],
+.inkswell-inspector__control input[type="date"],
 .inkswell-inspector__textarea {
   width: 100%;
+}
+/* Under a field whose stored value its control can't show natively
+   (a Date field holding "Spring 1204"). */
+.inkswell-inspector__hint {
+  margin-top: 2px;
+  font-size: var(--font-ui-smaller);
 }
 .inkswell-inspector__textarea {
   resize: vertical;

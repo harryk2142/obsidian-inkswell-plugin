@@ -39,7 +39,9 @@ function modeFor(el: HTMLElement): RestoreMode {
   if (el.instanceOf(HTMLTextAreaElement)) return "text";
   if (el.instanceOf(HTMLInputElement)) {
     if (SELECTABLE_TYPES.has(el.type)) return "text";
-    if (el.type === "number") return "value";
+    // Number and date inputs keep an uncommitted value across a rebuild; they
+    // have no caret to restore.
+    if (el.type === "number" || el.type === "date") return "value";
   }
   return "focus"; // selects, checkboxes, anything else
 }
@@ -84,9 +86,11 @@ function restore(scope: HTMLElement, saved: SavedField): void {
   }
   // On touch devices focusing a <select> opens its native picker — refocusing
   // the rebuilt one after a pick reopened the menu, bound to the select the
-  // rebuild just removed, so it couldn't be used (#47). Desktop keeps focus
-  // for keyboard flow; focusing a select there opens nothing.
-  if (el.tagName === "SELECT" && scope.doc.body.classList.contains("is-mobile")) return;
+  // rebuild just removed, so it couldn't be used (#47). A date input's picker
+  // is the same kind of native dialog. Desktop keeps focus for keyboard flow;
+  // focusing either there opens nothing.
+  const picker = el.tagName === "SELECT" || (el.instanceOf(HTMLInputElement) && el.type === "date");
+  if (picker && scope.doc.body.classList.contains("is-mobile")) return;
   el.focus({ preventScroll: true });
   if (saved.mode === "text" && text) {
     const end = saved.value.length;

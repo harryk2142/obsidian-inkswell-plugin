@@ -6,6 +6,7 @@
  * `challengeProgress` returns.
  */
 
+import { isDateKey } from "../lib/date-key";
 import { dateKey } from "../tracking/types";
 
 export interface WritingChallenge {
@@ -49,16 +50,9 @@ export interface ChallengeProgress {
 /** Longest window accepted (keeps the per-keystroke status-bar sum trivially cheap). */
 export const MAX_CHALLENGE_DAYS = 400;
 
-const KEY_RE = /^\d{4}-\d{2}-\d{2}$/;
-
 function parseKey(key: string): Date {
   const [y, m, d] = key.split("-").map(Number);
   return new Date(y, m - 1, d);
-}
-
-/** A real calendar date in YYYY-MM-DD form (rejects 2026-02-30). */
-function isDateKey(v: unknown): v is string {
-  return typeof v === "string" && KEY_RE.test(v) && dateKey(parseKey(v)) === v;
 }
 
 /** Every date key from `start` through `end`, walked by calendar day (DST-safe). */

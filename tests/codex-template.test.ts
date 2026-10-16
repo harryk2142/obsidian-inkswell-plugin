@@ -83,5 +83,6 @@ describe("codexTemplatesReadme", () => {
     expect(codexTemplatesReadme()).toContain("codex-fields:");
     expect(codexTemplatesReadme()).toContain("textarea");
     expect(codexTemplatesReadme()).toContain("`number`");
+    expect(codexTemplatesReadme()).toContain("`date`");
   });
 });

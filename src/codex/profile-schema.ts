@@ -8,12 +8,14 @@
  * prose. Keys not in a category's schema are preserved on write (never clobbered).
  */
 
+import { normalizeDate } from "../lib/date-key";
 import { BuiltinCodexCategory, isBuiltinCategory } from "./types";
 
 export type ProfileFieldType =
   | "text" // single-line string
   | "textarea" // multi-line string
   | "number" // numeric value, stored as a bare YAML number (Bases/Dataview-sortable)
+  | "date" // calendar date, stored as a `YYYY-MM-DD` string (Obsidian's date-property format)
   | "list" // array of plain strings (e.g. aliases)
   | "links" // wikilink(s) to other codex entities
   | "image"; // vault path (or wikilink) to an image, shown as the entry's portrait
@@ -377,7 +379,7 @@ function findKnownField(category: string, key: string): ProfileField | undefined
 }
 
 /**
- * `text` | `textarea` | `number` | `list` | `links[:cat][:labeled]` | `link[:cat]`
+ * `text` | `textarea` | `number` | `date` | `list` | `links[:cat][:labeled]` | `link[:cat]`
  * (single) → field shape; null if unknown. A trailing `labeled` segment on
  * `links` lets each link carry an alias-stored label (ignored for single `link`,
  * which has no chip to label). `number` also accepts `int`/`integer`/`float`/
@@ -408,6 +410,8 @@ export function parseTypeHint(
     case "float":
     case "decimal":
       return { type: "number" };
+    case "date":
+      return { type: "date" };
     case "list":
     case "tags":
       return { type: "list" };
@@ -435,8 +439,9 @@ export function humanizeKey(key: string): string {
   return words[0].charAt(0).toUpperCase() + words[0].slice(1) + (words.length > 1 ? " " + words.slice(1).join(" ") : "");
 }
 
-/** A profile value is a string (text/textarea/image/single link), a number
- *  (`number` — written as a bare YAML number), or string[] (list/links). */
+/** A profile value is a string (text/textarea/image/single link/date — a
+ *  `YYYY-MM-DD` key), a number (`number` — written as a bare YAML number), or
+ *  string[] (list/links). */
 export type ProfileValue = string | string[] | number;
 export type Profile = Record<string, ProfileValue | undefined>;
 
@@ -467,7 +472,9 @@ function toFiniteNumber(raw: unknown): number | null {
  * fields keep strings and stringify bare numbers (a hand-typed `- 42` is a
  * chip, not a vanished entry). A `number` field reads a YAML number or a
  * numeric string as a number and anything else as "" (shown empty; the stored
- * value is left alone until the user edits the field).
+ * value is left alone until the user edits the field). A `date` field reads any
+ * calendar date as its `YYYY-MM-DD` key and anything else as its raw text, so a
+ * value like "Spring 1204" stays visible (the control shows it as text).
  */
 export function coerceValue(field: ProfileField, raw: unknown): ProfileValue {
   if (isArrayField(field)) {
@@ -479,5 +486,10 @@ export function coerceValue(field: ProfileField, raw: unknown): ProfileValue {
     });
   }
   if (field.type === "number") return toFiniteNumber(raw) ?? "";
+  if (field.type === "date") {
+    const key = normalizeDate(raw);
+    if (key) return key;
+    return typeof raw === "string" ? raw : typeof raw === "number" ? String(raw) : "";
+  }
   return raw === undefined || raw === null ? "" : String(raw);
 }
