@@ -16,7 +16,9 @@ import { resolveCompileConfig } from "./src/compile/config";
 import { TargetModal } from "./src/goals/target-modal";
 import { Idea, newIdeaId } from "./src/ideation/types";
 import { baseDraftFor } from "./src/projects/stories";
-import { backupPluginData } from "./src/lib/data-backup";
+import { backupPluginData, keepDataCopy, listBackups } from "./src/lib/data-backup";
+import { StoredData, isPlainObject, isUsableData } from "./src/lib/stored-data";
+import { RestoreSettingsModal } from "./src/settings/restore-settings-modal";
 import { MarkKind } from "./src/lib/inline-format";
 import { PHONE_BODY_CLASS, isPhone, setForceTabletLayout } from "./src/lib/platform";
 import { countWords } from "./src/lib/wordcount";
@@ -246,6 +248,16 @@ export default class InkswellPlugin extends Plugin {
     this.app.workspace.onLayoutReady(() => {
       // The metadata cache is populated by now — safe to discover log notes.
       this.logSync.setEnabled(this.settings.syncWritingHistory);
+
+      if (this.recoveredFrom) {
+        const { date, kept } = this.recoveredFrom;
+        new Notice(
+          `Inkswell couldn't read its data file, so it loaded your settings and writing history ` +
+            `from the backup of ${date}. Changes made after that day may be missing.` +
+            (kept ? ` The unreadable file was kept as ${kept.split("/").pop()}.` : ""),
+          0
+        );
+      }
 
       if (!this.settings.welcomeSeen) new WelcomeModal(this.app, this).open();
 
@@ -568,6 +580,11 @@ export default class InkswellPlugin extends Plugin {
     });
     // Kept under its old id so users' hotkeys survive; lands on the Features section.
     this.addCommand({
+      id: "restore-settings-from-backup",
+      name: "Restore settings from a backup",
+      callback: () => void this.restoreSettingsFromBackup(),
+    });
+    this.addCommand({
       id: "manage-features",
       name: "Manage features",
       callback: () => void this.openCustomize("features"),
@@ -586,8 +603,11 @@ export default class InkswellPlugin extends Plugin {
       .find((p) => p.vaultPath === path || p.scenes.some((s) => s.path === path));
   }
 
+  /** Set when load had to fall back to a daily backup (#61) — shown once the layout is ready. */
+  private recoveredFrom: { date: string; kept: string | null } | null = null;
+
   async loadPersisted(): Promise<void> {
-    const stored = ((await this.loadData()) ?? {}) as {
+    const stored = (await this.readStoredData()) as {
       settings?: Partial<InkswellSettings>;
       writingLog?: Partial<WritingLogData>;
       ideas?: Idea[];
@@ -602,15 +622,50 @@ export default class InkswellPlugin extends Plugin {
   }
 
   /**
+   * data.json as stored. When it can't be read — Obsidian's `loadData()` gives
+   * `undefined` for a missing, empty or half-written file, which a sync tool can
+   * leave for a moment — retry once, then fall back to the newest readable daily
+   * backup, keeping a copy of the unreadable file. Starting from defaults
+   * instead would be saved over the writer's settings and history within
+   * seconds (#61). A true fresh install has no backups, so it gets defaults.
+   */
+  private async readStoredData(): Promise<StoredData> {
+    const first: unknown = await this.loadData();
+    if (isUsableData(first)) return first;
+    await new Promise((resolve) => window.setTimeout(resolve, 400));
+    const again: unknown = await this.loadData();
+    if (isUsableData(again)) return again;
+    const dir = this.manifest.dir;
+    const backup = dir ? (await listBackups(this.app, dir))[0] : undefined;
+    if (!dir || !backup) return isPlainObject(again) ? again : {};
+    const kept = await keepDataCopy(this.app, dir, "data-unreadable");
+    this.recoveredFrom = { date: backup.date, kept };
+    console.warn(`[Inkswell] data.json couldn't be read; loaded the backup of ${backup.date}.`);
+    return backup.data;
+  }
+
+  /**
    * data.json was changed by something else — in practice Obsidian Sync
    * delivering another device's copy. Adopt its SETTINGS (a challenge, Customize
    * overrides, preferences set elsewhere); without this, this device's next save
    * writes its stale in-memory settings back over them. The writing log, ideas
    * and active project stay this device's own (see gotcha 19).
+   *
+   * A file that can't be read (a sync mid-write) is IGNORED: adopting it as
+   * "no settings" reset every setting to its default, and the next save wrote
+   * that over the writer's real ones (#61).
    */
   async onExternalSettingsChange(): Promise<void> {
-    const stored = ((await this.loadData()) ?? {}) as { settings?: Partial<InkswellSettings> };
-    const incoming = readSettings(stored.settings);
+    const stored: unknown = await this.loadData();
+    if (!isUsableData(stored)) {
+      console.warn("[Inkswell] data.json changed but couldn't be read; keeping the current settings.");
+      return;
+    }
+    this.adoptSettings(readSettings(stored.settings));
+  }
+
+  /** Take `incoming` as the settings (keeping this device's own keys) and re-apply them. */
+  private adoptSettings(incoming: InkswellSettings): void {
     // Keys describing THIS device (its layout override, migrations already run
     // against its own baselines) never follow another device's copy.
     for (const key of DEVICE_LOCAL_SETTINGS) {
@@ -622,6 +677,28 @@ export default class InkswellPlugin extends Plugin {
     this.logSync.setEnabled(this.settings.syncWritingHistory);
     this.statusBar?.render();
     this.refreshView();
+  }
+
+  /**
+   * Pick a daily backup and restore ITS SETTINGS only (#61) — writing history,
+   * ideas and the open project are left as they are. The settings being
+   * replaced are kept as a `data-before-restore-…` copy first.
+   */
+  async restoreSettingsFromBackup(): Promise<void> {
+    const dir = this.manifest.dir;
+    const backups = dir ? await listBackups(this.app, dir) : [];
+    if (!dir || backups.length === 0) {
+      new Notice("Inkswell has no backups yet. One is made each day you open Obsidian.");
+      return;
+    }
+    new RestoreSettingsModal(this.app, backups, (b) => {
+      void (async () => {
+        await keepDataCopy(this.app, dir, "data-before-restore");
+        this.adoptSettings(readSettings(b.data.settings));
+        await this.saveSettings();
+        new Notice(`Settings restored from the backup of ${b.date}. Your writing history and ideas weren't changed.`);
+      })();
+    }).open();
   }
 
   /**

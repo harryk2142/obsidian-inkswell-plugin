@@ -10,6 +10,12 @@ time the version bump renames that section to the new version and date.
 
 ## [Unreleased]
 
+### Added
+- **Restore settings from a backup.** A new command, **Restore settings from a backup**, lists Inkswell's daily backups with what each one holds ("3 custom codex types · 2 renamed types · rail arranged") and brings back that backup's settings: custom codex types, renamed types, Customize changes, your rail arrangement and preferences. Your writing history and ideas stay as they are. [#61](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/61)
+
+### Fixed
+- **Settings could be reset to their defaults when Inkswell's data file was briefly unreadable**, for example while a sync service was still writing it. Custom codex types, renamed codex types and the rail arrangement were lost. Inkswell now ignores a data file it can't read instead of treating it as empty, and if the file still can't be read when Obsidian starts, it loads the newest daily backup, keeps a copy of the unreadable file, and tells you. [#61](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/61)
+
 ## [1.21.0] - 2026-10-16
 
 Your book, your names. Chapters can share a name, so chapters named for their point-of-view character (Alice, Bob, Alice) each stay their own. Your scene and codex fields can hold a real date. Home puts your series in the order you choose, and a codex entry's Scope stays out of the way in a vault with many books.

@@ -6,7 +6,8 @@
  * these backups are the writing history's only safety net.
  */
 import { beforeEach, describe, expect, it } from "vitest";
-import { backupPluginData } from "../src/lib/data-backup";
+import { backupPluginData, keepDataCopy, listBackups } from "../src/lib/data-backup";
+import { isUsableData, settingsSummary } from "../src/lib/stored-data";
 import type { App } from "obsidian";
 
 const DIR = ".obsidian/plugins/inkswell";
@@ -126,5 +127,57 @@ describe("backupPluginData", () => {
     (h.app.vault.adapter as unknown as { write: () => Promise<never> }).write = () =>
       Promise.reject(new Error("disk full"));
     await expect(backupPluginData(h.app, DIR, AUG_11)).resolves.toBeUndefined();
+  });
+});
+
+describe("recovering from an unreadable data.json (#61)", () => {
+  it("only a `{ settings: {…} }` payload is usable — what loadData gives for a bad file is not", () => {
+    expect(isUsableData({ settings: {}, writingLog: {} })).toBe(true);
+    expect(isUsableData(undefined)).toBe(false); // loadData on a missing/empty/corrupt file
+    expect(isUsableData(null)).toBe(false);
+    expect(isUsableData({})).toBe(false);
+    expect(isUsableData({ settings: null })).toBe(false);
+    expect(isUsableData({ settings: [] })).toBe(false);
+  });
+
+  it("lists usable backups newest first, skipping corrupt and settings-less ones", async () => {
+    const h = fakeAdapterApp();
+    h.dirs.add(`${DIR}/backups`);
+    h.files.set(`${DIR}/backups/data-2026-10-13.json`, JSON.stringify({ settings: { customCategories: [{ id: "a" }] } }));
+    h.files.set(`${DIR}/backups/data-2026-10-14.json`, "{ truncated");
+    h.files.set(`${DIR}/backups/data-2026-10-15.json`, JSON.stringify({ settings: {}, writingLog: {} }));
+    h.files.set(`${DIR}/backups/data-2026-10-16.json`, JSON.stringify({ writingLog: {} }));
+    h.files.set(`${DIR}/backups/data-before-restore-2026-10-16-101500.json`, JSON.stringify({ settings: {} }));
+    const list = await listBackups(h.app, DIR);
+    expect(list.map((b) => b.date)).toEqual(["2026-10-15", "2026-10-13"]);
+  });
+
+  it("no backups folder is an empty list, not an error", async () => {
+    expect(await listBackups(fakeAdapterApp().app, DIR)).toEqual([]);
+  });
+
+  it("keeps a timestamped copy of data.json that pruning never touches", async () => {
+    const h = fakeAdapterApp();
+    h.files.set(`${DIR}/data.json`, "{ half-written");
+    const kept = await keepDataCopy(h.app, DIR, "data-unreadable", new Date(2026, 9, 16, 8, 5, 9));
+    expect(kept).toBe(`${DIR}/data-unreadable-2026-10-16-080509.json`);
+    expect(h.files.get(kept!)).toBe("{ half-written");
+    // A missing or empty file has nothing worth keeping.
+    expect(await keepDataCopy(fakeAdapterApp().app, DIR, "x")).toBeNull();
+    h.files.set(`${DIR}/data.json`, "  ");
+    expect(await keepDataCopy(h.app, DIR, "x")).toBeNull();
+  });
+
+  it("summarizes what a backup's settings hold", () => {
+    expect(
+      settingsSummary({
+        customCategories: [{}, {}, {}],
+        categoryOverrides: { character: {}, item: {} },
+        railLayout: { upper: [], lower: [] },
+      })
+    ).toBe("3 custom codex types · 2 renamed types · rail arranged");
+    expect(settingsSummary({ customCategories: [{}] })).toBe("1 custom codex type");
+    expect(settingsSummary({ railLayout: null })).toBe("default settings");
+    expect(settingsSummary(undefined)).toBe("no settings");
   });
 });

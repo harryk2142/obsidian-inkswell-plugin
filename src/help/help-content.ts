@@ -561,8 +561,12 @@ export const HELP_SECTIONS: HelpSection[] = [
         el,
         "Inkswell also keeps a daily backup of data.json (the last 7 days) in a " +
           "backups folder next to it — inside the plugin's own folder under your " +
-          "vault's configuration directory. To restore one: disable Inkswell, copy " +
-          "the backup over data.json, and re-enable."
+          "vault's configuration directory. To bring back just your settings (custom " +
+          "codex types, renamed types, Customize changes, the rail), run the command " +
+          "“Restore settings from a backup” and pick a day; your writing history stays " +
+          "as it is. To restore everything: disable Inkswell, copy the backup over " +
+          "data.json, and re-enable. If data.json can't be read when Obsidian starts, " +
+          "Inkswell loads the newest backup by itself and tells you."
       );
     },
   },
