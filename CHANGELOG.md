@@ -10,6 +10,10 @@ time the version bump renames that section to the new version and date.
 
 ## [Unreleased]
 
+## [1.21.1] - 2026-10-17
+
+A safety fix. If Inkswell's data file was briefly unreadable, for example while a sync service was still writing it, your settings could reset to their defaults. That can no longer happen, and a new command brings your settings back from Inkswell's daily backups.
+
 ### Added
 - **Restore settings from a backup.** A new command, **Restore settings from a backup**, lists Inkswell's daily backups with what each one holds ("3 custom codex types · 2 renamed types · rail arranged") and brings back that backup's settings: custom codex types, renamed types, Customize changes, your rail arrangement and preferences. Your writing history and ideas stay as they are. [#61](https://github.com/leethobbit/obsidian-inkswell-plugin/issues/61)
 
@@ -438,7 +442,8 @@ First community-store release — the full local-first writer's suite.
 - Drop-in compatibility with Longform's `longform` frontmatter (zero migration);
   Inkswell-only data lives under a separate `inkswell` key.
 
-[Unreleased]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.21.0...HEAD
+[Unreleased]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.21.1...HEAD
+[1.21.1]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.21.0...1.21.1
 [1.21.0]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.20.0...1.21.0
 [1.20.0]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.19.0...1.20.0
 [1.19.0]: https://github.com/leethobbit/obsidian-inkswell-plugin/compare/1.18.1...1.19.0
