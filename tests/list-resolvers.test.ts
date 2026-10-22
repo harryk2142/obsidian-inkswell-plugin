@@ -200,6 +200,15 @@ describe("planning-note fields (rename / hide / reorder only)", () => {
     ]);
   });
 
+  it("maps German and customized H2 labels to their stable planning sections", () => {
+    const source = "## Zusammenfassung\nText\n\n## Erster Akt\nText";
+    const fields = planningSections({ labels: { "act-1": "Erster Akt" } });
+    expect([...planningSectionHeadings(source, fields)]).toEqual([
+      ["Synopsis", "Zusammenfassung"],
+      ["Act I", "Erster Akt"],
+    ]);
+  });
+
   it("hides a field from the overview without changing its stable heading", () => {
     const fields = planningSections({
       hidden: ["plot-groundwork"],

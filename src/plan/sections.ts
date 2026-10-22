@@ -37,10 +37,24 @@ export interface EffectivePlanSection {
  * Managed planning sections whose H2 headings actually occur in a note.
  * The map value preserves the heading exactly as written for display in the UI.
  */
-export function planningSectionHeadings(source: string): Map<PlanSection, string> {
-  const known = new Map(
-    PLAN_SECTION_DEFS.map((section) => [section.heading.toLowerCase(), section.heading] as const)
+export function planningSectionHeadings(
+  source: string,
+  fields: readonly EffectivePlanSection[] = planningSections()
+): Map<PlanSection, string> {
+  const headingById = new Map<string, PlanSection>(
+    PLAN_SECTION_DEFS.map((section) => [section.id, section.heading])
   );
+  const known = new Map<string, PlanSection>();
+  for (const section of PLAN_SECTION_DEFS) {
+    known.set(section.heading.toLowerCase(), section.heading);
+    known.set(section.label.toLowerCase(), section.heading);
+  }
+  // A user-renamed display label may also be used as the note's H2. Resolve it
+  // back to the same stable section id without changing the on-disk heading.
+  for (const field of fields) {
+    const heading = headingById.get(field.id);
+    if (heading) known.set(field.label.toLowerCase(), heading);
+  }
   const present = new Map<PlanSection, string>();
   for (const line of source.split(/\r?\n/)) {
     if (!/^##\s+/.test(line)) continue;

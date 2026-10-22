@@ -50,6 +50,11 @@ const SECTION_PROMPTS: Partial<Record<PlanSection, string>> = {
     "Welche fünf Schlüsselmomente, Szenen oder Ereignisse werden sicher stattfinden? Sie müssen noch weder geordnet noch miteinander verbunden sein.",
 };
 
+type RenderedPlanSection = EffectivePlanSection & {
+  /** Exact H2 text found in an existing note; used for both reads and writes. */
+  noteHeading?: string;
+};
+
 export class OverviewPanel {
   private app: App;
   private plugin: InkswellPlugin;
@@ -151,19 +156,20 @@ export class OverviewPanel {
   private renderProseEditors(
     root: HTMLElement,
     project: Project,
-    fields: EffectivePlanSection[],
+    fields: RenderedPlanSection[],
     source?: string
   ): void {
     for (const field of fields) {
       const { heading } = field;
+      const noteHeading = field.noteHeading ?? heading;
       const block = root.createDiv({ cls: "inkswell-overview__section" });
       block.createDiv({ cls: "inkswell-overview__label", text: field.label });
       const ta = block.createEl("textarea", { cls: "inkswell-overview__textarea" });
       tagField(ta, `overview:section:${field.id}`);
       ta.rows = field.rows;
       ta.placeholder = SECTION_PROMPTS[heading] ?? `${field.label}…`;
-      if (source !== undefined) ta.value = readSection(source, heading);
-      ta.onchange = () => void this.saveSection(project, heading, ta.value);
+      if (source !== undefined) ta.value = readSection(source, noteHeading);
+      ta.onchange = () => void this.saveSection(project, noteHeading, ta.value);
     }
   }
 
@@ -178,7 +184,7 @@ export class OverviewPanel {
     await this.rememberNote(project, file);
     const source = await this.app.vault.read(file);
     if (!root.isConnected) return;
-    const noteHeadings = planningSectionHeadings(source);
+    const noteHeadings = planningSectionHeadings(source, fields);
     this.renderProseEditors(
       root,
       project,
@@ -187,12 +193,13 @@ export class OverviewPanel {
         .map((field) => ({
           ...field,
           label: noteHeadings.get(field.heading) ?? field.label,
+          noteHeading: noteHeadings.get(field.heading),
         })),
       source
     );
   }
 
-  private async saveSection(project: Project, heading: PlanSection, text: string): Promise<void> {
+  private async saveSection(project: Project, heading: string, text: string): Promise<void> {
     await tryFileOp(async () => {
       const file = await ensurePlanningNote(this.app, project);
       await this.rememberNote(project, file);
