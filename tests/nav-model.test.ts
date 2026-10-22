@@ -13,7 +13,7 @@ describe("nav model", () => {
   it("keeps the phone bar slots in order: Write, Scenes(Home), Codex", () => {
     const bar = phoneBarDestinations();
     expect(bar.map((d) => d.id)).toEqual(["write", "home", "codex"]);
-    expect(bar[1].phone?.label).toBe("Scenes");
+    expect(bar[1].phone?.label).toBe("Szenen");
   });
 
   it("splits the More sheet into usable rows then redirected ones", () => {
@@ -93,7 +93,7 @@ describe("nav model", () => {
     // The merged worklist (old Log folded in) keeps the phone-matching label.
     expect(
       DESTINATIONS.find((d) => d.id === "revise")?.subtabs?.find((s) => s.id === "todos")?.label
-    ).toBe("To-dos");
+    ).toBe("Aufgaben");
     expect(
       DESTINATIONS.find((d) => d.id === "revise")?.subtabs?.some((s) => s.id === "log")
     ).toBe(false);

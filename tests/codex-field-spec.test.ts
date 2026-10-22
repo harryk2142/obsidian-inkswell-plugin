@@ -57,7 +57,7 @@ describe("serializeFieldSpec ↔ parseFieldSpec", () => {
   it("a { type, label } value sets the panel label", () => {
     const spec = parseFieldSpec({ species: { type: "text", label: "Species name" }, home: { type: "link:location" } });
     const fields = profileFields("character", spec);
-    expect(fields.map((f) => f.label)).toEqual(["Aliases", "Species name", "Home"]);
+    expect(fields.map((f) => f.label)).toEqual(["Aliasse", "Species name", "Home"]);
     expect(fields[2]).toMatchObject({ type: "links", single: true, linkCategory: "location" });
   });
 
@@ -81,7 +81,7 @@ describe("serializeFieldSpec ↔ parseFieldSpec", () => {
   it("a number field round-trips through the spec and normalizes hand-written synonyms", () => {
     const written = serializeFieldSpec([{ key: "age", type: "number" }, { key: "role", type: "text" }]);
     const fields = profileFields("character", parseFieldSpec(written));
-    expect(fields.find((f) => f.key === "age")).toMatchObject({ type: "number", label: "Age" });
+    expect(fields.find((f) => f.key === "age")).toMatchObject({ type: "number", label: "Alter" });
     const viaInt = profileFields("character", parseFieldSpec({ age: "int" }));
     expect(fieldToSpec(viaInt.find((f) => f.key === "age")!, "character")).toEqual({ key: "age", type: "number" });
   });
@@ -130,7 +130,7 @@ describe("fields editor row model", () => {
 
   it("rowsFromFields maps a number field to the number kind", () => {
     const rows = rowsFromFields(profileFields("character", [{ key: "age", type: "number" }]));
-    expect(rows).toEqual([{ id: "age", key: "age", label: "Age", kind: "number" }]);
+    expect(rows).toEqual([{ id: "age", key: "age", label: "Alter", kind: "number" }]);
   });
 
   it("rowTypeHint mirrors fieldTypeHint for every kind", () => {

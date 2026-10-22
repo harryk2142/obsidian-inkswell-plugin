@@ -121,7 +121,7 @@ export class AuditPanel {
     const projects = this.store.getProjects().filter((p) => p.draft.format === "scenes");
     const project = resolveActive(projects, this.active.get());
     if (!project) {
-      container.createDiv({ cls: "inkswell-stats__muted", text: "No multi-scene projects." });
+      container.createDiv({ cls: "inkswell-stats__muted", text: "Keine Projekte mit mehreren Szenen." });
       return;
     }
 
@@ -257,7 +257,7 @@ export class AuditPanel {
   private renderScenes(host: HTMLElement, project: Project): void {
     const scenes = project.scenes.filter((s) => s.path);
     if (scenes.length === 0) {
-      host.createDiv({ cls: "inkswell-stats__muted", text: "No scenes yet." });
+      host.createDiv({ cls: "inkswell-stats__muted", text: "Noch keine Szenen." });
       return;
     }
     for (const scene of scenes) {
@@ -615,7 +615,7 @@ export class AuditPanel {
     const kind = form.createEl("select", { cls: "dropdown" });
     tagField(kind, "audit:style-kind");
     for (const k of STYLE_KINDS) kind.createEl("option", { text: k.label, value: k.id });
-    const add = form.createEl("button", { text: "Add" });
+    const add = form.createEl("button", { text: "Hinzufügen" });
     add.onclick = () => {
       const canonical = canon.value.trim();
       if (!canonical) return;

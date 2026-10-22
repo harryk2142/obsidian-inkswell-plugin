@@ -64,7 +64,7 @@ export class HeroCard {
       img.alt = `${focused.draft.title} cover`;
     } else {
       cover.addClass("is-empty");
-      cover.createSpan({ cls: "inkswell-hero__placeholder", text: "+ Add cover" });
+      cover.createSpan({ cls: "inkswell-hero__placeholder", text: "+ Cover hinzufügen" });
     }
     cover.setAttribute("aria-label", "Set cover image");
     cover.onclick = (e) =>
@@ -82,7 +82,7 @@ export class HeroCard {
       seriesLine.setText(info.order != null ? `${info.name} · Book ${info.order}` : info.name);
     } else {
       seriesLine.addClass("is-empty");
-      seriesLine.setText("Add to series…");
+      seriesLine.setText("Zu Reihe hinzufügen…");
     }
     seriesLine.setAttribute("aria-label", "Edit series membership");
     seriesLine.onclick = () =>
@@ -119,7 +119,7 @@ export class HeroCard {
     const indexFile = this.indexFile(base);
 
     const row = meta.createDiv({ cls: "inkswell-hero__field" });
-    row.createDiv({ cls: "inkswell-hero__label", text: "Target" });
+    row.createDiv({ cls: "inkswell-hero__label", text: "Ziel" });
     const control = row.createDiv({ cls: "inkswell-hero__targetrow" });
     const input = control.createEl("input", { type: "number", cls: "inkswell-hero__input inkswell-hero__targetinput" });
     tagField(input, "hero:target");
@@ -139,7 +139,7 @@ export class HeroCard {
         "Couldn't save the word target."
       );
     };
-    control.createSpan({ cls: "inkswell-hero__unit", text: "words" });
+    control.createSpan({ cls: "inkswell-hero__unit", text: "Wörter" });
     const more = control.createEl("button", { cls: "inkswell-hero__more", text: "⋯" });
     more.setAttribute("aria-label", "Deadline & pace");
     more.onclick = () =>

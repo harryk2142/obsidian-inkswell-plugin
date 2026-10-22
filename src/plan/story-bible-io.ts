@@ -61,7 +61,7 @@ export function codexGroups(
     .filter((g) => g.entities.length > 0);
   const known = new Set(cats.map((c) => c.id));
   const orphans = entities.filter((e) => !known.has(e.category));
-  if (orphans.length) groups.push({ id: UNCATEGORIZED, label: "Uncategorized", entities: orphans });
+  if (orphans.length) groups.push({ id: UNCATEGORIZED, label: "Nicht kategorisiert", entities: orphans });
   return groups;
 }
 

@@ -49,11 +49,11 @@ export class QuickCodexModal extends FormModal {
   }
 
   protected renderForm(contentEl: HTMLElement): void {
-    contentEl.createEl("h3", { text: "New Codex entry" });
+    contentEl.createEl("h3", { text: "Neuer Kodex-Eintrag" });
 
     new Setting(contentEl)
       .setName("Name")
-      .setDesc("Becomes the note's file name; the link is inserted where the text was.")
+      .setDesc("Wird zum Dateinamen der Notiz; der Link wird anstelle des Textes eingefügt.")
       .addText((t) => {
         t.setPlaceholder("Beatrice")
           .setValue(this.name)
@@ -64,7 +64,7 @@ export class QuickCodexModal extends FormModal {
       });
 
     new Setting(contentEl)
-      .setName("Type")
+      .setName("Typ")
       .addDropdown((d) => {
         for (const c of this.opts.categories) d.addOption(c.id, c.label);
         d.setValue(this.categoryId).onChange((v) => {
@@ -75,7 +75,7 @@ export class QuickCodexModal extends FormModal {
     const core = this.opts.seed?.core.split(/\r?\n/)[0].trim() ?? "";
     this.aliasSetting = new Setting(contentEl)
       .setName(`Add “${core}” as an alias`)
-      .setDesc("So the Codex still recognises the wording you used in the scene.")
+      .setDesc("Damit der Kodex weiterhin die in der Szene verwendete Formulierung erkennt.")
       .addToggle((t) => t.setValue(this.addAlias).onChange((v) => (this.addAlias = v)));
     this.aliasSetting.settingEl.addClass("inkswell-quickcodex__alias");
 
@@ -105,11 +105,11 @@ export class QuickCodexModal extends FormModal {
   protected async submit(): Promise<boolean> {
     const name = this.name.trim();
     if (!name) {
-      new Notice("Name is required.");
+      new Notice("Ein Name ist erforderlich.");
       return false;
     }
     if (!this.categoryId) {
-      new Notice("Choose a Codex type.");
+      new Notice("Wähle einen Kodex-Typ.");
       return false;
     }
     const seed = this.opts.seed;

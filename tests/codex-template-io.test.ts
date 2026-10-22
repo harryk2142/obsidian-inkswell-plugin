@@ -73,7 +73,7 @@ describe("writeTemplateFields", () => {
     ]);
     const { fields, template } = resolveProfileFields(app, settings(), "faction");
     expect(template?.path).toBe("Templates/Faction.md");
-    expect(fields.map((f) => f.label)).toEqual(["Aliases", "Type", "Motto or creed", "Leadership"]);
+    expect(fields.map((f) => f.label)).toEqual(["Aliasse", "Typ", "Motto or creed", "Führung"]);
     // Other frontmatter survives.
     expect(app.metadataCache.getFileCache(file)?.frontmatter?.["tags"]).toEqual(["faction"]);
   });

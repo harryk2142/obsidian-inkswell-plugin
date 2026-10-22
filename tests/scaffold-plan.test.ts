@@ -30,40 +30,40 @@ function split(templateId: string): Array<[string, number]> {
 
 describe("planScaffold act boundaries", () => {
   it("save-the-cat splits 5/7/3 (Break Into Two/Three start their acts)", () => {
-    expect(split("save-the-cat")).toEqual([["Act I", 5], ["Act II", 7], ["Act III", 3]]);
+    expect(split("save-the-cat")).toEqual([["Akt I", 5], ["Akt II", 7], ["Akt III", 3]]);
   });
 
   it("three-act splits 2/3/2", () => {
-    expect(split("three-act")).toEqual([["Act I", 2], ["Act II", 3], ["Act III", 2]]);
+    expect(split("three-act")).toEqual([["Akt I", 2], ["Akt II", 3], ["Akt III", 2]]);
   });
 
   it("heros-journey splits 4/5/3", () => {
-    expect(split("heros-journey")).toEqual([["Act I", 4], ["Act II", 5], ["Act III", 3]]);
+    expect(split("heros-journey")).toEqual([["Akt I", 4], ["Akt II", 5], ["Akt III", 3]]);
   });
 
   it("seven-point splits 1/5/1", () => {
-    expect(split("seven-point")).toEqual([["Act I", 1], ["Act II", 5], ["Act III", 1]]);
+    expect(split("seven-point")).toEqual([["Akt I", 1], ["Akt II", 5], ["Akt III", 1]]);
   });
 
   it("story-circle splits 2/4/2", () => {
-    expect(split("story-circle")).toEqual([["Act I", 2], ["Act II", 4], ["Act III", 2]]);
+    expect(split("story-circle")).toEqual([["Akt I", 2], ["Akt II", 4], ["Akt III", 2]]);
   });
 
   it("romancing-the-beat uses Gwen Hayes' four part names, 4/3/4/3", () => {
     expect(split("romancing-the-beat")).toEqual([
-      ["Setup", 4],
-      ["Falling", 3],
-      ["Retreating", 4],
-      ["Fighting for Love", 3],
+      ["Ausgangslage", 4],
+      ["Verlieben", 3],
+      ["Rückzug", 4],
+      ["Kampf um die Liebe", 3],
     ]);
   });
 
   it("twenty-seven-chapter splits 9/9/9", () => {
-    expect(split("twenty-seven-chapter")).toEqual([["Act I", 9], ["Act II", 9], ["Act III", 9]]);
+    expect(split("twenty-seven-chapter")).toEqual([["Akt I", 9], ["Akt II", 9], ["Akt III", 9]]);
   });
 
   it("ten-point splits 3/4/3", () => {
-    expect(split("ten-point")).toEqual([["Act I", 3], ["Act II", 4], ["Act III", 3]]);
+    expect(split("ten-point")).toEqual([["Akt I", 3], ["Akt II", 4], ["Akt III", 3]]);
   });
 });
 
@@ -81,10 +81,10 @@ describe("planScaffold shape", () => {
   it("pairs each scene with its beat, chapter, and act", () => {
     const s = plan.scenes[5];
     expect(s.beatId).toBe("break-into-2");
-    expect(s.title).toBe("Break Into Two");
+    expect(s.title).toBe("Aufbruch in Akt II");
     expect(s.chapterTitle).toBe("Chapter Six");
-    expect(s.actTitle).toBe("Act II");
-    expect(s.synopsis).toContain("new world");
+    expect(s.actTitle).toBe("Akt II");
+    expect(s.synopsis).toContain("neue Welt");
   });
 
   it("chapter actIndex points into the emitted acts", () => {

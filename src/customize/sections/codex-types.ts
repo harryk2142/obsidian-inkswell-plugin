@@ -118,7 +118,7 @@ function renderList(host: HTMLElement, ctx: SectionCtx): void {
       const menu = new Menu();
       menu.addItem((i) =>
         i
-          .setTitle("Edit display…")
+          .setTitle("Anzeige bearbeiten…")
           .setIcon("pencil")
           .onClick(() => openCategoryEditor(app, plugin, cat, () => ctx.rerender()))
       );
@@ -126,7 +126,7 @@ function renderList(host: HTMLElement, ctx: SectionCtx): void {
         menu.addSeparator();
         menu.addItem((i) =>
           i
-            .setTitle("Delete type…")
+            .setTitle("Typ löschen…")
             .setIcon("trash")
             .onClick(() =>
               void deleteCustomCategory(app, plugin, cat).then((done) => {
@@ -140,10 +140,10 @@ function renderList(host: HTMLElement, ctx: SectionCtx): void {
   }
 
   const foot = host.createDiv({ cls: "inkswell-customize__foot" });
-  const add = foot.createEl("button", { cls: "mod-cta", text: "New type…" });
+  const add = foot.createEl("button", { cls: "mod-cta", text: "Neuer Typ…" });
   add.type = "button";
   add.onclick = () => openCategoryEditor(app, plugin, null, (def) => ctx.setTarget(def.id));
-  const gen = foot.createEl("button", { text: "Generate all starter templates" });
+  const gen = foot.createEl("button", { text: "Alle Startvorlagen erzeugen" });
   gen.type = "button";
   gen.setAttribute(
     "aria-label",
@@ -173,7 +173,7 @@ function renderType(host: HTMLElement, ctx: SectionCtx, id: string): void {
   const { app, plugin } = ctx;
   const settings: CodexSettings = plugin.settings;
 
-  const back = host.createEl("a", { cls: "inkswell-customize__back", text: "‹ Codex types" });
+  const back = host.createEl("a", { cls: "inkswell-customize__back", text: "‹ Kodex-Typen" });
   back.onclick = (e) => {
     e.preventDefault();
     ctx.setTarget(null);
@@ -181,7 +181,7 @@ function renderType(host: HTMLElement, ctx: SectionCtx, id: string): void {
 
   const cat = categories(ctx).find((c) => c.id === id);
   if (!cat) {
-    host.createDiv({ cls: "inkswell-stats__muted", text: "That type no longer exists." });
+    host.createDiv({ cls: "inkswell-stats__muted", text: "Dieser Typ existiert nicht mehr." });
     return;
   }
 
@@ -235,11 +235,11 @@ function renderDisplay(body: HTMLElement, ctx: SectionCtx, cat: CategoryDef): vo
     });
   }
   const actions = body.createDiv({ cls: "inkswell-customize__actions" });
-  const edit = actions.createEl("button", { text: "Edit…" });
+  const edit = actions.createEl("button", { text: "Bearbeiten…" });
   edit.type = "button";
   edit.onclick = () => openCategoryEditor(app, plugin, cat, () => ctx.rerender());
   if (overridden && shipped && isBuiltinCategory(cat.id)) {
-    const reset = actions.createEl("button", { text: "Reset to default" });
+    const reset = actions.createEl("button", { text: "Auf Standard zurücksetzen" });
     reset.type = "button";
     const builtinId = cat.id;
     reset.onclick = () =>
@@ -278,9 +278,9 @@ function renderFields(body: HTMLElement, ctx: SectionCtx, cat: CategoryDef): voi
     reserved: RESERVED_FIELD_KEYS,
     defaultLabel: (key) => defaultFieldLabel(cat.id, key),
     kinds: FIELD_KINDS,
-    emptyText: "No fields yet — add one below.",
+    emptyText: "Noch keine Felder – füge unten eines hinzu.",
     reset: {
-      label: "Reset to shipped fields",
+      label: "Auf mitgelieferte Felder zurücksetzen",
       confirm:
         `Use Inkswell's shipped fields for ${cat.label}? This removes the codex-fields ` +
         `property from ${template?.basename ?? "the template"} — existing entries keep their frontmatter.`,

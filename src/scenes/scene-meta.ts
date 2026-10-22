@@ -179,20 +179,20 @@ export type InspectorFieldId =
 
 export const INSPECTOR_FIELDS: readonly { id: InspectorFieldId; label: string }[] = [
   { id: "status", label: "Status" },
-  { id: "subtitle", label: "Subtitle" },
-  { id: "synopsis", label: "Synopsis" },
+  { id: "subtitle", label: "Untertitel" },
+  { id: "synopsis", label: "Zusammenfassung" },
   { id: "pov", label: "POV" },
-  { id: "characters", label: "Characters" },
-  { id: "location", label: "Location" },
+  { id: "characters", label: "Figuren" },
+  { id: "location", label: "Ort" },
   { id: "structure", label: "Act / Chapter" },
-  { id: "plotlines", label: "Plotlines" },
-  { id: "targetWords", label: "Target words" },
-  { id: "color", label: "Color" },
+  { id: "plotlines", label: "Handlungslinien" },
+  { id: "targetWords", label: "Zielwörter" },
+  { id: "color", label: "Farbe" },
   // The writer's own fields (#52) as one movable block; their order within it
   // comes from the scene template's `scene-fields`.
-  { id: "custom", label: "Your fields" },
-  { id: "notes", label: "Notes" },
-  { id: "inactive", label: "Archived" },
+  { id: "custom", label: "Eigene Felder" },
+  { id: "notes", label: "Notizen" },
+  { id: "inactive", label: "Archiviert" },
 ];
 
 export interface InspectorFieldDef {

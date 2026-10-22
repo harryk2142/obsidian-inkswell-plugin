@@ -26,8 +26,8 @@ export type FeatureId =
   | "prompts"
   | "tracking";
 
-/** Grouping label for the Settings → Features section. */
-export type FeatureGroup = "Planning" | "Revision" | "Publishing" | "Writing";
+/** Grouping label for the Customize → Features section. */
+export type FeatureGroup = "Planen" | "Überarbeiten" | "Veröffentlichen" | "Schreiben";
 
 export interface FeatureDef {
   id: FeatureId;
@@ -50,58 +50,58 @@ export const OPTIONAL_FEATURES: FeatureDef[] = [
   {
     id: "beats",
     label: "Beats",
-    group: "Planning",
-    desc: "The beat-sheet planner (Plan → Beats) and its scene scaffolding.",
+    group: "Planen",
+    desc: "Der Beat-Sheet-Planer (Planen → Beats) und seine Szenengerüste.",
   },
   {
     id: "board",
     label: "Board",
-    group: "Planning",
-    desc: "The Kanban board view of your scenes (Plan → Structure → Board).",
+    group: "Planen",
+    desc: "Die Kanban-Ansicht Ihrer Szenen (Planen → Struktur → Board).",
   },
   {
     id: "plot-grid",
-    label: "Plot grid",
-    group: "Planning",
-    desc: "The plotline × chapter matrix (Plan → Structure → Grid) and the scene Plotlines field.",
+    label: "Plot-Raster",
+    group: "Planen",
+    desc: "Die Matrix aus Handlungssträngen und Kapiteln (Planen → Struktur → Raster) sowie das Feld „Handlungsstränge“ einer Szene.",
   },
   {
     id: "audit",
-    label: "Revision audit",
-    group: "Revision",
-    desc: "The revision audit checklists and character-arc tracker (Revise → Audit).",
+    label: "Überarbeitungsprüfung",
+    group: "Überarbeiten",
+    desc: "Die Überarbeitungschecklisten und die Entwicklungskurven von Figuren (Überarbeiten → Prüfung).",
   },
   {
     id: "analysis",
-    label: "Analysis",
-    group: "Revision",
-    desc: "Readability, word-frequency, and echo analysis (Revise → Analysis).",
+    label: "Analyse",
+    group: "Überarbeiten",
+    desc: "Analysen zu Lesbarkeit, Worthäufigkeit und Wortwiederholungen (Überarbeiten → Analyse).",
   },
   {
     id: "checklist",
-    label: "Publishing checklist",
-    group: "Publishing",
-    desc: "The self-publishing task checklist (Publish → Checklist).",
+    label: "Veröffentlichungscheckliste",
+    group: "Veröffentlichen",
+    desc: "Die Aufgabencheckliste für die Selbstveröffentlichung (Veröffentlichen → Checkliste).",
   },
   {
     id: "launch",
-    label: "Launch planner",
-    group: "Publishing",
-    desc: "The pre-order timeline and launch trackers (Publish → Launch).",
+    label: "Veröffentlichungsplaner",
+    group: "Veröffentlichen",
+    desc: "Der Zeitplan für Vorbestellungen und die Veröffentlichungsübersichten (Veröffentlichen → Veröffentlichung).",
   },
   {
     id: "prompts",
-    label: "Writing prompts",
-    group: "Writing",
-    desc: "The writing-prompt / ideation button on the Write toolbar.",
+    label: "Schreibimpulse",
+    group: "Schreiben",
+    desc: "Die Schaltfläche für Schreibimpulse und Ideen in der Werkzeugleiste beim Schreiben.",
   },
   {
     id: "tracking",
-    label: "Tracking",
-    group: "Writing",
+    label: "Fortschritt",
+    group: "Schreiben",
     desc:
-      "Word goals, writing sprints, the status-bar counter, and the Track dashboard. " +
-      "Words are still logged while hidden, so turning it back on shows the full history.",
+      "Wortziele, Schreibsprints, der Zähler in der Statusleiste und die Fortschrittsübersicht. " +
+      "Auch ausgeblendet werden Wörter weiterhin protokolliert; nach dem erneuten Einblenden ist daher der vollständige Verlauf sichtbar.",
   },
 ];
 

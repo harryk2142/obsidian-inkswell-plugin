@@ -39,10 +39,10 @@ export async function promptRenameSeries(
   onRenamed?: (from: string, to: string) => void
 ): Promise<void> {
   const name = await promptText(app, {
-    title: "Rename series",
+    title: "Reihe umbenennen",
     value: series.name,
     multiline: false,
-    cta: "Rename",
+    cta: "Umbenennen",
   });
   if (name === null) return;
   if (await renameSeries(app, projects, series.name, name)) onRenamed?.(series.name, name.trim());
@@ -89,7 +89,7 @@ export function addExistingToSeries(
     (p) => !projectSeries(baseDraftFor(projects, p))
   );
   if (candidates.length === 0) {
-    new Notice("Every project already belongs to a series.");
+    new Notice("Jedes Projekt gehört bereits zu einer Reihe.");
     return;
   }
   new ProjectSuggestModal(app, candidates, `Add a book to ${series.name}…`, (p) => {
@@ -205,7 +205,7 @@ export class ReorderSeriesModal extends FormModal {
   }
 
   protected renderForm(contentEl: HTMLElement): void {
-    contentEl.createEl("h3", { text: "Reorder series" });
+    contentEl.createEl("h3", { text: "Reihen neu anordnen" });
     contentEl.createEl("p", {
       cls: "inkswell-stats__muted",
       text: "Drag to reorder, or use a row's ⋯ menu. Home shows your series in this order, with standalone books last.",

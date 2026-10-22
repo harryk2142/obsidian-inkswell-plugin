@@ -18,7 +18,7 @@ import type InkswellPlugin from "../../main";
 
 export class SceneInspector implements RightPanel {
   readonly id = "scene";
-  readonly label = "Scene";
+  readonly label = "Szene";
   private app: App;
   private plugin: InkswellPlugin;
   private store: ProjectStore;
@@ -37,7 +37,7 @@ export class SceneInspector implements RightPanel {
     if (!file || !ctx) {
       container.createDiv({
         cls: "inkswell-inspector__empty",
-        text: "Open a scene to edit its details.",
+        text: "Öffne eine Szene, um ihre Details zu bearbeiten.",
       });
       return;
     }
@@ -52,7 +52,7 @@ export class SceneInspector implements RightPanel {
     // click), and Write surfaces it here too — one consistent place.
     const open = container.createEl("button", {
       cls: "inkswell-inspector__open",
-      text: "Open in tab",
+      text: "In Tab öffnen",
     });
     open.onclick = () => openScene(this.app, file);
 
@@ -76,7 +76,7 @@ export class SceneInspector implements RightPanel {
     // Hidden when the Audit feature is off (its saved data is kept).
     if (featureEnabled(disabled, "audit")) {
       const audit = container.createEl("details", { cls: "inkswell-inspector__audit" });
-      audit.createEl("summary", { text: "Revision audit" });
+      audit.createEl("summary", { text: "Überarbeitungsprüfung" });
       renderSceneAuditFields(
         audit,
         this.app,

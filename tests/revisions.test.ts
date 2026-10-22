@@ -131,7 +131,7 @@ describe("typeChoices", () => {
       "rewrite",
       "research",
     ]);
-    expect(choices.at(-1)?.label).toBe("Research");
+    expect(choices.at(-1)?.label).toBe("Recherche");
   });
 
   it("does not duplicate a core type when editing one", () => {

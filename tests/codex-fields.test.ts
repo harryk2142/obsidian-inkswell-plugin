@@ -82,7 +82,7 @@ describe("image fields", () => {
     const withIt = profileFields("character", [{ key: "role" }, { key: "image" }]).find(
       (f) => f.key === "image"
     );
-    expect(withIt).toMatchObject({ key: "image", label: "Image", type: "image" });
+    expect(withIt).toMatchObject({ key: "image", label: "Bild", type: "image" });
   });
 });
 
@@ -98,7 +98,7 @@ describe("number fields (#40)", () => {
 
   it("a shipped text field hinted number becomes a number and keeps its placeholder", () => {
     const role = profileFields("character", [{ key: "role", type: "number" }]).find((f) => f.key === "role");
-    expect(role).toMatchObject({ key: "role", label: "Role", type: "number" });
+    expect(role).toMatchObject({ key: "role", label: "Rolle", type: "number" });
     expect(role?.placeholder).toBe(profileFields("character").find((f) => f.key === "role")?.placeholder);
   });
 
@@ -185,7 +185,7 @@ describe("profileFields with a spec", () => {
 
   it("reuses the shipped definition for a known key (label, type, picker)", () => {
     const [, rel] = profileFields("character", [{ key: "relationships" }]);
-    expect(rel.label).toBe("Relationships");
+    expect(rel.label).toBe("Beziehungen");
     expect(rel.type).toBe("links");
     expect(rel.linkCategory).toBe("character");
     // A key shipped under ANOTHER category is found too (owner is an Item field).

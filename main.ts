@@ -93,7 +93,10 @@ function readSettings(stored: Partial<InkswellSettings> | undefined): InkswellSe
   const settings: InkswellSettings = Object.assign({}, DEFAULT_SETTINGS, stored ?? {});
   // Drop malformed/colliding custom codex types and beat templates before
   // anything renders them.
-  settings.categoryOverrides = normalizeCategoryOverrides(settings.categoryOverrides);
+  settings.categoryOverrides = normalizeCategoryOverrides({
+    ...DEFAULT_SETTINGS.categoryOverrides,
+    ...(stored?.categoryOverrides ?? {}),
+  });
   settings.customCategories = normalizeCustomCategories(
     settings.customCategories,
     builtinCategories(settings.categoryOverrides)
@@ -291,8 +294,8 @@ export default class InkswellPlugin extends Plugin {
       if (!this.settings.categoryNoticeSeen) {
         if (Object.keys(this.writingLog.daily).length > 0) {
           new Notice(
-            "Inkswell goals now count only project words. Choose what counts " +
-              "(scenes, planning, codex) in Settings → Inkswell.",
+            "Inkswell-Ziele zählen jetzt nur noch Wörter aus Projekten. Lege unter " +
+              "Einstellungen → Inkswell fest, was zählt (Szenen, Planung, Kodex).",
             10000
           );
         }
@@ -305,17 +308,17 @@ export default class InkswellPlugin extends Plugin {
   private registerCommands(): void {
     this.addCommand({
       id: "open-explorer",
-      name: "Open projects",
+      name: "Projekte öffnen",
       callback: () => this.openProjects(),
     });
     this.addCommand({
       id: "new-project",
-      name: "New project",
+      name: "Neues Projekt",
       callback: () => this.newProject(),
     });
     this.addCommand({
       id: "rename-project",
-      name: "Rename project",
+      name: "Projekt umbenennen",
       checkCallback: (checking) => {
         const project = resolveActive(this.store.getProjects(), this.activeProject.get());
         if (!project) return false;
@@ -325,13 +328,13 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "set-up-writing-challenge",
-      name: "Set up writing challenge",
+      name: "Schreibchallenge einrichten",
       checkCallback: (checking) =>
         this.featureCommand(checking, "tracking", () => this.openChallengeModal()),
     });
     this.addCommand({
       id: "export-story-bible",
-      name: "Export story bible",
+      name: "Story-Bibel exportieren",
       checkCallback: (checking) => {
         const project = resolveActive(this.store.getProjects(), this.activeProject.get());
         if (!project) return false;
@@ -341,7 +344,7 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "new-scene",
-      name: "New scene",
+      name: "Neue Szene",
       checkCallback: (checking) => {
         const project = resolveActive(this.store.getProjects(), this.activeProject.get());
         if (!project || !isMultiScene(project.draft)) return false;
@@ -355,7 +358,7 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "sort-scenes-by-chapter",
-      name: "Sort scenes by chapter number",
+      name: "Szenen nach Kapitelnummer sortieren",
       checkCallback: (checking) => {
         const project = resolveActive(this.store.getProjects(), this.activeProject.get());
         if (!project || !isMultiScene(project.draft)) return false;
@@ -365,61 +368,61 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "open-beats",
-      name: "Open beat sheet (Plan)",
+      name: "Beat-Sheet öffnen (Planen)",
       checkCallback: (checking) =>
         this.featureCommand(checking, "beats", () => void this.openBeats()),
     });
     this.addCommand({
       id: "open-board",
-      name: "Open board (Plan)",
+      name: "Board öffnen (Planen)",
       checkCallback: (checking) =>
         this.featureCommand(checking, "board", () => void this.openBoard()),
     });
     this.addCommand({
       id: "open-plot-grid",
-      name: "Open plot grid (Plan)",
+      name: "Plot-Raster öffnen (Planen)",
       checkCallback: (checking) =>
         this.featureCommand(checking, "plot-grid", () => void this.openPlotGrid()),
     });
     this.addCommand({
       id: "open-codex",
-      name: "Open codex",
+      name: "Kodex öffnen",
       callback: () => this.openCodex(),
     });
     this.addCommand({
       id: "open-write",
-      name: "Open Write",
+      name: "Schreiben öffnen",
       callback: () => this.openWrite(),
     });
     this.addCommand({
       id: "open-stats",
-      name: "Open writing stats (Track)",
+      name: "Schreibstatistik öffnen (Fortschritt)",
       checkCallback: (checking) =>
         this.featureCommand(checking, "tracking", () => void this.openStats()),
     });
     this.addCommand({
       id: "open-compile",
-      name: "Open compile (Publish)",
+      name: "Kompilieren öffnen (Veröffentlichen)",
       callback: () => this.openCompile(),
     });
     this.addCommand({
       id: "compile-active-project",
-      name: "Compile the active project",
+      name: "Aktives Projekt kompilieren",
       callback: () => void this.compileActiveProject(),
     });
     this.addCommand({
       id: "open-todos",
-      name: "Open to-dos (Revise)",
+      name: "Aufgaben öffnen (Überarbeiten)",
       callback: () => this.openTodos(),
     });
     this.addCommand({
       id: "search-scenes",
-      name: "Search scenes",
+      name: "Szenen durchsuchen",
       callback: () => this.openSearch(),
     });
     this.addCommand({
       id: "insert-todo",
-      name: "Insert a to-do marker…",
+      name: "Aufgabenmarkierung einfügen…",
       checkCallback: (checking) => {
         const view = this.inkswellView();
         if (!view || !view.canInsertTodo()) return false;
@@ -433,9 +436,9 @@ export default class InkswellPlugin extends Plugin {
     // are in the palette and rebindable under Settings → Hotkeys (no defaults —
     // they'd collide with the core editor's).
     const formatCommands: { id: string; name: string; kind: MarkKind }[] = [
-      { id: "toggle-bold", name: "Toggle bold (Write editor)", kind: "bold" },
-      { id: "toggle-italic", name: "Toggle italic (Write editor)", kind: "italic" },
-      { id: "toggle-strikethrough", name: "Toggle strikethrough (Write editor)", kind: "strike" },
+      { id: "toggle-bold", name: "Fettdruck umschalten (Schreibeditor)", kind: "bold" },
+      { id: "toggle-italic", name: "Kursivschrift umschalten (Schreibeditor)", kind: "italic" },
+      { id: "toggle-strikethrough", name: "Durchstreichen umschalten (Schreibeditor)", kind: "strike" },
     ];
     for (const { id, name, kind } of formatCommands) {
       this.addCommand({
@@ -451,7 +454,7 @@ export default class InkswellPlugin extends Plugin {
     }
     this.addCommand({
       id: "split-scene",
-      name: "Split scene at cursor (Write editor)",
+      name: "Szene am Cursor teilen (Schreibeditor)",
       checkCallback: (checking) => {
         const view = this.inkswellView();
         if (!view || !view.canFormat()) return false;
@@ -461,7 +464,7 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "move-selection-to-new-scene",
-      name: "Move selection to new scene (Write editor)",
+      name: "Auswahl in neue Szene verschieben (Schreibeditor)",
       checkCallback: (checking) => {
         const view = this.inkswellView();
         if (!view || !view.canFormat()) return false;
@@ -471,7 +474,7 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "quick-codex",
-      name: "Create Codex entry from selection (Write editor)",
+      name: "Kodex-Eintrag aus Auswahl erstellen (Schreibeditor)",
       checkCallback: (checking) => {
         const view = this.inkswellView();
         if (!view || !view.canFormat()) return false;
@@ -481,7 +484,7 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "open-link-at-cursor",
-      name: "Open link at cursor (Write editor)",
+      name: "Link am Cursor öffnen (Schreibeditor)",
       checkCallback: (checking) => {
         const view = this.inkswellView();
         if (!view || !view.canFormat()) return false;
@@ -493,25 +496,25 @@ export default class InkswellPlugin extends Plugin {
     // and pushes it onto a live editor. No default hotkey, per house rule.
     this.addCommand({
       id: "toggle-typewriter",
-      name: "Toggle typewriter mode (Write editor)",
+      name: "Schreibmaschinenmodus umschalten (Schreibeditor)",
       callback: () => {
         this.settings.typewriterMode = !this.settings.typewriterMode;
         void this.saveSettings();
         this.applyEditorPrefs();
-        new Notice(`Typewriter mode ${this.settings.typewriterMode ? "on" : "off"}`);
+        new Notice(`Schreibmaschinenmodus ${this.settings.typewriterMode ? "aktiviert" : "deaktiviert"}`);
       },
     });
     // Sprints belong to the "tracking" feature: hidden with it. End/cancel stay
     // reachable while a sprint is actually running so one can't get stranded.
     this.addCommand({
       id: "start-sprint",
-      name: "Start a writing sprint",
+      name: "Schreibsprint starten",
       checkCallback: (checking) =>
         this.featureCommand(checking, "tracking", () => this.startSprint()),
     });
     this.addCommand({
       id: "end-sprint",
-      name: "End the current sprint now",
+      name: "Aktuellen Sprint jetzt beenden",
       checkCallback: (checking) => {
         if (!this.sprints.isActive()) return false;
         if (!checking) this.sprints.finish();
@@ -520,7 +523,7 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "cancel-sprint",
-      name: "Cancel the current sprint",
+      name: "Aktuellen Sprint abbrechen",
       checkCallback: (checking) => {
         if (!this.sprints.isActive()) return false;
         if (!checking) this.sprints.cancel();
@@ -529,7 +532,7 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "set-word-target",
-      name: "Set word target for the active project",
+      name: "Wortziel für das aktive Projekt festlegen",
       callback: () =>
         this.withActiveProject((p) =>
           // Goals are story-level: write the BASE draft, like the Home hero
@@ -544,13 +547,13 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "log-revision",
-      name: "Log a revision decision",
+      name: "Überarbeitungsentscheidung protokollieren",
       editorCallback: (editor, ctx) => {
         const file = ctx.file;
         if (!file) return;
         const project = this.projectForPath(file.path);
         if (!project) {
-          new Notice("The active file isn't part of an Inkswell project.");
+          new Notice("Die aktive Datei gehört zu keinem Inkswell-Projekt.");
           return;
         }
         const scene = project.scenes.find((s) => s.path === file.path)?.title ?? null;
@@ -559,23 +562,23 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "open-revisions",
-      name: "Open revision log",
+      name: "Überarbeitungsprotokoll öffnen",
       callback: () => this.openRevisions(),
     });
     this.addCommand({
       id: "open-analysis",
-      name: "Open analysis (Revise)",
+      name: "Analyse öffnen (Überarbeiten)",
       checkCallback: (checking) =>
         this.featureCommand(checking, "analysis", () => void this.openAnalysis()),
     });
     this.addCommand({
       id: "open-help",
-      name: "Open help",
+      name: "Hilfe öffnen",
       callback: () => this.openHelp(),
     });
     this.addCommand({
       id: "open-customize",
-      name: "Open customize",
+      name: "Anpassen öffnen",
       callback: () => void this.openCustomize(),
     });
     // Kept under its old id so users' hotkeys survive; lands on the Features section.
@@ -586,12 +589,12 @@ export default class InkswellPlugin extends Plugin {
     });
     this.addCommand({
       id: "manage-features",
-      name: "Manage features",
+      name: "Funktionen verwalten",
       callback: () => void this.openCustomize("features"),
     });
     this.addCommand({
       id: "quick-capture",
-      name: "Quick capture an idea",
+      name: "Idee schnell erfassen",
       callback: () => void this.quickCaptureIdea(),
     });
   }
@@ -777,14 +780,14 @@ export default class InkswellPlugin extends Plugin {
    *  phone "More → Capture idea" action. */
   async quickCaptureIdea(): Promise<void> {
     const text = await promptText(this.app, {
-      title: "Quick capture",
+      title: "Schnellerfassung",
       value: "",
       multiline: true,
-      cta: "Capture",
+      cta: "Erfassen",
     });
     if (text) {
       this.addIdea(text);
-      new Notice("Idea captured.");
+      new Notice("Idee erfasst.");
     }
   }
 
@@ -836,7 +839,7 @@ export default class InkswellPlugin extends Plugin {
     }, "Couldn't save the idea as a note.");
     if (!file) return;
     this.removeIdea(idea.id);
-    new Notice(`Saved to ${file.path}`);
+    new Notice(`Gespeichert unter ${file.path}`);
     openScene(this.app, file);
   }
 
@@ -985,16 +988,16 @@ export default class InkswellPlugin extends Plugin {
   private async compileActiveProject(): Promise<void> {
     const project = resolveActive(this.store.getProjects(), this.activeProject.get());
     if (!project) {
-      new Notice("No active project to compile. Open one in Inkswell first.");
+      new Notice("Kein aktives Projekt zum Kompilieren. Öffne zuerst eines in Inkswell.");
       return;
     }
     try {
       const config = resolveCompileConfig(project, this.settings.defaultCompileFormat);
       const result = await runCompile(this.app, project, config);
       const words = countWords(result.wordCountSource);
-      new Notice(`Compiled ${words.toLocaleString()} words to ${result.outputPath}`);
+      new Notice(`${words.toLocaleString()} Wörter nach ${result.outputPath} kompiliert`);
     } catch (e) {
-      new Notice(`Compile failed: ${(e as Error).message}`, 8000);
+      new Notice(`Kompilierung fehlgeschlagen: ${(e as Error).message}`, 8000);
     }
   }
 
@@ -1135,7 +1138,7 @@ export default class InkswellPlugin extends Plugin {
       (activeFile ? this.projectForPath(activeFile.path) : undefined) ??
       resolveActive(this.store.getProjects(), null);
     if (!project) {
-      new Notice("No Inkswell project found. Create one with the New project command.");
+      new Notice("Kein Inkswell-Projekt gefunden. Erstelle eines mit dem Befehl „Neues Projekt“.");
       return;
     }
     fn(project);

@@ -16,7 +16,7 @@ export function openMoreSheet(
   disabledFeatures: readonly string[] = []
 ): void {
   const menu = new Menu();
-  menu.addItem((i) => i.setTitle("Capture idea").setIcon("plus").onClick(() => onCapture()));
+  menu.addItem((i) => i.setTitle("Idee erfassen").setIcon("plus").onClick(() => onCapture()));
   const all = phoneMoreDestinations();
   const usable = all.usable.filter((d) => destinationEnabled(d, disabledFeatures));
   const redirected = all.redirected.filter((d) => destinationEnabled(d, disabledFeatures));

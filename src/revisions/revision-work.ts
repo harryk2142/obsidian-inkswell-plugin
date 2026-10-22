@@ -85,7 +85,7 @@ export function buildRevisionGroups(
   if (projectDecisions.length > 0) {
     out.push({
       key: PROJECT_GROUP_KEY,
-      title: "Whole project",
+      title: "Gesamtes Projekt",
       path: null,
       isCurrent: false,
       todos: [],
@@ -146,7 +146,7 @@ export function buildWorkChips(
 
   const chips: WorkChip[] = [
     {
-      label: "All",
+      label: "Alle",
       filter: { facet: "all" },
       count: markerTotal + decisions.length,
       decision: false,

@@ -84,7 +84,7 @@ export class ScopeModal extends FormModal {
     contentEl.createEl("h3", { text: `Scope: ${this.opts.entityName}` });
     contentEl.createEl("p", {
       cls: "inkswell-stats__muted",
-      text: "Where this entry shows up in the Codex, its detection in your scenes, and the story bible.",
+      text: "Legt fest, wo dieser Eintrag im Kodex, bei der Erkennung in Szenen und in der Story-Bibel erscheint.",
     });
     this.kindsEl = contentEl.createDiv({ cls: "inkswell-viewswitch inkswell-scope__kinds" });
     this.body = contentEl.createDiv({ cls: "inkswell-scope-modal__body" });
@@ -124,7 +124,7 @@ export class ScopeModal extends FormModal {
     if (!body) return;
     body.empty();
     if (this.kind === "global") {
-      body.createDiv({ cls: "inkswell-stats__muted", text: "Visible from every project." });
+      body.createDiv({ cls: "inkswell-stats__muted", text: "In jedem Projekt sichtbar." });
       return;
     }
     const list = body.createDiv({ cls: "inkswell-scope-modal__list" });
@@ -168,7 +168,7 @@ export class ScopeModal extends FormModal {
     }
     const stale = this.initialList.filter((v) => this.isStale(v));
     if (stale.length > 0) {
-      list.createDiv({ cls: "inkswell-scope-modal__group", text: "Not found" });
+      list.createDiv({ cls: "inkswell-scope-modal__group", text: "Nicht gefunden" });
       for (const v of stale) {
         this.checkRow(list, v, this.unknown.has(v), (on) => {
           if (on) this.unknown.add(v);
@@ -193,7 +193,7 @@ export class ScopeModal extends FormModal {
     }
     if (this.kind === "series") {
       if (!this.seriesName) {
-        new Notice("Pick a series.");
+        new Notice("Wähle eine Reihe aus.");
         return false;
       }
       this.opts.onSave({ kind: "replace", scope: { series: this.seriesName } });

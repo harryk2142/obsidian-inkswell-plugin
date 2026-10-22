@@ -58,12 +58,12 @@ export class RevisionModal extends Modal {
     });
     contentEl.createEl("p", {
       cls: "inkswell-revision__hint",
-      text: "Note the change and keep writing forward — apply it later during revision.",
+      text: "Notiere die Änderung und schreibe weiter – setze sie später bei der Überarbeitung um.",
     });
 
     new Setting(contentEl)
-      .setName("Decision")
-      .setDesc('e.g. "From now on, the brother is dead."')
+      .setName("Entscheidung")
+      .setDesc('z. B. „Ab jetzt ist der Bruder tot.“')
       .addTextArea((t) => {
         t.setValue(this.text).onChange((v) => (this.text = v));
         t.inputEl.rows = 3;
@@ -72,7 +72,7 @@ export class RevisionModal extends Modal {
       });
 
     new Setting(contentEl)
-      .setName("Type")
+      .setName("Typ")
       .setDesc(
         "Continuity decisions read 'from now on…'; others are issues to fix later. " +
           "For research questions or missing scenes, drop a [RESEARCH: ] or [SCENE: ] " +
@@ -94,8 +94,8 @@ export class RevisionModal extends Modal {
     // projects (a single-scene project has nothing to anchor to).
     if (this.project.scenes.length > 0) {
       new Setting(contentEl)
-        .setName("Anchor")
-        .setDesc("Tie this decision to a scene, or make it project-wide.")
+        .setName("Bezug")
+        .setDesc("Verknüpfe diese Entscheidung mit einer Szene oder lege sie projektweit fest.")
         .addDropdown((d) => {
           d.addOption("", "Whole project");
           for (const s of this.project.scenes) d.addOption(s.title, s.title);
@@ -114,7 +114,7 @@ export class RevisionModal extends Modal {
   private async save(): Promise<void> {
     const text = this.text.trim();
     if (!text) {
-      new Notice("Enter a decision first.");
+      new Notice("Gib zuerst eine Entscheidung ein.");
       return;
     }
     const decision: RevisionDecision = {

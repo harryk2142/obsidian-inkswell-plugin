@@ -63,7 +63,7 @@ describe("starterCodexTemplate", () => {
     expect(t).toContain("- creature"); // tag defaults to the custom id
     expect(t).toContain("codex: creature"); // guidance names the stamped key
     expect(t).toContain("every new Creature");
-    expect(t).toContain("Significance"); // generic profile fields are listed
+    expect(t).toContain("Bedeutung"); // generic profile fields are listed
     expect(t.split("\n").some((line) => /^codex:/.test(line))).toBe(false);
   });
 });

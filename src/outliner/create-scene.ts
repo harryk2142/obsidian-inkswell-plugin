@@ -194,7 +194,7 @@ class NewSceneModal extends Modal {
 
   onOpen(): void {
     const { contentEl } = this;
-    contentEl.createEl("h3", { text: "New scene" });
+    contentEl.createEl("h3", { text: "Neue Szene" });
     this.input = contentEl.createEl("input", { type: "text", cls: "inkswell-prompt__input" });
     this.input.placeholder = "Scene title";
     this.input.onkeydown = (e) => {
@@ -206,16 +206,16 @@ class NewSceneModal extends Modal {
     }, 0);
 
     new Setting(contentEl)
-      .addButton((b) => b.setButtonText("Create").setCta().onClick(() => void this.create(true)))
-      .addButton((b) => b.setButtonText("Create another").onClick(() => void this.create(false)))
-      .addButton((b) => b.setButtonText("Cancel").onClick(() => this.close()));
+      .addButton((b) => b.setButtonText("Erstellen").setCta().onClick(() => void this.create(true)))
+      .addButton((b) => b.setButtonText("Weitere erstellen").onClick(() => void this.create(false)))
+      .addButton((b) => b.setButtonText("Abbrechen").onClick(() => this.close()));
   }
 
   /** Create the scene; dismiss the modal when `close`, else reset for another. */
   private async create(close: boolean): Promise<void> {
     const title = sanitizeSegment(this.input.value);
     if (!title) {
-      new Notice("Enter a scene title.");
+      new Notice("Gib einen Szenentitel ein.");
       this.input.focus();
       return;
     }

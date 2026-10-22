@@ -56,7 +56,7 @@ export class SprintController extends Component {
 
   start(durationMin: number, goal: number | null = null): void {
     if (this.active) {
-      new Notice("A sprint is already running.");
+      new Notice("Es läuft bereits ein Sprint.");
       return;
     }
     this.active = {
@@ -80,7 +80,7 @@ export class SprintController extends Component {
   cancel(): void {
     if (!this.active) return;
     this.teardown();
-    new Notice("Sprint cancelled.");
+    new Notice("Sprint abgebrochen.");
     this.emit();
   }
 

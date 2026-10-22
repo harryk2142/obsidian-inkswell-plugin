@@ -142,7 +142,7 @@ describe("buildPlotGrid", () => {
     // Tier-less group: the planned chapter then the No-chapter bucket.
     expect(grid.groups[2].rows.map((r) => `${r.kind}:${r.label}`)).toEqual([
       "planned:Nine",
-      "unassigned:No chapter",
+      "unassigned:Kein Kapitel",
     ]);
     expect(grid.groups[2].rows[1].chapterTitle).toBe("");
   });

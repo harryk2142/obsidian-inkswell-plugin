@@ -24,7 +24,7 @@ class ScaffoldConfirmModal extends FormModal {
 
   protected renderForm(contentEl: HTMLElement): void {
     const a = this.analysis;
-    contentEl.createEl("h3", { text: "Scaffold structure" });
+    contentEl.createEl("h3", { text: "Struktur anlegen" });
 
     contentEl.createEl("p", {
       cls: "inkswell-stats__muted",
@@ -52,7 +52,7 @@ class ScaffoldConfirmModal extends FormModal {
       const row = box.createDiv({ cls: "inkswell-scaffold-preview__row" });
       row.createSpan({ text: `${item.chapterTitle} — ${item.title}` });
       if (item.exists) {
-        row.createSpan({ cls: "inkswell-scaffold-preview__note", text: "file exists — adopted" });
+        row.createSpan({ cls: "inkswell-scaffold-preview__note", text: "Datei vorhanden – übernommen" });
       }
     }
   }

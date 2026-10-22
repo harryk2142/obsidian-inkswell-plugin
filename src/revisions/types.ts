@@ -28,12 +28,12 @@ export type RevisionType =
 export type RevisionPriority = "low" | "med" | "high";
 
 export const REVISION_TYPES: { id: RevisionType; label: string }[] = [
-  { id: "continuity", label: "Continuity" },
-  { id: "plot-hole", label: "Plot hole" },
-  { id: "rewrite", label: "Rewrite" },
-  { id: "character", label: "Character" },
-  { id: "research", label: "Research" },
-  { id: "new-scene", label: "New scene" },
+  { id: "continuity", label: "Kontinuität" },
+  { id: "plot-hole", label: "Logikfehler" },
+  { id: "rewrite", label: "Umschreiben" },
+  { id: "character", label: "Figur" },
+  { id: "research", label: "Recherche" },
+  { id: "new-scene", label: "Neue Szene" },
 ];
 
 /**

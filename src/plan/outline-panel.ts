@@ -81,15 +81,15 @@ export class OutlinePanel {
 
     // Toolbar
     const bar = container.createDiv({ cls: "inkswell-outline__bar" });
-    const addAct = bar.createEl("button", { text: "Add act" });
+    const addAct = bar.createEl("button", { text: "Akt hinzufügen" });
     addAct.onclick = () => void this.addAct();
-    const addChapter = bar.createEl("button", { text: "Add chapter" });
+    const addChapter = bar.createEl("button", { text: "Kapitel hinzufügen" });
     addChapter.onclick = () => void this.addChapter(null);
-    const addScene = bar.createEl("button", { text: "Add scene" });
+    const addScene = bar.createEl("button", { text: "Szene hinzufügen" });
     addScene.setAttribute("aria-label", "Create a new scene without a chapter");
     addScene.onclick = () => this.addScene(null);
     // One-shot reorder by each scene's chapter number (#44) — not a mode.
-    const sort = bar.createEl("button", { text: "Sort by chapter" });
+    const sort = bar.createEl("button", { text: "Nach Kapitel sortieren" });
     sort.setAttribute(
       "aria-label",
       "Reorder the manuscript once by the number in each scene's chapter label"
@@ -107,7 +107,7 @@ export class OutlinePanel {
         container,
         "Nothing to structure yet. The usual flow: sketch your Beats, scaffold scenes " +
           "from them, then come back to group scenes into acts and chapters.",
-        [{ label: "Go to Beats", cta: true, onClick: () => void this.plugin.openBeats() }]
+        [{ label: "Zu Beats", cta: true, onClick: () => void this.plugin.openBeats() }]
       );
       return;
     }
@@ -183,7 +183,7 @@ export class OutlinePanel {
         text: `${act.chapters.length} chapter${act.chapters.length === 1 ? "" : "s"}`,
       });
     }
-    const addCh = row.createEl("button", { cls: "inkswell-outline__mini", text: "Add chapter" });
+    const addCh = row.createEl("button", { cls: "inkswell-outline__mini", text: "Kapitel hinzufügen" });
     addCh.onclick = () => void this.addChapter(act.id);
 
     this.draggable(row, "act", act.id);
@@ -206,7 +206,7 @@ export class OutlinePanel {
       if (kind === "chapter") this.commit(moveChapter(this.tree, id, act.id, null));
     });
     if (act.chapters.length === 0) {
-      body.createDiv({ cls: "inkswell-outline__empty", text: "Drop chapters here" });
+      body.createDiv({ cls: "inkswell-outline__empty", text: "Kapitel hier ablegen" });
     }
     for (const c of act.chapters) this.renderChapter(body, c, act.id, fills);
   }
@@ -240,7 +240,7 @@ export class OutlinePanel {
       void this.setTarget(chapter.id, Number.isFinite(n) && n > 0 ? n : 0);
     };
 
-    const addSc = row.createEl("button", { cls: "inkswell-outline__mini", text: "Add scene" });
+    const addSc = row.createEl("button", { cls: "inkswell-outline__mini", text: "Szene hinzufügen" });
     addSc.onclick = () => this.addScene(chapter);
 
     this.draggable(row, "chapter", chapter.id);
@@ -263,7 +263,7 @@ export class OutlinePanel {
         if (kind === "scene") this.commit(moveScene(this.tree, id, chapter.id, null));
       });
       if (chapter.scenes.length === 0) {
-        body.createDiv({ cls: "inkswell-outline__empty", text: "Drop scenes here" });
+        body.createDiv({ cls: "inkswell-outline__empty", text: "Szenen hier ablegen" });
       }
       for (const s of chapter.scenes) this.renderScene(body, s, chapter.id);
     }
@@ -421,7 +421,7 @@ export class OutlinePanel {
     if (scene.path) {
       // The row click already opens the scene in Write; offer the plain note here.
       menu.addItem((i) =>
-        i.setTitle("Open in new tab").setIcon("file-text").onClick(() => {
+        i.setTitle("In neuem Tab öffnen").setIcon("file-text").onClick(() => {
           const f = this.app.vault.getAbstractFileByPath(scene.path!);
           if (f instanceof TFile) openScene(this.app, f);
         })
@@ -436,16 +436,16 @@ export class OutlinePanel {
       );
     });
     menu.addItem((i) =>
-      i.setTitle("Move to: (unassigned)").onClick(() => this.commit(moveScene(this.tree, scene.title, null, null)))
+      i.setTitle("Verschieben nach: (nicht zugewiesen)").onClick(() => this.commit(moveScene(this.tree, scene.title, null, null)))
     );
     return menu;
   }
 
   private chapterMenu(chapter: ChapterNode, actId: string | null): Menu {
     const menu = new Menu();
-    menu.addItem((i) => i.setTitle("New scene…").setIcon("plus").onClick(() => this.addScene(chapter)));
-    menu.addItem((i) => i.setTitle("Rename…").setIcon("pencil").onClick(() => void this.renameChapter(chapter)));
-    menu.addItem((i) => i.setTitle("Delete").setIcon("trash").onClick(() => void this.deleteChapter(chapter)));
+    menu.addItem((i) => i.setTitle("Neue Szene…").setIcon("plus").onClick(() => this.addScene(chapter)));
+    menu.addItem((i) => i.setTitle("Umbenennen…").setIcon("pencil").onClick(() => void this.renameChapter(chapter)));
+    menu.addItem((i) => i.setTitle("Löschen").setIcon("trash").onClick(() => void this.deleteChapter(chapter)));
     menu.addSeparator();
     for (const a of this.tree.acts) {
       if (a.id === actId) continue;
@@ -455,7 +455,7 @@ export class OutlinePanel {
     }
     if (actId !== null) {
       menu.addItem((i) =>
-        i.setTitle("Move to: (no act)").onClick(() => this.commit(moveChapter(this.tree, chapter.id, null, null)))
+        i.setTitle("Verschieben nach: (kein Akt)").onClick(() => this.commit(moveChapter(this.tree, chapter.id, null, null)))
       );
     }
     return menu;
@@ -463,16 +463,16 @@ export class OutlinePanel {
 
   private actMenu(act: ActNode): Menu {
     const menu = new Menu();
-    menu.addItem((i) => i.setTitle("Rename…").setIcon("pencil").onClick(() => void this.renameAct(act)));
-    menu.addItem((i) => i.setTitle("Delete").setIcon("trash").onClick(() => void this.deleteAct(act)));
+    menu.addItem((i) => i.setTitle("Umbenennen…").setIcon("pencil").onClick(() => void this.renameAct(act)));
+    menu.addItem((i) => i.setTitle("Löschen").setIcon("trash").onClick(() => void this.deleteAct(act)));
     const idx = this.tree.acts.findIndex((a) => a.id === act.id);
     if (idx > 0) {
       const before = this.tree.acts[idx - 1];
-      menu.addItem((i) => i.setTitle("Move up").setIcon("arrow-up").onClick(() => this.commit(moveAct(this.tree, act.id, before.id))));
+      menu.addItem((i) => i.setTitle("Nach oben").setIcon("arrow-up").onClick(() => this.commit(moveAct(this.tree, act.id, before.id))));
     }
     if (idx < this.tree.acts.length - 1) {
       const after = this.tree.acts[idx + 2]?.id ?? null; // insert before the act two down = after the next
-      menu.addItem((i) => i.setTitle("Move down").setIcon("arrow-down").onClick(() => this.commit(moveAct(this.tree, act.id, after))));
+      menu.addItem((i) => i.setTitle("Nach unten").setIcon("arrow-down").onClick(() => this.commit(moveAct(this.tree, act.id, after))));
     }
     return menu;
   }
@@ -505,14 +505,14 @@ export class OutlinePanel {
   }
 
   private async addAct(): Promise<void> {
-    const name = await promptText(this.app, { title: "New act", value: "", multiline: false, cta: "Add" });
+    const name = await promptText(this.app, { title: "Neuer Akt", value: "", multiline: false, cta: "Hinzufügen" });
     if (!name?.trim()) return;
     const next = { ...this.tree, acts: [...this.tree.acts, newActNode(name.trim())] };
     this.commit(next);
   }
 
   private async addChapter(actId: string | null): Promise<void> {
-    const name = await promptText(this.app, { title: "New chapter", value: "", multiline: false, cta: "Add" });
+    const name = await promptText(this.app, { title: "Neues Kapitel", value: "", multiline: false, cta: "Hinzufügen" });
     if (!name?.trim()) return;
     const node = newChapterNode(name.trim());
     let next: OutlineTree;
@@ -528,14 +528,14 @@ export class OutlinePanel {
   }
 
   private async renameChapter(chapter: ChapterNode): Promise<void> {
-    const input = await promptText(this.app, { title: "Rename chapter", value: chapter.title, multiline: false, cta: "Rename" });
+    const input = await promptText(this.app, { title: "Kapitel umbenennen", value: chapter.title, multiline: false, cta: "Umbenennen" });
     const t = input?.trim();
     if (!t || t === chapter.title) return;
     this.commit(this.mapChapter(chapter.id, (c) => ({ ...c, title: t })));
   }
 
   private async renameAct(act: ActNode): Promise<void> {
-    const input = await promptText(this.app, { title: "Rename act", value: act.title, multiline: false, cta: "Rename" });
+    const input = await promptText(this.app, { title: "Akt umbenennen", value: act.title, multiline: false, cta: "Umbenennen" });
     const t = input?.trim();
     if (!t || t === act.title) return;
     this.commit({ ...this.tree, acts: this.tree.acts.map((a) => (a.id === act.id ? { ...a, title: t } : a)) });

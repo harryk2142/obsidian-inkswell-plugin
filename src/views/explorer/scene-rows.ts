@@ -116,14 +116,14 @@ export class SceneRows {
     const sceneFile = scene?.path ? this.app.vault.getAbstractFileByPath(scene.path) : null;
     if (sceneFile instanceof TFile) {
       menu.addItem((i) =>
-        i.setTitle("Open in new tab").setIcon("file-text").onClick(() => openScene(this.app, sceneFile))
+        i.setTitle("In neuem Tab öffnen").setIcon("file-text").onClick(() => openScene(this.app, sceneFile))
       );
       menu.addSeparator();
     }
 
     menu.addItem((i) =>
       i
-        .setTitle("Indent (nest)")
+        .setTitle("Einrücken (verschachteln)")
         .setIcon("indent")
         .onClick(() =>
           void tryFileOp(
@@ -134,7 +134,7 @@ export class SceneRows {
     );
     menu.addItem((i) =>
       i
-        .setTitle("Unindent")
+        .setTitle("Ausrücken")
         .setIcon("outdent")
         .onClick(() =>
           void tryFileOp(
@@ -148,19 +148,19 @@ export class SceneRows {
       menu.addSeparator();
       menu.addItem((i) =>
         i
-          .setTitle("Edit scene…")
+          .setTitle("Szene bearbeiten…")
           .setIcon("settings-2")
           .onClick(() => new EditSceneModal(this.app, sceneFile, project, this.plugin).open())
       );
       menu.addItem((i) =>
         i
-          .setTitle("Edit synopsis…")
+          .setTitle("Zusammenfassung bearbeiten…")
           .setIcon("text")
           .onClick(() => void editSynopsis(this.app, sceneFile, (p) => this.plugin.selfWrites.mark(p)))
       );
       menu.addItem((i) =>
         i
-          .setTitle("Rename…")
+          .setTitle("Umbenennen…")
           .setIcon("pencil")
           .onClick(() =>
             void renameScene(this.app, project, scene.title, sceneFile, (p) =>
@@ -173,7 +173,7 @@ export class SceneRows {
     menu.addSeparator();
     menu.addItem((i) =>
       i
-        .setTitle("Remove from project (keep file)")
+        .setTitle("Aus Projekt entfernen (Datei behalten)")
         .setIcon("link-2-off")
         .onClick(() => {
           if (scene?.title) {
@@ -192,7 +192,7 @@ export class SceneRows {
     if (scene && sceneFile instanceof TFile) {
       menu.addItem((i) =>
         i
-          .setTitle("Delete scene")
+          .setTitle("Szene löschen")
           .setIcon("trash")
           .onClick(() => void deleteScene(this.app, project, scene.title, sceneFile))
       );
@@ -262,7 +262,7 @@ export class SceneRows {
     if (index > 0) {
       menu.addItem((i) =>
         i
-          .setTitle("Move up")
+          .setTitle("Nach oben")
           .setIcon("arrow-up")
           .onClick(() =>
             void tryFileOp(
@@ -275,7 +275,7 @@ export class SceneRows {
     if (index < last) {
       menu.addItem((i) =>
         i
-          .setTitle("Move down")
+          .setTitle("Nach unten")
           .setIcon("arrow-down")
           .onClick(() =>
             void tryFileOp(

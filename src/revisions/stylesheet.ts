@@ -12,10 +12,10 @@
 export type StyleKind = "spelling" | "name" | "term" | "number" | "format";
 
 export const STYLE_KINDS: { id: StyleKind; label: string }[] = [
-  { id: "spelling", label: "Spelling" },
+  { id: "spelling", label: "Rechtschreibung" },
   { id: "name", label: "Name" },
-  { id: "term", label: "Term" },
-  { id: "number", label: "Number" },
+  { id: "term", label: "Begriff" },
+  { id: "number", label: "Zahl" },
   { id: "format", label: "Format" },
 ];
 

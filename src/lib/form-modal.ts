@@ -18,7 +18,7 @@ export abstract class FormModal extends Modal {
 
   /** CTA label for the appended button row; null = subclass renders its own
    *  buttons (call {@link trySubmit} from them). */
-  protected cta: string | null = "Save";
+  protected cta: string | null = "Speichern";
 
   constructor(app: App) {
     super(app);
@@ -41,7 +41,7 @@ export abstract class FormModal extends Modal {
         .addButton((b) =>
           b.setButtonText(this.cta as string).setCta().onClick(() => void this.trySubmit())
         )
-        .addButton((b) => b.setButtonText("Cancel").onClick(() => this.close()));
+        .addButton((b) => b.setButtonText("Abbrechen").onClick(() => this.close()));
     }
     this.wireInputs();
   }

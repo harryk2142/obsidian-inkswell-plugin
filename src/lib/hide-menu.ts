@@ -40,7 +40,7 @@ export function addHideItem(menu: Menu, plugin: InkswellPlugin, feature: Feature
         let notice: Notice | null = null;
         const body = createFragment((frag) => {
           frag.appendText(`${sentence} hidden. `);
-          const undo = frag.createEl("a", { text: "Undo" });
+          const undo = frag.createEl("a", { text: "Rückgängig" });
           undo.onclick = (ev) => {
             ev.preventDefault();
             void plugin.setFeatureEnabled(feature, true);

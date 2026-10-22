@@ -1,7 +1,7 @@
 /**
  * Typed plugin settings + the settings tab.
  *
- * Settings persist via Obsidian's plugin data (`.obsidian/plugins/inkswell/data.json`).
+ * Settings persist via Obsidian's plugin data (`.obsidian/plugins/inkswell-de/data.json`).
  * Per-project config (compile workflows, goals, revisions) does NOT live here —
  * it belongs in the project index's `inkswell` frontmatter.
  */
@@ -14,7 +14,7 @@ import { WeekStart } from "../goals/goals";
 import type { WritingChallenge } from "../goals/challenge";
 import type { RailLayout } from "../views/nav-model";
 import { WORD_CATEGORIES, WordCategory } from "../tracking/types";
-import { CategoryDef, CategoryOverrides } from "../codex/types";
+import { CategoryDef, CategoryOverrides, GERMAN_CATEGORY_OVERRIDES } from "../codex/types";
 import { BeatTemplateDef } from "../outliner/custom-templates";
 import { deviceFlaggedAsPhone } from "../lib/platform";
 import type { ListOverrides } from "./overridable-lists";
@@ -146,9 +146,10 @@ export interface InkswellSettings {
    */
   forceTabletLayout: boolean;
   /**
-   * Customize's overrides for the shipped lists (revision checkpoints, the
-   * publishing checklist, writing prompts, scene statuses): lossless hide /
-   * rename / reorder / add, one optional entry per list id. Normalized on load
+   * Customize's overrides for the shipped lists (planning-note fields,
+   * revision checkpoints, publishing checklist, writing prompts, scene
+   * statuses): lossless hide / rename / reorder / add, one optional entry per
+   * list id. Normalized on load
    * (`normalizeListOverrides`). Absent key = shipped list verbatim.
    */
   listOverrides: ListOverrides;
@@ -185,7 +186,7 @@ export const DEFAULT_SETTINGS: InkswellSettings = {
   dismissedHints: [],
   disabledFeatures: [],
   customCategories: [],
-  categoryOverrides: {},
+  categoryOverrides: GERMAN_CATEGORY_OVERRIDES,
   customBeatTemplates: [],
   smartDashes: false,
   smartQuotes: false,
@@ -204,18 +205,18 @@ export const DEFAULT_SETTINGS: InkswellSettings = {
  * prompts, features) is a Customize section, never a Settings row.
  */
 const CUSTOMIZE_ROW = {
-  name: "Customize Inkswell",
+  name: "Inkswell anpassen",
   desc:
-    "Codex types and fields, starter templates, beat structures, scene statuses, writing " +
-    "prompts, checklists, and which features are shown — all edited inside Inkswell.",
+    "Kodex-Typen und -Felder, Startvorlagen, Beat-Strukturen, Szenenstatus, Schreibimpulse, " +
+    "Checklisten und sichtbare Funktionen – alles direkt in Inkswell bearbeitbar.",
 };
 
 /** Copy for the one platform-conditional row (shared by both renderers). */
 const LAYOUT_TOGGLE = {
-  name: "Use the full layout on this device",
+  name: "Vollständiges Layout auf diesem Gerät verwenden",
   desc:
-    "Obsidian classifies this screen as phone-sized, so Inkswell shows its phone layout and " +
-    "keeps Plan and Publish behind a “needs a larger screen” notice. Turn this on if you're on a tablet.",
+    "Obsidian stuft diesen Bildschirm als Smartphone ein. Deshalb zeigt Inkswell das Smartphone-Layout " +
+    "und blendet Planen und Veröffentlichen hinter einem Hinweis aus. Auf Tablets hier aktivieren.",
 };
 
 /** Milestone spacing: 0 = off; anything else at least 100 words (a tag per few words is noise). */
@@ -251,57 +252,57 @@ const WRITE_EDITOR_TOGGLES: {
 }[] = [
   {
     key: "typewriterMode",
-    name: "Typewriter mode",
+    name: "Schreibmaschinenmodus",
     desc:
-      "Keep the line you're typing on vertically centered in the Write editor, so your eyes stay in one place. " +
-      "Mouse clicks don't recenter. Also available as the command “Toggle typewriter mode (Write editor)”.",
+      "Hält die aktuelle Zeile im Schreibeditor vertikal zentriert. Mausklicks zentrieren nicht neu. " +
+      "Auch als Befehl „Schreibmaschinenmodus umschalten (Schreibeditor)“ verfügbar.",
   },
   {
     key: "manuscriptTypography",
-    name: "Manuscript typography",
+    name: "Manuskript-Typografie",
     desc:
-      "Book-style layout in the Write editor: paragraphs get a first-line indent (except the first paragraph " +
-      "after a heading or scene break), and headings are centered. Purely visual — your text is unchanged. " +
-      "The font follows Obsidian's Appearance → Text font.",
+      "Buchähnliches Layout im Schreibeditor: Absätze erhalten einen Erstzeileneinzug (außer nach Überschriften " +
+      "und Szenentrennern), Überschriften werden zentriert. Rein visuell – der Text bleibt unverändert. " +
+      "Die Schrift folgt Obsidian unter Darstellung → Textschriftart.",
   },
   {
     key: "smartDashes",
-    name: "Smart dashes",
+    name: "Intelligente Gedankenstriche",
     desc:
-      "In the Write editor, typing -- becomes an en dash (–) and a third - makes an em dash (—). " +
-      "A line of dashes (---) is left alone. Applies only to Inkswell's Write editor, not Obsidian's notes.",
+      "Im Schreibeditor wird -- zum Halbgeviertstrich (–), ein dritter Bindestrich zum Geviertstrich (—). " +
+      "Eine Trennlinie (---) bleibt unverändert. Gilt nur im Inkswell-Schreibeditor.",
   },
   {
     key: "smartQuotes",
-    name: "Smart quotes",
+    name: "Intelligente Anführungszeichen",
     desc:
-      "Straight quotes typed in the Write editor become curly quotes (“ ” and ‘ ’); apostrophes become ’. " +
-      "Skipped inside code and links.",
+      "Gerade Anführungszeichen werden im Schreibeditor typografisch (“ ” und ‘ ’), Apostrophe werden zu ’. " +
+      "Code und Links bleiben unverändert.",
   },
   {
     key: "smartEllipsis",
-    name: "Smart ellipsis",
-    desc: "Three periods typed in the Write editor become an ellipsis (…).",
+    name: "Intelligente Auslassungspunkte",
+    desc: "Drei im Schreibeditor eingegebene Punkte werden zu Auslassungspunkten (…).",
   },
 ];
 
 /** Settings-tab copy for the goal category toggles. */
 const CATEGORY_LABELS: Record<WordCategory, { name: string; desc: string }> = {
   scene: {
-    name: "Manuscript scenes",
-    desc: "Scene files and single-note projects — the manuscript itself.",
+    name: "Manuskriptszenen",
+    desc: "Szenendateien und Projekte in einer einzelnen Notiz – das Manuskript selbst.",
   },
   planning: {
-    name: "Planning notes",
-    desc: "Each project's planning note (synopsis, plot groundwork, act sketch).",
+    name: "Planungsnotizen",
+    desc: "Die Planungsnotiz jedes Projekts (Zusammenfassung, Handlungsskizze, Aktentwurf).",
   },
   codex: {
-    name: "Codex notes",
-    desc: "Notes with a codex key (characters, places, lore), wherever they live.",
+    name: "Kodex-Notizen",
+    desc: "Notizen mit einem Kodex-Schlüssel (Figuren, Orte, Hintergrundwissen), unabhängig von ihrem Speicherort.",
   },
   other: {
-    name: "Other project notes",
-    desc: "The project index note and any other notes inside a project's folder.",
+    name: "Andere Projektnotizen",
+    desc: "Die Indexnotiz des Projekts und alle weiteren Notizen im Projektordner.",
   },
 };
 
@@ -324,8 +325,8 @@ const NUMERIC_BOUNDS: Partial<
 };
 
 const MILESTONE_DESC =
-  "Put a small tag in the Write editor's margin on the line where the scene's running word count " +
-  "passes each multiple of this number (e.g. 500 → tags at 500, 1k, 1.5k…). 0 = off; minimum 100.";
+  "Setzt am Rand des Schreibeditors eine kleine Marke, sobald die laufende Wortzahl der Szene ein Vielfaches " +
+  "dieses Werts überschreitet (z. B. 500 → Marken bei 500, 1.000, 1.500 …). 0 = aus; mindestens 100.";
 
 export class InkswellSettingTab extends PluginSettingTab {
   private plugin: InkswellPlugin;
@@ -360,8 +361,8 @@ export class InkswellSettingTab extends PluginSettingTab {
         action: () => this.openCustomize(),
       },
       {
-        name: "Default compile format",
-        desc: "Format pre-selected when you open the compile dialog.",
+        name: "Standardformat für die Kompilierung",
+        desc: "Format, das beim Öffnen des Kompilierdialogs vorausgewählt ist.",
         control: {
           type: "dropdown",
           key: "defaultCompileFormat",
@@ -370,22 +371,21 @@ export class InkswellSettingTab extends PluginSettingTab {
         },
       },
       {
-        name: "Show word counts",
-        desc: "Display per-scene and per-project word counts in the explorer.",
+        name: "Wortzahlen anzeigen",
+        desc: "Wortzahlen pro Szene und Projekt im Explorer anzeigen.",
         control: { type: "toggle", key: "showWordCounts", defaultValue: true },
       },
       {
-        name: "Sync writing history across devices",
+        name: "Schreibverlauf geräteübergreifend synchronisieren",
         desc:
-          "Words are counted on the device where you type them. Turn this on to keep a " +
-          "small log note per device under your base folder's “Writing log” folder and " +
-          "merge them on Track, so streaks and totals include every device. Your vault's " +
-          "own sync (Obsidian Sync, iCloud, …) carries the notes.",
+          "Wörter werden auf dem Gerät gezählt, auf dem du sie schreibst. Erstellt pro Gerät eine kleine " +
+          "Protokollnotiz im Ordner „Writing log“ unter dem Basisordner und führt sie unter Fortschritt zusammen. " +
+          "Die Tresor-Synchronisierung (Obsidian Sync, iCloud usw.) überträgt die Notizen.",
         control: { type: "toggle", key: "syncWritingHistory", defaultValue: false },
       },
       {
-        name: "Scene heading level",
-        desc: "Heading level (1–6) for the optional 'prepend title' compile step.",
+        name: "Überschriftenebene für Szenen",
+        desc: "Überschriftenebene (1–6) für den optionalen Kompilierschritt „Titel voranstellen“.",
         control: { type: "slider", key: "sceneHeadingLevel", min: 1, max: 6, step: 1 },
       },
     ];
@@ -393,43 +393,43 @@ export class InkswellSettingTab extends PluginSettingTab {
     items.push(
       {
         type: "group",
-        heading: "Write editor",
+        heading: "Schreibeditor",
         items: [
           ...WRITE_EDITOR_TOGGLES.map((o) => ({
             name: o.name,
             desc: o.desc,
             control: { type: "toggle" as const, key: o.key, defaultValue: false },
           })),
-          numberDef("Milestone tags every…", MILESTONE_DESC, "milestoneWords"),
+          numberDef("Meilensteinmarken alle…", MILESTONE_DESC, "milestoneWords"),
         ],
       },
       {
         type: "group",
-        heading: "Goals & sprints",
+        heading: "Ziele & Sprints",
         items: [
           {
-            name: "Week starts on",
-            desc: "First day of the week for weekly goals, habit tracking, and the heatmap.",
+            name: "Woche beginnt am",
+            desc: "Erster Wochentag für Wochenziele, Gewohnheiten und die Heatmap.",
             control: {
               type: "dropdown",
               key: "weekStart",
-              options: { monday: "Monday", sunday: "Sunday" },
+              options: { monday: "Montag", sunday: "Sonntag" },
               defaultValue: "monday",
             },
           },
-          numberDef("Daily word goal", "Target words per day, shown in the status bar and stats.", "dailyWordGoal"),
-          numberDef("Weekly word goal", "Target words per week (start of week→today).", "weeklyWordGoal"),
-          numberDef("Monthly word goal", "Target words per month (1st→today).", "monthlyWordGoal"),
-          numberDef("Habit: days per week", "How many days a week you aim to write.", "habitDaysPerWeek"),
-          numberDef("Habit: minimum words/day", "Minimum words for a day to count toward the habit.", "habitMinWords"),
-          numberDef("Default sprint length", "Default sprint duration in minutes.", "defaultSprintMinutes"),
-          numberDef("Default sprint word goal", "Word goal pre-filled in the sprint dialog. 0 = no goal.", "defaultSprintWordGoal"),
-          numberDef("Streak threshold", "Minimum words in a day for it to extend your writing streak.", "streakThreshold"),
+          numberDef("Tägliches Wortziel", "Zielwörter pro Tag, angezeigt in Statusleiste und Statistik.", "dailyWordGoal"),
+          numberDef("Wöchentliches Wortziel", "Zielwörter pro Woche (Wochenbeginn bis heute).", "weeklyWordGoal"),
+          numberDef("Monatliches Wortziel", "Zielwörter pro Monat (1. bis heute).", "monthlyWordGoal"),
+          numberDef("Gewohnheit: Tage pro Woche", "An wie vielen Tagen pro Woche du schreiben möchtest.", "habitDaysPerWeek"),
+          numberDef("Gewohnheit: Mindestwörter pro Tag", "Mindestwortzahl, damit ein Tag für die Gewohnheit zählt.", "habitMinWords"),
+          numberDef("Standarddauer für Sprints", "Standarddauer eines Sprints in Minuten.", "defaultSprintMinutes"),
+          numberDef("Standard-Wortziel für Sprints", "Im Sprintdialog vorausgefülltes Wortziel. 0 = kein Ziel.", "defaultSprintWordGoal"),
+          numberDef("Schwelle für Schreibserien", "Mindestwortzahl pro Tag, um deine Schreibserie fortzusetzen.", "streakThreshold"),
         ],
       },
       {
         type: "group",
-        heading: "What counts toward goals",
+        heading: "Was für Ziele zählt",
         items: WORD_CATEGORIES.map((cat) => ({
           name: CATEGORY_LABELS[cat].name,
           desc: CATEGORY_LABELS[cat].desc,
@@ -438,27 +438,27 @@ export class InkswellSettingTab extends PluginSettingTab {
       },
       {
         type: "group",
-        heading: "Folders",
+        heading: "Ordner",
         items: [
           {
-            name: "Base folder",
+            name: "Basisordner",
             desc:
-              "Folder new projects and the shared codex scaffold under. Blank = vault root. " +
-              "This only sets where new content is created — existing projects and codex " +
-              "anywhere in the vault still work.",
-            control: { type: "folder", key: "baseFolder", placeholder: "(vault root)" },
+              "Ordner für neue Projekte und den gemeinsamen Kodex. Leer = Tresor-Stammordner. " +
+              "Dies legt nur den Speicherort neuer Inhalte fest – vorhandene Projekte und Kodex-Notizen " +
+              "funktionieren weiterhin überall im Tresor.",
+            control: { type: "folder", key: "baseFolder", placeholder: "(Tresor-Stammordner)" },
           },
           {
-            name: "Codex folder name",
-            desc: "Subfolder name used for codex notes (shared and per-project).",
+            name: "Name des Kodex-Ordners",
+            desc: "Name des Unterordners für gemeinsame und projektbezogene Kodex-Notizen.",
             control: { type: "text", key: "codexFolder", defaultValue: "Codex" },
           },
           {
-            name: "Co-locate codex with projects",
+            name: "Kodex bei Projekten ablegen",
             desc:
-              "Book-scoped entries are created in their project's own codex folder; " +
-              "series and global entries go to the shared base codex. Organization only — " +
-              "visibility is set per-entry by its Scope field, not by where the note lives.",
+              "Buchbezogene Einträge werden im Kodex-Ordner ihres Projekts angelegt; Reihen- und globale " +
+              "Einträge landen im gemeinsamen Kodex. Dies betrifft nur die Ablage – die Sichtbarkeit wird " +
+              "pro Eintrag über das Feld „Geltungsbereich“ bestimmt.",
             control: { type: "toggle", key: "coLocateCodex", defaultValue: true },
           },
         ],
@@ -483,18 +483,18 @@ export class InkswellSettingTab extends PluginSettingTab {
     items.push(
       {
         type: "group",
-        heading: "Help",
+        heading: "Hilfe",
         items: [
           {
-            name: "Show contextual tips",
+            name: "Kontexttipps anzeigen",
             desc:
-              'Show the dismissible "How this works" callouts at the top of panels. ' +
-              "Tips you dismiss stay hidden until you reset them below.",
+              "Ausblendbare Hinweise zur Funktionsweise oben in den Bereichen anzeigen. " +
+              "Ausgeblendete Tipps bleiben verborgen, bis du sie unten zurücksetzt.",
             control: { type: "toggle", key: "showHelpHints", defaultValue: true },
           },
           {
-            name: "Reset tips & replay welcome",
-            desc: "Re-enable every dismissed tip and show the welcome screen again.",
+            name: "Tipps zurücksetzen und Begrüßung erneut anzeigen",
+            desc: "Alle ausgeblendeten Tipps wieder aktivieren und die Begrüßung erneut anzeigen.",
             action: () => void this.resetTips(),
           },
         ],
@@ -589,7 +589,7 @@ export class InkswellSettingTab extends PluginSettingTab {
   /** The "Write editor" section (imperative fallback): editor toggles.
    *  Same table as the declarative group — keep them in lockstep. */
   private renderWriteEditor(containerEl: HTMLElement): void {
-    new Setting(containerEl).setName("Write editor").setHeading();
+    new Setting(containerEl).setName("Schreibeditor").setHeading();
     for (const o of WRITE_EDITOR_TOGGLES) {
       new Setting(containerEl)
         .setName(o.name)
@@ -603,7 +603,7 @@ export class InkswellSettingTab extends PluginSettingTab {
         );
     }
     new Setting(containerEl)
-      .setName("Milestone tags every…")
+      .setName("Meilensteinmarken alle…")
       .setDesc(MILESTONE_DESC)
       .addText((t) =>
         t.setValue(`${this.plugin.settings.milestoneWords}`).onChange(async (v) => {
@@ -629,7 +629,7 @@ export class InkswellSettingTab extends PluginSettingTab {
   private async resetTips(): Promise<void> {
     await resetHelpState(this.plugin);
     this.plugin.refreshExplorer();
-    new Notice("Tips reset.");
+    new Notice("Tipps zurückgesetzt.");
     new WelcomeModal(this.app, this.plugin).open();
   }
 
@@ -645,11 +645,11 @@ export class InkswellSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName(CUSTOMIZE_ROW.name)
       .setDesc(CUSTOMIZE_ROW.desc)
-      .addButton((b) => b.setButtonText("Open customize").setCta().onClick(() => this.openCustomize()));
+      .addButton((b) => b.setButtonText("Anpassen öffnen").setCta().onClick(() => this.openCustomize()));
 
     new Setting(containerEl)
-      .setName("Default compile format")
-      .setDesc("Format pre-selected when you open the compile dialog.")
+      .setName("Standardformat für die Kompilierung")
+      .setDesc("Format, das beim Öffnen des Kompilierdialogs vorausgewählt ist.")
       .addDropdown((d) =>
         d
           .addOption("md", "Markdown")
@@ -663,8 +663,8 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Show word counts")
-      .setDesc("Display per-scene and per-project word counts in the explorer.")
+      .setName("Wortzahlen anzeigen")
+      .setDesc("Wortzahlen pro Szene und Projekt im Explorer anzeigen.")
       .addToggle((t) =>
         t.setValue(this.plugin.settings.showWordCounts).onChange(async (v) => {
           this.plugin.settings.showWordCounts = v;
@@ -674,9 +674,9 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Scene heading level")
+      .setName("Überschriftenebene für Szenen")
       .setDesc(
-        "Heading level (1–6) for the optional 'prepend title' compile step."
+        "Überschriftenebene (1–6) für den optionalen Kompilierschritt „Titel voranstellen“."
       )
       .addSlider((s) =>
         s
@@ -690,15 +690,15 @@ export class InkswellSettingTab extends PluginSettingTab {
 
     this.renderWriteEditor(containerEl);
 
-    new Setting(containerEl).setName("Goals & sprints").setHeading();
+    new Setting(containerEl).setName("Ziele & Sprints").setHeading();
 
     new Setting(containerEl)
-      .setName("Week starts on")
-      .setDesc("First day of the week for weekly goals, habit tracking, and the heatmap.")
+      .setName("Woche beginnt am")
+      .setDesc("Erster Wochentag für Wochenziele, Gewohnheiten und die Heatmap.")
       .addDropdown((d) =>
         d
-          .addOption("monday", "Monday")
-          .addOption("sunday", "Sunday")
+          .addOption("monday", "Montag")
+          .addOption("sunday", "Sonntag")
           .setValue(this.plugin.settings.weekStart)
           .onChange(async (v) => {
             this.plugin.settings.weekStart = v === "sunday" ? "sunday" : "monday";
@@ -707,8 +707,8 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Daily word goal")
-      .setDesc("Target words per day, shown in the status bar and stats.")
+      .setName("Tägliches Wortziel")
+      .setDesc("Zielwörter pro Tag, angezeigt in Statusleiste und Statistik.")
       .addText((t) =>
         t
           .setValue(`${this.plugin.settings.dailyWordGoal}`)
@@ -720,8 +720,8 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Weekly word goal")
-      .setDesc("Target words per week (start of week→today).")
+      .setName("Wöchentliches Wortziel")
+      .setDesc("Zielwörter pro Woche (Wochenbeginn bis heute).")
       .addText((t) =>
         t.setValue(`${this.plugin.settings.weeklyWordGoal}`).onChange(async (v) => {
           this.plugin.settings.weeklyWordGoal = clampInt(v, 0, 1000000, 3500);
@@ -730,8 +730,8 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Monthly word goal")
-      .setDesc("Target words per month (1st→today).")
+      .setName("Monatliches Wortziel")
+      .setDesc("Zielwörter pro Monat (1. bis heute).")
       .addText((t) =>
         t.setValue(`${this.plugin.settings.monthlyWordGoal}`).onChange(async (v) => {
           this.plugin.settings.monthlyWordGoal = clampInt(v, 0, 10000000, 15000);
@@ -740,8 +740,8 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Habit: days per week")
-      .setDesc("How many days a week you aim to write.")
+      .setName("Gewohnheit: Tage pro Woche")
+      .setDesc("An wie vielen Tagen pro Woche du schreiben möchtest.")
       .addText((t) =>
         t.setValue(`${this.plugin.settings.habitDaysPerWeek}`).onChange(async (v) => {
           this.plugin.settings.habitDaysPerWeek = clampInt(v, 1, 7, 5);
@@ -750,8 +750,8 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Habit: minimum words/day")
-      .setDesc("Minimum words for a day to count toward the habit.")
+      .setName("Gewohnheit: Mindestwörter pro Tag")
+      .setDesc("Mindestwortzahl, damit ein Tag für die Gewohnheit zählt.")
       .addText((t) =>
         t.setValue(`${this.plugin.settings.habitMinWords}`).onChange(async (v) => {
           this.plugin.settings.habitMinWords = clampInt(v, 1, 100000, 100);
@@ -760,8 +760,8 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Default sprint length")
-      .setDesc("Default sprint duration in minutes.")
+      .setName("Standarddauer für Sprints")
+      .setDesc("Standarddauer eines Sprints in Minuten.")
       .addText((t) =>
         t
           .setValue(`${this.plugin.settings.defaultSprintMinutes}`)
@@ -772,8 +772,8 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Default sprint word goal")
-      .setDesc("Word goal pre-filled in the sprint dialog. 0 = no goal.")
+      .setName("Standard-Wortziel für Sprints")
+      .setDesc("Im Sprintdialog vorausgefülltes Wortziel. 0 = kein Ziel.")
       .addText((t) =>
         t
           .setValue(`${this.plugin.settings.defaultSprintWordGoal}`)
@@ -784,8 +784,8 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Streak threshold")
-      .setDesc("Minimum words in a day for it to extend your writing streak.")
+      .setName("Schwelle für Schreibserien")
+      .setDesc("Mindestwortzahl pro Tag, um deine Schreibserie fortzusetzen.")
       .addText((t) =>
         t
           .setValue(`${this.plugin.settings.streakThreshold}`)
@@ -795,14 +795,13 @@ export class InkswellSettingTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl).setName("What counts toward goals").setHeading();
+    new Setting(containerEl).setName("Was für Ziele zählt").setHeading();
     containerEl.createEl("p", {
       cls: "setting-item-description",
       text:
-        "Goals, streaks, and sprints only ever count writing in project notes — " +
-        "notes elsewhere in the vault never count. Choose which kinds count. " +
-        "Changing a toggle also re-counts words already written since this " +
-        "option was introduced; older history always counts.",
+        "Ziele, Schreibserien und Sprints zählen nur Text in Projektnotizen – andere Notizen im Tresor " +
+        "werden nie gezählt. Wähle, welche Arten zählen. Eine Änderung berechnet auch Wörter neu, die seit " +
+        "Einführung dieser Option geschrieben wurden; ältere Verlaufsdaten zählen immer.",
     });
     for (const cat of WORD_CATEGORIES) {
       const label = CATEGORY_LABELS[cat];
@@ -826,18 +825,18 @@ export class InkswellSettingTab extends PluginSettingTab {
         );
     }
 
-    new Setting(containerEl).setName("Folders").setHeading();
+    new Setting(containerEl).setName("Ordner").setHeading();
 
     new Setting(containerEl)
-      .setName("Base folder")
+      .setName("Basisordner")
       .setDesc(
-        "Folder new projects and the shared codex scaffold under. Blank = vault root. " +
-          "This only sets where new content is created — existing projects and codex " +
-          "anywhere in the vault still work."
+        "Ordner für neue Projekte und den gemeinsamen Kodex. Leer = Tresor-Stammordner. " +
+          "Dies legt nur den Speicherort neuer Inhalte fest – vorhandene Projekte und Kodex-Notizen " +
+          "funktionieren weiterhin überall im Tresor."
       )
       .addText((t) =>
         t
-          .setPlaceholder("(vault root)")
+          .setPlaceholder("(Tresor-Stammordner)")
           .setValue(this.plugin.settings.baseFolder)
           .onChange(async (v) => {
             this.plugin.settings.baseFolder = trimSlashes(v);
@@ -846,8 +845,8 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Codex folder name")
-      .setDesc("Subfolder name used for codex notes (shared and per-project).")
+      .setName("Name des Kodex-Ordners")
+      .setDesc("Name des Unterordners für gemeinsame und projektbezogene Kodex-Notizen.")
       .addText((t) =>
         t
           .setValue(this.plugin.settings.codexFolder)
@@ -858,11 +857,11 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Co-locate codex with projects")
+      .setName("Kodex bei Projekten ablegen")
       .setDesc(
-        "Book-scoped entries are created in their project's own codex folder; " +
-          "series and global entries go to the shared base codex. Organization only — " +
-          "visibility is set per-entry by its Scope field, not by where the note lives."
+        "Buchbezogene Einträge werden im Kodex-Ordner ihres Projekts angelegt; Reihen- und globale " +
+          "Einträge landen im gemeinsamen Kodex. Dies betrifft nur die Ablage – die Sichtbarkeit wird " +
+          "pro Eintrag über das Feld „Geltungsbereich“ bestimmt."
       )
       .addToggle((t) =>
         t.setValue(this.plugin.settings.coLocateCodex).onChange(async (v) => {
@@ -884,13 +883,13 @@ export class InkswellSettingTab extends PluginSettingTab {
         );
     }
 
-    new Setting(containerEl).setName("Help").setHeading();
+    new Setting(containerEl).setName("Hilfe").setHeading();
 
     new Setting(containerEl)
-      .setName("Show contextual tips")
+      .setName("Kontexttipps anzeigen")
       .setDesc(
-        'Show the dismissible "How this works" callouts at the top of panels. ' +
-          "Tips you dismiss stay hidden until you reset them below."
+        "Ausblendbare Hinweise zur Funktionsweise oben in den Bereichen anzeigen. " +
+          "Ausgeblendete Tipps bleiben verborgen, bis du sie unten zurücksetzt."
       )
       .addToggle((t) =>
         t.setValue(this.plugin.settings.showHelpHints).onChange(async (v) => {
@@ -901,9 +900,9 @@ export class InkswellSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Reset tips & replay welcome")
-      .setDesc("Re-enable every dismissed tip and show the welcome screen again.")
-      .addButton((b) => b.setButtonText("Reset").onClick(() => void this.resetTips()));
+      .setName("Tipps zurücksetzen und Begrüßung erneut anzeigen")
+      .setDesc("Alle ausgeblendeten Tipps wieder aktivieren und die Begrüßung erneut anzeigen.")
+      .addButton((b) => b.setButtonText("Zurücksetzen").onClick(() => void this.resetTips()));
   }
 }
 

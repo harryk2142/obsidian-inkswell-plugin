@@ -58,7 +58,7 @@ export function renderSeriesFields(
   let orderTouched = false;
 
   new Setting(container)
-    .setName("Series")
+    .setName("Reihe")
     .setDesc("Group this book with others under one name — pick an existing series or start one.")
     .addDropdown((d) => {
       d.addOption("", "None");
@@ -76,15 +76,15 @@ export function renderSeriesFields(
     });
 
   let nameInput!: HTMLInputElement;
-  const nameRow = new Setting(container).setName("New series name").addText((t) => {
-    t.setPlaceholder("e.g. The Lattice Cycle");
+  const nameRow = new Setting(container).setName("Name der neuen Reihe").addText((t) => {
+    t.setPlaceholder("z. B. Der Lattice-Zyklus");
     if (initial && selected === NEW) t.setValue(initial.name);
     nameInput = t.inputEl;
   });
 
   let orderInput!: HTMLInputElement;
   const orderRow = new Setting(container)
-    .setName("Book number")
+    .setName("Bandnummer")
     .setDesc("Position in the series. Use 0 or 0.5 for a prequel or novella. Blank = unnumbered (sorts last).")
     .addText((t) => {
       orderInput = t.inputEl;
@@ -121,7 +121,7 @@ export function renderSeriesFields(
       if (selected === NEW) {
         name = nameInput.value.trim();
         if (!name) {
-          new Notice("Enter a name for the new series.");
+          new Notice("Gib einen Namen für die neue Reihe ein.");
           nameInput.focus();
           return false;
         }
@@ -157,7 +157,7 @@ export class SeriesModal extends FormModal {
   }
 
   protected renderForm(contentEl: HTMLElement): void {
-    contentEl.createEl("h3", { text: "Series" });
+    contentEl.createEl("h3", { text: "Reihe" });
     contentEl.createEl("p", { cls: "inkswell-stats__muted", text: this.base.draft.title });
     this.fields = renderSeriesFields(contentEl, {
       series: this.series,

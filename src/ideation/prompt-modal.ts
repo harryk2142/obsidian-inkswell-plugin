@@ -58,7 +58,7 @@ export class PromptModal extends Modal {
   onOpen(): void {
     const { contentEl } = this;
     contentEl.addClass("inkswell-prompt-modal");
-    contentEl.createEl("h3", { text: "Writing prompt" });
+    contentEl.createEl("h3", { text: "Schreibimpuls" });
 
     // Filters: phase (draft/revise) + category.
     const filters = contentEl.createDiv({ cls: "inkswell-prompt-card__filters" });
@@ -76,7 +76,7 @@ export class PromptModal extends Modal {
     };
 
     const catSel = filters.createEl("select", { cls: "dropdown" });
-    catSel.createEl("option", { text: "Any category", value: "" });
+    catSel.createEl("option", { text: "Beliebige Kategorie", value: "" });
     for (const c of PROMPT_CATEGORIES) {
       const o = catSel.createEl("option", { text: c.label, value: c.id });
       if (c.id === this.category) o.selected = true;
@@ -91,14 +91,14 @@ export class PromptModal extends Modal {
     else this.repick();
 
     const btns = contentEl.createDiv({ cls: "inkswell-prompt-modal__buttons" });
-    const newBtn = btns.createEl("button", { text: "New prompt" });
+    const newBtn = btns.createEl("button", { text: "Neuer Impuls" });
     newBtn.onclick = () => this.repick();
     const use = () => {
       if (!this.text) return;
       this.onUse({ text: this.text, phase: this.phase, category: this.category });
       this.close();
     };
-    const useBtn = btns.createEl("button", { text: "Use this prompt", cls: "mod-cta" });
+    const useBtn = btns.createEl("button", { text: "Diesen Impuls verwenden", cls: "mod-cta" });
     useBtn.onclick = use;
     // Enter commits the shown prompt (house dialog behavior) — unless a button
     // has focus, where Enter is that button's own click.

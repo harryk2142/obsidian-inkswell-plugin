@@ -35,9 +35,9 @@ reference/
 # sample vault: commit the seeded writing history (negation must follow the
 # global `data.json` ignore above), but never the deployed plugin binaries —
 # those are (re)created by `npm run build:sample` (main.js is already ignored).
-!examples/sample-vault/.obsidian/plugins/inkswell/data.json
-examples/sample-vault/.obsidian/plugins/inkswell/styles.css
-examples/sample-vault/.obsidian/plugins/inkswell/manifest.json
+!examples/sample-vault/.obsidian/plugins/inkswell-de/data.json
+examples/sample-vault/.obsidian/plugins/inkswell-de/styles.css
+examples/sample-vault/.obsidian/plugins/inkswell-de/manifest.json
 
 # Obsidian UI-layout state churns on every open — keep it out of the committed
 # sample vault (the file stays on disk so the vault still opens fine locally).

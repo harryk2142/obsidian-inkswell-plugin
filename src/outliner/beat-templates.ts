@@ -30,92 +30,92 @@ export interface BeatSheet {
 }
 
 export const SAVE_THE_CAT: BeatDef[] = [
-  { id: "opening-image", name: "Opening Image", position: 0.0, blurb: "A snapshot of the hero's life before the story — sets tone and starting point." },
-  { id: "theme-stated", name: "Theme Stated", position: 0.05, blurb: "Someone hints at what the story is really about — the lesson the hero must learn." },
-  { id: "setup", name: "Setup", position: 0.08, blurb: "Establish the hero's status-quo world, flaws, and what needs fixing." },
-  { id: "catalyst", name: "Catalyst", position: 0.1, blurb: "The inciting incident that disrupts the status quo." },
-  { id: "debate", name: "Debate", position: 0.15, blurb: "The hero hesitates and resists the change — what should they do?" },
-  { id: "break-into-2", name: "Break Into Two", position: 0.2, blurb: "The hero makes a choice and steps into the new world (Act 2)." },
-  { id: "b-story", name: "B Story", position: 0.22, blurb: "A new relationship begins that carries the theme." },
-  { id: "fun-and-games", name: "Fun and Games", position: 0.35, blurb: "The 'promise of the premise' — set pieces exploring the new world." },
-  { id: "midpoint", name: "Midpoint", position: 0.5, blurb: "A false victory or false defeat; stakes rise and the story pivots." },
-  { id: "bad-guys-close-in", name: "Bad Guys Close In", position: 0.62, blurb: "Pressure mounts — external foes and internal doubts tighten." },
-  { id: "all-is-lost", name: "All Is Lost", position: 0.75, blurb: "The lowest point; the hero loses something major (a 'whiff of death')." },
-  { id: "dark-night-of-the-soul", name: "Dark Night of the Soul", position: 0.78, blurb: "The hero's darkest moment of despair before the breakthrough." },
-  { id: "break-into-3", name: "Break Into Three", position: 0.8, blurb: "The 'aha!' — the hero finds the solution, fusing the A and B stories." },
-  { id: "finale", name: "Finale", position: 0.9, blurb: "The hero proves the lesson learned and sets the world right." },
-  { id: "final-image", name: "Final Image", position: 1.0, blurb: "A closing snapshot mirroring the opening — shows how far the hero has come." },
+  { id: "opening-image", name: "Eröffnungsbild", position: 0.0, blurb: "Eine Momentaufnahme aus dem Leben der Hauptfigur vor Beginn der Geschichte – sie bestimmt Ton und Ausgangspunkt." },
+  { id: "theme-stated", name: "Thema wird genannt", position: 0.05, blurb: "Jemand deutet an, worum es in der Geschichte wirklich geht – die Lektion, welche die Hauptfigur lernen muss." },
+  { id: "setup", name: "Ausgangslage", position: 0.08, blurb: "Etabliert die gewohnte Welt der Hauptfigur, ihre Schwächen und das, was verändert werden muss." },
+  { id: "catalyst", name: "Auslöser", position: 0.1, blurb: "Das auslösende Ereignis durchbricht den bisherigen Zustand." },
+  { id: "debate", name: "Zweifel", position: 0.15, blurb: "Die Hauptfigur zögert und widersetzt sich der Veränderung – was soll sie tun?" },
+  { id: "break-into-2", name: "Aufbruch in Akt II", position: 0.2, blurb: "Die Hauptfigur trifft eine Entscheidung und betritt die neue Welt (Akt II)." },
+  { id: "b-story", name: "B-Handlung", position: 0.22, blurb: "Eine neue Beziehung beginnt, die das Thema der Geschichte trägt." },
+  { id: "fun-and-games", name: "Spaß und Spiel", position: 0.35, blurb: "Das Versprechen der Prämisse – Schlüsselszenen erkunden die neue Welt." },
+  { id: "midpoint", name: "Mittelpunkt", position: 0.5, blurb: "Ein falscher Sieg oder eine falsche Niederlage; der Einsatz steigt und die Geschichte nimmt eine neue Richtung." },
+  { id: "bad-guys-close-in", name: "Die Gegner rücken näher", position: 0.62, blurb: "Der Druck wächst – äußere Gegner und innere Zweifel ziehen sich immer enger zusammen." },
+  { id: "all-is-lost", name: "Alles ist verloren", position: 0.75, blurb: "Der Tiefpunkt; die Hauptfigur verliert etwas Entscheidendes und spürt einen Hauch des Todes." },
+  { id: "dark-night-of-the-soul", name: "Dunkle Nacht der Seele", position: 0.78, blurb: "Der dunkelste Moment der Verzweiflung vor dem Durchbruch." },
+  { id: "break-into-3", name: "Aufbruch in Akt III", position: 0.8, blurb: "Der Aha-Moment – die Hauptfigur findet die Lösung und führt A- und B-Handlung zusammen." },
+  { id: "finale", name: "Finale", position: 0.9, blurb: "Die Hauptfigur beweist, dass sie ihre Lektion gelernt hat, und bringt die Welt wieder ins Lot." },
+  { id: "final-image", name: "Schlussbild", position: 1.0, blurb: "Eine abschließende Momentaufnahme spiegelt den Anfang und zeigt, wie weit sich die Hauptfigur entwickelt hat." },
 ];
 
 export const THREE_ACT: BeatDef[] = [
-  { id: "setup", name: "Setup", position: 0.0, blurb: "Establish protagonist, world, and the status quo." },
-  { id: "inciting-incident", name: "Inciting Incident", position: 0.12, blurb: "The event that sets the story in motion." },
-  { id: "plot-point-1", name: "Plot Point 1", position: 0.25, blurb: "The protagonist commits; Act 2 begins." },
-  { id: "midpoint", name: "Midpoint", position: 0.5, blurb: "A turn that raises stakes and shifts the goal." },
-  { id: "plot-point-2", name: "Plot Point 2", position: 0.75, blurb: "Lowest point / final push into Act 3." },
-  { id: "climax", name: "Climax", position: 0.9, blurb: "The decisive confrontation." },
-  { id: "resolution", name: "Resolution", position: 1.0, blurb: "Aftermath and the new normal." },
+  { id: "setup", name: "Ausgangslage", position: 0.0, blurb: "Etabliert Hauptfigur, Welt und bisherigen Zustand." },
+  { id: "inciting-incident", name: "Auslösendes Ereignis", position: 0.12, blurb: "Das Ereignis, das die Geschichte in Gang setzt." },
+  { id: "plot-point-1", name: "Erster Wendepunkt", position: 0.25, blurb: "Die Hauptfigur legt sich fest; Akt II beginnt." },
+  { id: "midpoint", name: "Mittelpunkt", position: 0.5, blurb: "Eine Wendung erhöht den Einsatz und verschiebt das Ziel." },
+  { id: "plot-point-2", name: "Zweiter Wendepunkt", position: 0.75, blurb: "Tiefpunkt und letzter Anstoß in Richtung Akt III." },
+  { id: "climax", name: "Höhepunkt", position: 0.9, blurb: "Die entscheidende Konfrontation." },
+  { id: "resolution", name: "Auflösung", position: 1.0, blurb: "Die Folgen und der neue Alltag." },
 ];
 
 export const HEROS_JOURNEY: BeatDef[] = [
-  { id: "ordinary-world", name: "Ordinary World", position: 0.0, blurb: "The hero's normal life before the adventure." },
-  { id: "call-to-adventure", name: "Call to Adventure", position: 0.08, blurb: "A problem or challenge appears." },
-  { id: "refusal", name: "Refusal of the Call", position: 0.12, blurb: "The hero hesitates or refuses." },
-  { id: "meeting-the-mentor", name: "Meeting the Mentor", position: 0.18, blurb: "Guidance and tools to face the journey." },
-  { id: "crossing-the-threshold", name: "Crossing the Threshold", position: 0.25, blurb: "The hero commits to the special world." },
-  { id: "tests-allies-enemies", name: "Tests, Allies, Enemies", position: 0.35, blurb: "Learning the rules; forming bonds." },
-  { id: "approach", name: "Approach to the Inmost Cave", position: 0.45, blurb: "Preparation for the central ordeal." },
-  { id: "ordeal", name: "The Ordeal", position: 0.5, blurb: "The greatest fear / a brush with death." },
-  { id: "reward", name: "Reward", position: 0.6, blurb: "Seizing the prize after surviving." },
-  { id: "the-road-back", name: "The Road Back", position: 0.75, blurb: "Driven to complete the journey home." },
-  { id: "resurrection", name: "Resurrection", position: 0.85, blurb: "The final test; transformation proven." },
-  { id: "return-with-elixir", name: "Return with the Elixir", position: 1.0, blurb: "Home, changed, bearing something of value." },
+  { id: "ordinary-world", name: "Gewohnte Welt", position: 0.0, blurb: "Das normale Leben der Hauptfigur vor dem Abenteuer." },
+  { id: "call-to-adventure", name: "Ruf zum Abenteuer", position: 0.08, blurb: "Ein Problem oder eine Herausforderung taucht auf." },
+  { id: "refusal", name: "Weigerung", position: 0.12, blurb: "Die Hauptfigur zögert oder verweigert sich dem Ruf." },
+  { id: "meeting-the-mentor", name: "Begegnung mit dem Mentor", position: 0.18, blurb: "Rat und Hilfsmittel für die bevorstehende Reise." },
+  { id: "crossing-the-threshold", name: "Überschreiten der Schwelle", position: 0.25, blurb: "Die Hauptfigur entscheidet sich für die besondere Welt." },
+  { id: "tests-allies-enemies", name: "Prüfungen, Verbündete und Feinde", position: 0.35, blurb: "Die Regeln werden erlernt und Bindungen entstehen." },
+  { id: "approach", name: "Vordringen zur tiefsten Höhle", position: 0.45, blurb: "Vorbereitung auf die zentrale Prüfung." },
+  { id: "ordeal", name: "Entscheidende Prüfung", position: 0.5, blurb: "Die größte Angst und eine Begegnung mit dem Tod." },
+  { id: "reward", name: "Belohnung", position: 0.6, blurb: "Nach dem Überleben wird der Preis errungen." },
+  { id: "the-road-back", name: "Rückweg", position: 0.75, blurb: "Der Drang, die Heimreise zu vollenden." },
+  { id: "resurrection", name: "Auferstehung", position: 0.85, blurb: "Die letzte Prüfung beweist die Verwandlung." },
+  { id: "return-with-elixir", name: "Rückkehr mit dem Elixier", position: 1.0, blurb: "Verändert kehrt die Hauptfigur mit etwas Wertvollem nach Hause zurück." },
 ];
 
 export const SEVEN_POINT: BeatDef[] = [
-  { id: "hook", name: "Hook", position: 0.0, blurb: "Starting state — opposite of the resolution." },
-  { id: "plot-turn-1", name: "Plot Turn 1", position: 0.15, blurb: "The call to action moves into Act 2." },
-  { id: "pinch-1", name: "Pinch Point 1", position: 0.3, blurb: "Apply pressure; introduce the antagonist's force." },
-  { id: "midpoint", name: "Midpoint", position: 0.5, blurb: "Shift from reaction to action." },
-  { id: "pinch-2", name: "Pinch Point 2", position: 0.625, blurb: "Greater pressure; things look dire." },
-  { id: "plot-turn-2", name: "Plot Turn 2", position: 0.75, blurb: "The final piece needed to win is gained." },
-  { id: "resolution", name: "Resolution", position: 1.0, blurb: "The end state — opposite of the hook." },
+  { id: "hook", name: "Aufhänger", position: 0.0, blurb: "Der Ausgangszustand – das Gegenteil der Auflösung." },
+  { id: "plot-turn-1", name: "Erste Wendung", position: 0.15, blurb: "Der Handlungsimpuls führt in Akt II." },
+  { id: "pinch-1", name: "Erster Druckpunkt", position: 0.3, blurb: "Der Druck steigt und die Macht des Gegenspielers zeigt sich." },
+  { id: "midpoint", name: "Mittelpunkt", position: 0.5, blurb: "Der Wechsel vom Reagieren zum Handeln." },
+  { id: "pinch-2", name: "Zweiter Druckpunkt", position: 0.625, blurb: "Der Druck wächst weiter; die Lage scheint aussichtslos." },
+  { id: "plot-turn-2", name: "Zweite Wendung", position: 0.75, blurb: "Das letzte zum Sieg benötigte Puzzlestück wird gewonnen." },
+  { id: "resolution", name: "Auflösung", position: 1.0, blurb: "Der Endzustand – das Gegenteil des Aufhängers." },
 ];
 
 export const STORY_CIRCLE: BeatDef[] = [
-  { id: "you", name: "You", position: 0.0, blurb: "A character in a zone of comfort." },
-  { id: "need", name: "Need", position: 0.12, blurb: "But they want something." },
-  { id: "go", name: "Go", position: 0.25, blurb: "They enter an unfamiliar situation." },
-  { id: "search", name: "Search", position: 0.4, blurb: "Adapt to it." },
-  { id: "find", name: "Find", position: 0.5, blurb: "Getting what they wanted." },
-  { id: "take", name: "Take", position: 0.62, blurb: "Paying a heavy price for it." },
-  { id: "return", name: "Return", position: 0.8, blurb: "Then returning to their familiar situation." },
-  { id: "change", name: "Change", position: 1.0, blurb: "Having changed." },
+  { id: "you", name: "Du", position: 0.0, blurb: "Eine Figur befindet sich in ihrer vertrauten Umgebung." },
+  { id: "need", name: "Bedürfnis", position: 0.12, blurb: "Doch sie will etwas." },
+  { id: "go", name: "Aufbruch", position: 0.25, blurb: "Sie begibt sich in eine ungewohnte Situation." },
+  { id: "search", name: "Suche", position: 0.4, blurb: "Sie passt sich der Situation an." },
+  { id: "find", name: "Finden", position: 0.5, blurb: "Sie erhält, was sie wollte." },
+  { id: "take", name: "Preis", position: 0.62, blurb: "Dafür zahlt sie einen hohen Preis." },
+  { id: "return", name: "Rückkehr", position: 0.8, blurb: "Dann kehrt sie in ihre vertraute Umgebung zurück." },
+  { id: "change", name: "Veränderung", position: 1.0, blurb: "Sie hat sich verändert." },
 ];
 
 export const ROMANCING_THE_BEAT: BeatDef[] = [
-  { id: "introduce-leads", name: "Introduce Leads", position: 0.0, blurb: "Establish both protagonists and their flaws." },
-  { id: "meet", name: "Meet", position: 0.1, blurb: "The leads meet; spark and friction." },
-  { id: "adhesion", name: "Adhesion", position: 0.15, blurb: "A reason they're stuck together." },
-  { id: "no-way-1", name: "No Way #1", position: 0.2, blurb: "Why this relationship can't work." },
-  { id: "inkling-of-desire", name: "Inkling of Desire", position: 0.3, blurb: "Attraction surfaces despite resistance." },
-  { id: "deepening-desire", name: "Deepening Desire", position: 0.4, blurb: "Falling, against better judgment." },
-  { id: "midpoint-of-love", name: "Midpoint of Love", position: 0.5, blurb: "A peak moment of connection." },
-  { id: "inkling-of-doubt", name: "Inkling of Doubt", position: 0.6, blurb: "Cracks reappear; old fears return." },
-  { id: "retreating", name: "Retreating", position: 0.7, blurb: "Pulling away to protect themselves." },
-  { id: "breakup", name: "Breakup / Dark Moment", position: 0.75, blurb: "The relationship shatters." },
-  { id: "wallowing", name: "Wallowing", position: 0.82, blurb: "The lowest point apart." },
-  { id: "epiphany", name: "Epiphany", position: 0.88, blurb: "Realizing what must change." },
-  { id: "grand-gesture", name: "Grand Gesture", position: 0.95, blurb: "Proving the lesson learned." },
-  { id: "happily-ever-after", name: "Happily Ever After", position: 1.0, blurb: "Earned union; the new normal together." },
+  { id: "introduce-leads", name: "Hauptfiguren vorstellen", position: 0.0, blurb: "Beide Hauptfiguren und ihre Schwächen werden etabliert." },
+  { id: "meet", name: "Begegnung", position: 0.1, blurb: "Die Hauptfiguren treffen aufeinander; es funkt und reibt sich." },
+  { id: "adhesion", name: "Bindung", position: 0.15, blurb: "Ein Grund zwingt sie, zusammenzubleiben." },
+  { id: "no-way-1", name: "Keine Chance Nr. 1", position: 0.2, blurb: "Warum diese Beziehung nicht funktionieren kann." },
+  { id: "inkling-of-desire", name: "Erste Sehnsucht", position: 0.3, blurb: "Trotz aller Widerstände wird die Anziehung spürbar." },
+  { id: "deepening-desire", name: "Wachsende Sehnsucht", position: 0.4, blurb: "Entgegen besserem Wissen verlieben sie sich." },
+  { id: "midpoint-of-love", name: "Mittelpunkt der Liebe", position: 0.5, blurb: "Ein Höhepunkt ihrer Verbundenheit." },
+  { id: "inkling-of-doubt", name: "Erste Zweifel", position: 0.6, blurb: "Risse zeigen sich erneut und alte Ängste kehren zurück." },
+  { id: "retreating", name: "Rückzug", position: 0.7, blurb: "Sie ziehen sich zurück, um sich selbst zu schützen." },
+  { id: "breakup", name: "Trennung / Dunkler Moment", position: 0.75, blurb: "Die Beziehung zerbricht." },
+  { id: "wallowing", name: "Im Elend versinken", position: 0.82, blurb: "Der gemeinsame Tiefpunkt in der Trennung." },
+  { id: "epiphany", name: "Erkenntnis", position: 0.88, blurb: "Sie erkennen, was sich ändern muss." },
+  { id: "grand-gesture", name: "Große Geste", position: 0.95, blurb: "Sie beweisen, dass sie ihre Lektion gelernt haben." },
+  { id: "happily-ever-after", name: "Glücklich bis ans Ende", position: 1.0, blurb: "Die verdiente Vereinigung und der neue gemeinsame Alltag." },
 ];
 
 const TWENTY_SEVEN_LABELS = [
-  "Introduction", "Inciting Incident", "Immediate Reaction", "Reaction", "Action",
-  "Consequence", "Pressure", "Pinch", "Push", "New World", "Fun & Games",
-  "Old World Contrast", "Build Up", "Midpoint", "Reversal", "Reaction",
-  "Action", "Dedication", "Trials", "Pinch 2", "Darkest Moment", "Power Within",
-  "Action", "Converging Paths", "Battle", "Climax", "Resolution",
+  "Einführung", "Auslösendes Ereignis", "Unmittelbare Reaktion", "Reaktion", "Handlung",
+  "Folge", "Druck", "Engpass", "Anstoß", "Neue Welt", "Spaß und Spiel",
+  "Kontrast zur alten Welt", "Aufbau", "Mittelpunkt", "Umkehr", "Reaktion",
+  "Handlung", "Entschlossenheit", "Prüfungen", "Zweiter Engpass", "Dunkelster Moment", "Innere Kraft",
+  "Handlung", "Zusammenlaufende Wege", "Kampf", "Höhepunkt", "Auflösung",
 ];
 export const TWENTY_SEVEN_CHAPTER: BeatDef[] = TWENTY_SEVEN_LABELS.map((name, i) => ({
   id: `ch-${i + 1}`,
@@ -131,13 +131,13 @@ export const TWENTY_SEVEN_CHAPTER: BeatDef[] = TWENTY_SEVEN_LABELS.map((name, i)
  */
 export const TEN_POINT: BeatDef[] = Array.from({ length: 10 }, (_, i) => ({
   id: `point-${i + 1}`,
-  name: `Point ${i + 1}`,
+  name: `Punkt ${i + 1}`,
   position: i / 9,
   blurb:
     i === 0
-      ? "The first thing that must happen — where the story opens."
+      ? "Das erste unverzichtbare Ereignis – hier beginnt die Geschichte."
       : i === 9
-        ? "The last thing that must happen — where the story lands."
+        ? "Das letzte unverzichtbare Ereignis – hier kommt die Geschichte an."
         : "",
 }));
 
@@ -156,13 +156,13 @@ export const BEAT_TEMPLATES: Record<string, BeatDef[]> = {
  *  at render time via allTemplateMeta — see custom-templates.ts). */
 export const TEMPLATE_META: { id: string; label: string }[] = [
   { id: "save-the-cat", label: "Save the Cat (15)" },
-  { id: "three-act", label: "Three-Act (7)" },
-  { id: "heros-journey", label: "Hero's Journey (12)" },
-  { id: "seven-point", label: "Seven-Point (7)" },
+  { id: "three-act", label: "Drei-Akt-Struktur (7)" },
+  { id: "heros-journey", label: "Heldenreise (12)" },
+  { id: "seven-point", label: "Sieben-Punkte-Struktur (7)" },
   { id: "story-circle", label: "Story Circle (8)" },
   { id: "romancing-the-beat", label: "Romancing the Beat (14)" },
-  { id: "twenty-seven-chapter", label: "27-Chapter (27)" },
-  { id: "ten-point", label: "Ten-Point Outline (10)" },
+  { id: "twenty-seven-chapter", label: "27-Kapitel-Methode (27)" },
+  { id: "ten-point", label: "Zehn-Punkte-Gliederung (10)" },
 ];
 
 export const DEFAULT_TEMPLATE = "save-the-cat";
@@ -178,9 +178,9 @@ export interface TemplateAct {
 }
 
 const THREE_ACTS = (act2From: number, act3From: number): TemplateAct[] => [
-  { title: "Act I", from: 0 },
-  { title: "Act II", from: act2From },
-  { title: "Act III", from: act3From },
+  { title: "Akt I", from: 0 },
+  { title: "Akt II", from: act2From },
+  { title: "Akt III", from: act3From },
 ];
 
 /**
@@ -196,10 +196,10 @@ export const TEMPLATE_ACTS: Record<string, TemplateAct[]> = {
   "seven-point": THREE_ACTS(0.15, 0.9),
   "story-circle": THREE_ACTS(0.25, 0.8),
   "romancing-the-beat": [
-    { title: "Setup", from: 0 },
-    { title: "Falling", from: 0.3 },
-    { title: "Retreating", from: 0.6 },
-    { title: "Fighting for Love", from: 0.88 },
+    { title: "Ausgangslage", from: 0 },
+    { title: "Verlieben", from: 0.3 },
+    { title: "Rückzug", from: 0.6 },
+    { title: "Kampf um die Liebe", from: 0.88 },
   ],
   "twenty-seven-chapter": THREE_ACTS(9 / 26, 18 / 26),
   "ten-point": THREE_ACTS(0.25, 0.75), // points 1–3 / 4–7 / 8–10

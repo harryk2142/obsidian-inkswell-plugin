@@ -62,7 +62,7 @@ export class RevisionSidebar implements RightPanel {
 
     // Toolbar: log a decision for the current scene + reveal applied ones.
     const bar = host.createDiv({ cls: "inkswell-revsidebar__bar" });
-    const add = bar.createEl("button", { cls: "inkswell-revsidebar__add", text: "Log a decision" });
+    const add = bar.createEl("button", { cls: "inkswell-revsidebar__add", text: "Entscheidung protokollieren" });
     add.onclick = () => new RevisionModal(this.app, project, this.currentSceneTitle(project), "").open();
     const toggle = bar.createEl("label", { cls: "inkswell-revsidebar__toggle" });
     const cb = toggle.createEl("input", { type: "checkbox" });
@@ -71,10 +71,10 @@ export class RevisionSidebar implements RightPanel {
       this.showApplied = cb.checked;
       if (this.host) this.render(this.host, this.file);
     };
-    toggle.createSpan({ text: "Show applied" });
+    toggle.createSpan({ text: "Umgesetzte anzeigen" });
 
     const listEl = host.createDiv({ cls: "inkswell-revsidebar__list" });
-    listEl.createDiv({ cls: "inkswell-stats__muted", text: "Scanning scenes…" });
+    listEl.createDiv({ cls: "inkswell-stats__muted", text: "Szenen werden durchsucht…" });
 
     const token = ++this.token;
     void this.build(project).then((groups) => {

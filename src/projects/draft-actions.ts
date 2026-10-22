@@ -53,7 +53,7 @@ export async function createDraft(
   }
   const sourceIndex = app.vault.getAbstractFileByPath(plan.indexFrom);
   if (!(sourceIndex instanceof TFile)) {
-    new Notice("Source draft index note not found.");
+    new Notice("Indexnotiz des Ausgangsentwurfs nicht gefunden.");
     return null;
   }
 

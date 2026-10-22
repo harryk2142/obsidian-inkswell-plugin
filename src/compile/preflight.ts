@@ -128,7 +128,7 @@ export function preflight(scenes: SceneText[]): PreflightFinding[] {
   if (empty.length > 0) {
     findings.push({
       rule: "empty",
-      label: "Empty scenes — nothing to compile",
+      label: "Leere Szenen – nichts zu kompilieren",
       count: empty.length,
       scenes: empty,
     });
@@ -137,7 +137,7 @@ export function preflight(scenes: SceneText[]): PreflightFinding[] {
   if (styles.size > 1) {
     findings.push({
       rule: "scene-break",
-      label: "Mixed scene-break markers — standardize on one",
+      label: "Gemischte Szenentrenner – auf einen vereinheitlichen",
       count: styles.size,
       scenes: [],
       detail: [...styles].join("  ·  "),

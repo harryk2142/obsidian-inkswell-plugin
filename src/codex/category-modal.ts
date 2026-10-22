@@ -75,7 +75,7 @@ export class CategoryModal extends FormModal {
 
     new Setting(contentEl)
       .setName("Plural")
-      .setDesc("Group heading in the Codex list. Blank = name + “s”.")
+      .setDesc("Gruppenüberschrift in der Kodex-Liste. Leer = Name + „s“.")
       .addText((t) => {
         pluralInput = t.inputEl;
         t.setPlaceholder(this.label.trim() ? `${this.label.trim()}s` : "")
@@ -84,8 +84,8 @@ export class CategoryModal extends FormModal {
       });
 
     new Setting(contentEl)
-      .setName("Icon")
-      .setDesc("Lucide icon name — e.g. “dog”, “crown”, “scroll”.")
+      .setName("Symbol")
+      .setDesc("Name eines Lucide-Symbols – z. B. „dog“, „crown“, „scroll“.")
       .addText((t) => {
         const preview = createSpan({ cls: "inkswell-catmodal__preview" });
         t.inputEl.after(preview);
@@ -116,10 +116,10 @@ export class CategoryModal extends FormModal {
         existing.icon !== builtin.icon)
     ) {
       new Setting(contentEl)
-        .setName("Reset to default")
+        .setName("Auf Standard zurücksetzen")
         .setDesc(`${builtin.label} / ${builtin.plural} / ${builtin.icon}`)
         .addButton((b) =>
-          b.setButtonText("Reset").onClick(() => {
+          b.setButtonText("Zurücksetzen").onClick(() => {
             void (async () => {
               await this.opts.onSubmit({ ...builtin });
               this.close();
@@ -132,12 +132,12 @@ export class CategoryModal extends FormModal {
   protected async submit(): Promise<boolean> {
     const label = this.label.trim();
     if (!label) {
-      new Notice("Name is required.");
+      new Notice("Ein Name ist erforderlich.");
       return false;
     }
     const id = this.opts.existing?.id ?? slugifyCategoryId(label);
     if (!id) {
-      new Notice("Name must contain letters or numbers.");
+      new Notice("Der Name muss Buchstaben oder Ziffern enthalten.");
       return false;
     }
     if (!this.opts.existing && this.opts.takenIds.includes(id)) {

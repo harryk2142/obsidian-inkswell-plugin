@@ -22,7 +22,7 @@ const prod = process.argv[2] === "production";
 // deploys into the pristine sample vault when packaging the demo.
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)));
 const VAULT = process.env.INKSWELL_VAULT || join(REPO_ROOT, "examples", "dev-vault");
-const PLUGIN_DIR = join(VAULT, ".obsidian", "plugins", "inkswell");
+const PLUGIN_DIR = join(VAULT, ".obsidian", "plugins", "inkswell-de");
 const ARTIFACTS = ["main.js", "manifest.json", "styles.css"];
 
 const deployPlugin = {

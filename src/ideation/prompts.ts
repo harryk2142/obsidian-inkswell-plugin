@@ -53,12 +53,12 @@ export function promptId(p: { phase: PromptPhase; category: PromptCategory; text
 
 export const PROMPT_CATEGORIES: { id: PromptCategory; label: string }[] = [
   { id: "pov", label: "POV" },
-  { id: "dialogue", label: "Dialogue" },
-  { id: "setting", label: "Setting" },
-  { id: "character", label: "Character" },
-  { id: "structure", label: "Structure" },
-  { id: "tension", label: "Tension" },
-  { id: "constraint", label: "Constraint" },
+  { id: "dialogue", label: "Dialog" },
+  { id: "setting", label: "Schauplatz" },
+  { id: "character", label: "Figur" },
+  { id: "structure", label: "Struktur" },
+  { id: "tension", label: "Spannung" },
+  { id: "constraint", label: "Einschränkung" },
 ];
 
 const POV_TOKEN = /\{pov\}/;

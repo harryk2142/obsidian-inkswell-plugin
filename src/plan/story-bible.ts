@@ -20,10 +20,10 @@ export const STORY_BIBLE_MARKER = "<!-- inkswell:story-bible -->";
 export type StoryBibleSection = "overview" | "beats" | "outline" | "codex";
 
 export const STORY_BIBLE_SECTIONS: { id: StoryBibleSection; label: string }[] = [
-  { id: "overview", label: "Overview & synopsis" },
-  { id: "beats", label: "Beat sheet" },
-  { id: "outline", label: "Outline" },
-  { id: "codex", label: "Codex" },
+  { id: "overview", label: "Übersicht & Zusammenfassung" },
+  { id: "beats", label: "Beat-Sheet" },
+  { id: "outline", label: "Gliederung" },
+  { id: "codex", label: "Kodex" },
 ];
 
 export interface CodexEntryField {

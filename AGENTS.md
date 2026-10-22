@@ -13,7 +13,7 @@ Obsidian plugin conventions (toolchain, Vault API rules, deferred views, mobile,
 | Dev (watch build) | `npm run dev` (auto-deploys to the dev scratch vault on each rebuild) |
 | Production build | `npm run build` (`tsc -noEmit` then esbuild; auto-deploys to the dev scratch vault) |
 | Refresh demo binaries | `npm run build:sample` (deploys into the committed `examples/sample-vault/` for packaging) |
-| Deploy target | `examples/dev-vault/.obsidian/plugins/inkswell` (git-ignored) — override with `INKSWELL_VAULT`. Test here, NOT in the committed sample vault, and never in a real user vault (DKB runs the published store build). |
+| Deploy target | `examples/dev-vault/.obsidian/plugins/inkswell-de` (git-ignored) — override with `INKSWELL_VAULT`. Test here, NOT in the committed sample vault, and never in a real user vault (DKB runs the published store build). |
 | Typecheck only | `npm run typecheck` |
 | Lint | `npm run lint` (ESLint 9 flat config running **eslint-plugin-obsidianmd's `recommended` set** — the published encoding of the community-store automated review: all `obsidianmd/*` rules plus the type-aware checks the bot reports, e.g. `no-unsupported-api`, `no-deprecated`, `no-misused-promises`, `prefer-window-timers`. Run it before every release to mirror the review locally. The release CI gates on it. Errors block; a few non-blocking rules are tuned in `eslint.config.mjs` with rationale. Then runs `npm run lint:css` — stylelint on `styles.css`, see gotcha 20.) |
 | Tests | `npm test` (vitest) |
@@ -62,7 +62,7 @@ Obsidian plugin conventions (toolchain, Vault API rules, deferred views, mobile,
 |------|---------|
 | Persist project structure | Rewrite index `longform` frontmatter only — never scene bodies |
 | Persist Inkswell-only project data | `inkswell:` sub-key in the same index frontmatter |
-| Persist sprint/daily telemetry | `.obsidian/plugins/inkswell/data.json`, date-keyed (plugin `saveData`) |
+| Persist sprint/daily telemetry | `.obsidian/plugins/inkswell-de/data.json`, date-keyed (plugin `saveData`) |
 | Count words | `import { countWords } from "src/lib/wordcount"` |
 | Export docx/pdf | Optional pandoc manuscript step; detect binary, disable if missing |
 

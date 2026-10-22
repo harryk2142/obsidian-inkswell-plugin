@@ -87,7 +87,7 @@ class ConfirmModal extends Modal {
         // semantics) and Escape still cancels — matching the house dialogs.
         window.setTimeout(() => b.buttonEl.focus(), 0);
       })
-      .addButton((b) => b.setButtonText("Cancel").onClick(() => this.close()));
+      .addButton((b) => b.setButtonText("Abbrechen").onClick(() => this.close()));
   }
   onClose(): void {
     this.contentEl.empty();
@@ -152,7 +152,7 @@ export async function editSynopsis(
     title: `Synopsis — ${file.basename}`,
     value: current,
     multiline: true,
-    cta: "Save",
+    cta: "Speichern",
   });
   if (value !== null) {
     mark(file.path);
@@ -177,7 +177,7 @@ export async function renameScene(
     title: "Rename scene",
     value: oldTitle,
     multiline: false,
-    cta: "Rename",
+    cta: "Umbenennen",
   });
   if (input === null) return null;
   // Same sanitizer the create path uses: strips filename-illegal chars AND
@@ -185,7 +185,7 @@ export async function renameScene(
   // or folder-escaping file (which is how a scene renamed to ".." vanished).
   const next = sanitizeSegment(input);
   if (!next) {
-    if (input.trim()) new Notice("That name can't be used as a file name.");
+    if (input.trim()) new Notice("Dieser Name kann nicht als Dateiname verwendet werden.");
     return null;
   }
   if (next === oldTitle) return null;
@@ -258,23 +258,23 @@ export function addSceneMenuItems(
   const mark = (p: string): void => opts.plugin?.selfWrites.mark(p);
   if (opts.includeOpen) {
     menu.addItem((i) =>
-      i.setTitle("Open in new tab").setIcon("file-text").onClick(() => openScene(app, file))
+      i.setTitle("In neuem Tab öffnen").setIcon("file-text").onClick(() => openScene(app, file))
     );
   }
   menu.addItem((i) =>
-    i.setTitle("Edit scene…").setIcon("settings-2").onClick(() => new EditSceneModal(app, file, project, opts.plugin ?? null).open())
+    i.setTitle("Szene bearbeiten…").setIcon("settings-2").onClick(() => new EditSceneModal(app, file, project, opts.plugin ?? null).open())
   );
   menu.addItem((i) =>
-    i.setTitle("Edit synopsis…").setIcon("text").onClick(() => void editSynopsis(app, file, mark))
+    i.setTitle("Zusammenfassung bearbeiten…").setIcon("text").onClick(() => void editSynopsis(app, file, mark))
   );
   menu.addItem((i) =>
-    i.setTitle("Rename…").setIcon("pencil").onClick(async () => {
+    i.setTitle("Umbenennen…").setIcon("pencil").onClick(async () => {
       const newPath = await renameScene(app, project, title, file, mark);
       if (newPath) opts.onRenamed?.(newPath);
     })
   );
   menu.addSeparator();
   menu.addItem((i) =>
-    i.setTitle("Delete scene").setIcon("trash").onClick(() => void deleteScene(app, project, title, file))
+    i.setTitle("Szene löschen").setIcon("trash").onClick(() => void deleteScene(app, project, title, file))
   );
 }

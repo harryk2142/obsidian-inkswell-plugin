@@ -41,9 +41,9 @@ export interface ProfileField {
 /** Shared first field: alternative names (matches Obsidian's `aliases`). */
 const ALIASES: ProfileField = {
   key: "aliases",
-  label: "Aliases",
+  label: "Aliasse",
   type: "list",
-  placeholder: "Alternative name",
+  placeholder: "Alternativer Name",
 };
 
 /**
@@ -51,7 +51,7 @@ const ALIASES: ProfileField = {
  * Rendered at the top of the Codex detail pane, not in the field list. A
  * `codex-fields` template drops it like any other field unless listed.
  */
-const IMAGE: ProfileField = { key: "image", label: "Image", type: "image" };
+const IMAGE: ProfileField = { key: "image", label: "Bild", type: "image" };
 
 /**
  * Category-specific fields (excluding the shared `aliases`, which is prepended
@@ -59,79 +59,79 @@ const IMAGE: ProfileField = { key: "image", label: "Image", type: "image" };
  */
 const CATEGORY_FIELDS: Record<BuiltinCodexCategory, ProfileField[]> = {
   character: [
-    { key: "role", label: "Role", type: "text", placeholder: "Protagonist, mentor…" },
+    { key: "role", label: "Rolle", type: "text", placeholder: "Hauptfigur, Mentor:in…" },
     {
       key: "function",
-      label: "Narrative function",
+      label: "Erzählerische Funktion",
       type: "text",
-      placeholder: "e.g. Stands in the hero's way",
+      placeholder: "z. B. Steht der Hauptfigur im Weg",
     },
     {
       key: "memorableTrait",
-      label: "Memorable trait",
+      label: "Einprägsames Merkmal",
       type: "text",
-      placeholder: "A distinctive 'thing'",
+      placeholder: "Ein unverwechselbares Merkmal",
     },
-    { key: "age", label: "Age", type: "text" },
-    { key: "gender", label: "Gender", type: "text" },
-    { key: "occupation", label: "Occupation", type: "text" },
-    { key: "traits", label: "Traits", type: "textarea", placeholder: "Defining qualities" },
-    { key: "motivation", label: "Motivation", type: "textarea", placeholder: "What they want" },
-    { key: "flaw", label: "Flaw", type: "text" },
-    { key: "appearance", label: "Appearance", type: "textarea" },
-    { key: "backstory", label: "Backstory", type: "textarea" },
-    { key: "arc", label: "Arc", type: "textarea", placeholder: "How they change" },
+    { key: "age", label: "Alter", type: "text" },
+    { key: "gender", label: "Geschlecht", type: "text" },
+    { key: "occupation", label: "Beruf", type: "text" },
+    { key: "traits", label: "Eigenschaften", type: "textarea", placeholder: "Prägende Eigenschaften" },
+    { key: "motivation", label: "Motivation", type: "textarea", placeholder: "Was die Figur will" },
+    { key: "flaw", label: "Schwäche", type: "text" },
+    { key: "appearance", label: "Aussehen", type: "textarea" },
+    { key: "backstory", label: "Vorgeschichte", type: "textarea" },
+    { key: "arc", label: "Entwicklung", type: "textarea", placeholder: "Wie sie sich verändert" },
     {
       key: "relationships",
-      label: "Relationships",
+      label: "Beziehungen",
       type: "links",
       linkCategory: "character",
       labeled: true,
     },
   ],
   location: [
-    { key: "type", label: "Type", type: "text", placeholder: "City, fortress, forest…" },
-    { key: "parent", label: "World", type: "links", linkCategory: "world", single: true },
+    { key: "type", label: "Typ", type: "text", placeholder: "Stadt, Festung, Wald…" },
+    { key: "parent", label: "Welt", type: "links", linkCategory: "world", single: true },
     { key: "region", label: "Region", type: "text" },
-    { key: "climate", label: "Climate", type: "text" },
-    { key: "population", label: "Population", type: "text" },
-    { key: "atmosphere", label: "Atmosphere", type: "textarea" },
-    { key: "significance", label: "Significance", type: "textarea" },
-    { key: "history", label: "History", type: "textarea" },
+    { key: "climate", label: "Klima", type: "text" },
+    { key: "population", label: "Bevölkerung", type: "text" },
+    { key: "atmosphere", label: "Atmosphäre", type: "textarea" },
+    { key: "significance", label: "Bedeutung", type: "textarea" },
+    { key: "history", label: "Geschichte", type: "textarea" },
   ],
   world: [
-    { key: "geography", label: "Geography", type: "textarea" },
-    { key: "culture", label: "Culture", type: "textarea" },
-    { key: "politics", label: "Politics", type: "textarea" },
-    { key: "magicTech", label: "Magic / Tech", type: "textarea" },
+    { key: "geography", label: "Geografie", type: "textarea" },
+    { key: "culture", label: "Kultur", type: "textarea" },
+    { key: "politics", label: "Politik", type: "textarea" },
+    { key: "magicTech", label: "Magie / Technik", type: "textarea" },
     { key: "religion", label: "Religion", type: "textarea" },
-    { key: "economy", label: "Economy", type: "textarea" },
-    { key: "history", label: "History", type: "textarea" },
+    { key: "economy", label: "Wirtschaft", type: "textarea" },
+    { key: "history", label: "Geschichte", type: "textarea" },
   ],
   faction: [
-    { key: "type", label: "Type", type: "text", placeholder: "Guild, kingdom, cult…" },
-    { key: "leadership", label: "Leadership", type: "links", linkCategory: "character" },
-    { key: "size", label: "Size", type: "text" },
-    { key: "territory", label: "Territory", type: "links", linkCategory: "location" },
-    { key: "goal", label: "Goal", type: "textarea" },
-    { key: "allies", label: "Allies", type: "links", linkCategory: "faction" },
-    { key: "enemies", label: "Enemies", type: "links", linkCategory: "faction" },
+    { key: "type", label: "Typ", type: "text", placeholder: "Gilde, Königreich, Kult…" },
+    { key: "leadership", label: "Führung", type: "links", linkCategory: "character" },
+    { key: "size", label: "Größe", type: "text" },
+    { key: "territory", label: "Gebiet", type: "links", linkCategory: "location" },
+    { key: "goal", label: "Ziel", type: "textarea" },
+    { key: "allies", label: "Verbündete", type: "links", linkCategory: "faction" },
+    { key: "enemies", label: "Feinde", type: "links", linkCategory: "faction" },
   ],
   item: [
-    { key: "type", label: "Type", type: "text", placeholder: "Weapon, relic, document…" },
-    { key: "owner", label: "Owner", type: "links", linkCategory: "character", single: true },
-    { key: "significance", label: "Significance", type: "textarea" },
+    { key: "type", label: "Typ", type: "text", placeholder: "Waffe, Relikt, Dokument…" },
+    { key: "owner", label: "Besitzer:in", type: "links", linkCategory: "character", single: true },
+    { key: "significance", label: "Bedeutung", type: "textarea" },
   ],
   event: [
-    { key: "date", label: "Date", type: "text", placeholder: "In-world date" },
-    { key: "participants", label: "Participants", type: "links", linkCategory: "character" },
-    { key: "outcome", label: "Outcome", type: "textarea" },
+    { key: "date", label: "Datum", type: "text", placeholder: "Datum in der Welt" },
+    { key: "participants", label: "Beteiligte", type: "links", linkCategory: "character" },
+    { key: "outcome", label: "Ergebnis", type: "textarea" },
   ],
   concept: [
-    { key: "type", label: "Type", type: "text", placeholder: "Magic, tech, religion…" },
-    { key: "rules", label: "Rules", type: "textarea" },
-    { key: "limitations", label: "Limitations", type: "textarea" },
-    { key: "significance", label: "Significance", type: "textarea" },
+    { key: "type", label: "Typ", type: "text", placeholder: "Magie, Technik, Religion…" },
+    { key: "rules", label: "Regeln", type: "textarea" },
+    { key: "limitations", label: "Einschränkungen", type: "textarea" },
+    { key: "significance", label: "Bedeutung", type: "textarea" },
   ],
 };
 
@@ -143,15 +143,15 @@ const CATEGORY_FIELDS: Record<BuiltinCodexCategory, ProfileField[]> = {
  * (writeProfile only manages schema keys).
  */
 const GENERIC_FIELDS: ProfileField[] = [
-  { key: "type", label: "Type", type: "text", placeholder: "What kind of entry this is" },
-  { key: "description", label: "Description", type: "textarea" },
+  { key: "type", label: "Typ", type: "text", placeholder: "Welche Art von Eintrag dies ist" },
+  { key: "description", label: "Beschreibung", type: "textarea" },
   {
     key: "significance",
-    label: "Significance",
+    label: "Bedeutung",
     type: "textarea",
-    placeholder: "Why it matters to the story",
+    placeholder: "Warum dies für die Geschichte wichtig ist",
   },
-  { key: "related", label: "Related entries", type: "links" },
+  { key: "related", label: "Verwandte Einträge", type: "links" },
 ];
 
 /** The category's default (shipped) fields, excluding the shared `aliases`:

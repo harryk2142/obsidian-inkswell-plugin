@@ -91,7 +91,7 @@ export class CustomizePanel {
         const text = row.createDiv({ cls: "inkswell-customize__text" });
         const name = text.createDiv({ cls: "inkswell-customize__name", text: entry.label });
         if (entry.feature && !featureEnabled(disabled, entry.feature)) {
-          name.createSpan({ cls: "inkswell-customize__badge", text: "hidden" });
+          name.createSpan({ cls: "inkswell-customize__badge", text: "ausgeblendet" });
         }
         text.createDiv({
           cls: "inkswell-customize__desc",
@@ -118,7 +118,7 @@ export class CustomizePanel {
     if (entry.feature && !featureEnabled(this.plugin.settings.disabledFeatures, entry.feature)) {
       const note = host.createDiv({ cls: "inkswell-customize__hidden-note inkswell-stats__muted" });
       note.appendText("This feature is currently hidden. ");
-      const link = note.createEl("a", { text: "Turn it on under Features" });
+      const link = note.createEl("a", { text: "Unter Funktionen aktivieren" });
       link.onclick = (e) => {
         e.preventDefault();
         this.open("features");

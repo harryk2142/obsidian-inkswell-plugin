@@ -31,6 +31,7 @@ import {
   visibleStatuses,
 } from "../src/scenes/scene-meta";
 import { buildColumns } from "../src/outliner/board";
+import { PLAN_SECTION_DEFS, planningSections } from "../src/plan/sections";
 import { normalizeListOverrides } from "../src/settings/overridable-lists";
 
 describe("revision checkpoints", () => {
@@ -181,6 +182,37 @@ describe("scene inspector fields (rename / hide / reorder only)", () => {
       "scene.fields": { hidden: ["subtitle"], added: [{ id: "sf-1", label: "Mood" }] },
     });
     expect(out["scene.fields"]).toEqual({ hidden: ["subtitle"] });
+  });
+});
+
+describe("planning-note fields (rename / hide / reorder only)", () => {
+  it("hides a field from the overview without changing its stable heading", () => {
+    const fields = planningSections({
+      hidden: ["plot-groundwork"],
+      labels: { synopsis: "Zusammenfassung" },
+      order: ["act-1", "synopsis"],
+    });
+    expect(fields[0]).toMatchObject({ id: "act-1", heading: "Act I", hidden: false });
+    expect(fields[1]).toMatchObject({
+      id: "synopsis",
+      label: "Zusammenfassung",
+      heading: "Synopsis",
+    });
+    expect(fields.find((field) => field.id === "plot-groundwork")).toMatchObject({
+      heading: "Plot groundwork",
+      hidden: true,
+    });
+    expect(fields).toHaveLength(PLAN_SECTION_DEFS.length);
+  });
+
+  it("normalizes the stored hide and rejects custom fields", () => {
+    const out = normalizeListOverrides({
+      "plan.sections": {
+        hidden: ["plot-groundwork"],
+        added: [{ id: "ps-extra", label: "Extra" }],
+      },
+    });
+    expect(out["plan.sections"]).toEqual({ hidden: ["plot-groundwork"] });
   });
 });
 

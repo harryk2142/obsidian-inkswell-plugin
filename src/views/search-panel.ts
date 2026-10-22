@@ -174,14 +174,14 @@ export class SearchPanel {
     const repl = replaceRow.createEl("input", {
       type: "text",
       cls: "inkswell-search__replace",
-      attr: { placeholder: "Replace with… (leave empty to delete)" },
+      attr: { placeholder: "Ersetzen durch… (zum Löschen leer lassen)" },
     });
     tagField(repl, "search:replace");
     repl.value = this.replacement;
     repl.oninput = () => {
       this.replacement = repl.value;
     };
-    this.replaceBtn = replaceRow.createEl("button", { text: "Replace all…" });
+    this.replaceBtn = replaceRow.createEl("button", { text: "Alle ersetzen…" });
     this.replaceBtn.onclick = () => this.promptReplace();
     this.updateReplaceBtn();
 
@@ -282,7 +282,7 @@ export class SearchPanel {
     const wrap = parent.createDiv({ cls: "inkswell-search__filter" });
     wrap.createSpan({ cls: "inkswell-search__filterlabel", text: label });
     const sel = wrap.createEl("select", { cls: "dropdown" });
-    sel.createEl("option", { text: "Any", value: "" });
+    sel.createEl("option", { text: "Beliebig", value: "" });
     for (const v of values) sel.createEl("option", { text: v.label, value: v.value });
     sel.value = selected ?? "";
     sel.onchange = () => onChange(sel.value);
@@ -506,7 +506,7 @@ export class SearchPanel {
       const header = this.listEl.createDiv({ cls: "inkswell-search__scene" });
       header.createSpan({ text: `${g.title}${g.matches.length ? ` (${g.matches.length})` : ""}` });
       if (g.inactive) {
-        header.createSpan({ cls: "inkswell-search__badge", text: "archived" });
+        header.createSpan({ cls: "inkswell-search__badge", text: "archiviert" });
       }
       header.onclick = () => this.cb.onOpenInWrite(g.path);
       openSceneOnModClick(header, this.app, g.path);
@@ -514,7 +514,7 @@ export class SearchPanel {
       for (const m of g.matches) {
         const row = this.listEl.createDiv({ cls: "inkswell-search__hit" });
         if (m.target === "synopsis") {
-          row.createSpan({ cls: "inkswell-search__badge inkswell-search__badge--synopsis", text: "synopsis" });
+          row.createSpan({ cls: "inkswell-search__badge inkswell-search__badge--synopsis", text: "Zusammenfassung" });
         } else {
           row.createSpan({ cls: "inkswell-search__line", text: `L${m.line}` });
         }
@@ -522,7 +522,7 @@ export class SearchPanel {
         row.onclick = () => {
           if (m.target === "synopsis") {
             this.cb.onOpenInWrite(g.path);
-            new Notice("That match is in the scene’s synopsis, not the manuscript body.");
+            new Notice("Dieser Treffer befindet sich in der Szenenzusammenfassung, nicht im Manuskripttext.");
           } else {
             this.cb.onOpenInWrite(g.path, { from: m.from, to: m.to, verify: m.text });
           }
@@ -668,7 +668,7 @@ class ReplaceConfirmModal extends FormModal {
   }
 
   protected renderForm(el: HTMLElement): void {
-    el.createEl("h3", { text: "Replace across scenes" });
+    el.createEl("h3", { text: "In allen Szenen ersetzen" });
     el.createEl("p", {
       text: `Replace ${this.opts.matches} occurrence${this.opts.matches === 1 ? "" : "s"} in ${this.opts.scenes} scene${this.opts.scenes === 1 ? "" : "s"}.`,
     });
@@ -679,7 +679,7 @@ class ReplaceConfirmModal extends FormModal {
     });
     el.createEl("p", {
       cls: "inkswell-stats__muted",
-      text: "Applies to scene prose only (never frontmatter). This can't be undone across files.",
+      text: "Gilt nur für den Szenentext (niemals für Frontmatter). Dies kann nicht dateiübergreifend rückgängig gemacht werden.",
     });
     if (this.opts.needsAck) {
       const label = el.createEl("label", { cls: "inkswell-search__ack" });

@@ -12,7 +12,7 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
 const root = dirname(fileURLToPath(import.meta.url)) + "/..";
-const dest = join(root, "examples", "sample-vault", ".obsidian", "plugins", "inkswell");
+const dest = join(root, "examples", "sample-vault", ".obsidian", "plugins", "inkswell-de");
 const artifacts = ["main.js", "manifest.json", "styles.css"];
 
 mkdirSync(dest, { recursive: true });

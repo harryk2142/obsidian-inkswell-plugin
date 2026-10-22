@@ -27,9 +27,9 @@ import {
 import type InkswellPlugin from "../../../main";
 
 const FORMATS: { key: "ebook" | "paperback" | "hardcover"; label: string }[] = [
-  { key: "ebook", label: "eBook" },
-  { key: "paperback", label: "Paperback" },
-  { key: "hardcover", label: "Hardcover" },
+  { key: "ebook", label: "E-Book" },
+  { key: "paperback", label: "Taschenbuch" },
+  { key: "hardcover", label: "Gebundene Ausgabe" },
 ];
 
 export class ChecklistPanel {
@@ -61,7 +61,7 @@ export class ChecklistPanel {
 
     const active = resolveActive(this.store.getProjects(), this.plugin.activeProject.get());
     if (!active) {
-      container.createDiv({ cls: "inkswell-stats__muted", text: "No project selected." });
+      container.createDiv({ cls: "inkswell-stats__muted", text: "Kein Projekt ausgewählt." });
       return;
     }
     // Publishing metadata/checklist describe the BOOK, not one draft — read and
@@ -125,7 +125,7 @@ export class ChecklistPanel {
     label.createSpan({ text: task.label + (task.optional ? " (optional)" : "") });
 
     if (task.deepLink === "compile") {
-      const link = row.createEl("button", { cls: "inkswell-publishing__link", text: "Open Compile →" });
+      const link = row.createEl("button", { cls: "inkswell-publishing__link", text: "Kompilieren öffnen →" });
       link.onclick = () => void this.plugin.openInkswell("publish", undefined, "compile");
     }
 
@@ -189,7 +189,7 @@ export class ChecklistPanel {
     text("Tagline", m.tagline, (v) => this.saveMeta(file, { tagline: v }), "One-line hook");
 
     const blurbF = host.createDiv({ cls: "inkswell-inspector__field" });
-    blurbF.createDiv({ cls: "inkswell-inspector__label", text: "Back blurb" });
+    blurbF.createDiv({ cls: "inkswell-inspector__label", text: "Klappentext" });
     const blurb = blurbF.createDiv({ cls: "inkswell-inspector__control" }).createEl("textarea", {
       cls: "inkswell-inspector__textarea",
     });
@@ -222,7 +222,7 @@ export class ChecklistPanel {
       this.saveCategories(file, { sub: splitList(v) }), "≤3, comma-separated"
     );
     if (m.categories && !categoriesOk(m.categories)) {
-      host.createDiv({ cls: "inkswell-stats__muted", text: "Categories: set 1 main + up to 3 sub." });
+      host.createDiv({ cls: "inkswell-stats__muted", text: "Kategorien: 1 Haupt- und bis zu 3 Unterkategorien festlegen." });
     }
 
     // KU exclusivity.
@@ -232,10 +232,10 @@ export class ChecklistPanel {
     tagField(ku, "pub:meta:ku");
     ku.checked = !!m.kuExclusive;
     ku.onchange = () => this.saveMeta(file, { kuExclusive: ku.checked });
-    kuLabel.createSpan({ text: "Kindle Unlimited exclusive (Amazon-only eBook)" });
+    kuLabel.createSpan({ text: "Exklusiv bei Kindle Unlimited (E-Book nur bei Amazon)" });
 
     // Formats × price + ISBN.
-    host.createDiv({ cls: "inkswell-audit__grouplabel", text: "Formats" });
+    host.createDiv({ cls: "inkswell-audit__grouplabel", text: "Formate" });
     for (const f of FORMATS) {
       const info = m.formats?.[f.key] ?? {};
       const row = host.createDiv({ cls: "inkswell-publishing__format" });

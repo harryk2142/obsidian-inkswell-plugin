@@ -55,6 +55,17 @@ export const CODEX_CATEGORIES: (CategoryDef & { id: BuiltinCodexCategory })[] = 
   { id: "concept", label: "Concept", plural: "Concepts", icon: "sparkles" },
 ];
 
+/** German display defaults; shipped English labels remain template fallbacks. */
+export const GERMAN_CATEGORY_OVERRIDES: CategoryOverrides = {
+  character: { label: "Figur", plural: "Figuren" },
+  location: { label: "Ort", plural: "Orte" },
+  world: { label: "Welt", plural: "Welten" },
+  faction: { label: "Fraktion", plural: "Fraktionen" },
+  item: { label: "Gegenstand", plural: "Gegenstände" },
+  event: { label: "Ereignis", plural: "Ereignisse" },
+  concept: { label: "Konzept", plural: "Konzepte" },
+};
+
 export function isBuiltinCategory(v: unknown): v is BuiltinCodexCategory {
   return CODEX_CATEGORIES.some((c) => c.id === v);
 }

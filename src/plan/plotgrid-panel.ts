@@ -177,15 +177,15 @@ export class PlotGridPanel {
       "cells are the scenes that advance them — so the grid always matches the manuscript." +
       (noScenes ? " You have no scenes yet — Beats → Scaffold scenes is the fastest start." : "");
     const actions: EmptyStateAction[] = [
-      { label: "Create your first plotline", cta: true, onClick: () => void this.addPlotline() },
+      { label: "Erste Handlungslinie erstellen", cta: true, onClick: () => void this.addPlotline() },
     ];
-    if (noScenes) actions.push({ label: "Go to Beats", onClick: () => void this.plugin.openBeats() });
+    if (noScenes) actions.push({ label: "Zu Beats", onClick: () => void this.plugin.openBeats() });
     renderEmptyStateAction(container, text, actions);
   }
 
   private renderToolbar(root: HTMLElement, grid: PlotGrid): void {
     const bar = root.createDiv({ cls: "inkswell-plotgrid__toolbar" });
-    const add = bar.createEl("button", { text: "New plotline" });
+    const add = bar.createEl("button", { text: "Neue Handlungslinie" });
     add.setAttribute("aria-label", "Create a new plotline");
     add.onclick = () => void this.addPlotline();
 
@@ -227,7 +227,7 @@ export class PlotGridPanel {
       head.createSpan({ cls: "inkswell-plotgrid__colcount", text: String(grid.totals[v.idx]) });
       if (isOrphanPlotline(v.col)) {
         head.setAttribute("title", "Tag found on scenes but not in your plotline list");
-        head.createSpan({ cls: "inkswell-stats__muted", text: " (untracked)" });
+        head.createSpan({ cls: "inkswell-stats__muted", text: " (nicht verfolgt)" });
       }
       // Click the title to focus the column (click again on the chip to clear).
       label.onclick = () => {
@@ -286,12 +286,12 @@ export class PlotGridPanel {
     const menu = new Menu();
     if (isOrphanPlotline(col)) {
       menu.addItem((i) =>
-        i.setTitle("Add to plotlines").setIcon("plus").onClick(() => {
+        i.setTitle("Zu Handlungslinien hinzufügen").setIcon("plus").onClick(() => {
           this.persist((cur) => upsertPlotline(cur, { title: col.title }));
         })
       );
       menu.addItem((i) =>
-        i.setTitle("Remove tag from all scenes…").setIcon("trash").onClick(() => {
+        i.setTitle("Tag aus allen Szenen entfernen…").setIcon("trash").onClick(() => {
           void this.stripTagEverywhere(col.title);
         })
       );
@@ -303,7 +303,7 @@ export class PlotGridPanel {
         this.rerender();
       })
     );
-    menu.addItem((i) => i.setTitle("Rename…").setIcon("pencil").onClick(() => void this.renamePlotline(col)));
+    menu.addItem((i) => i.setTitle("Umbenennen…").setIcon("pencil").onClick(() => void this.renamePlotline(col)));
     menu.addSeparator();
     for (const c of COLORS) {
       menu.addItem((i) =>
@@ -314,7 +314,7 @@ export class PlotGridPanel {
     }
     if (col.color) {
       menu.addItem((i) =>
-        i.setTitle("Clear color").onClick(() => {
+        i.setTitle("Farbe löschen").onClick(() => {
           this.persist((cur) => upsertPlotline(cur, { id: col.id, title: col.title, color: "" }));
         })
       );
@@ -325,7 +325,7 @@ export class PlotGridPanel {
     const idx = cfg.findIndex((p) => p.id === col.id);
     if (idx > 0) {
       menu.addItem((i) =>
-        i.setTitle("Move left").setIcon("arrow-left").onClick(() => {
+        i.setTitle("Nach links").setIcon("arrow-left").onClick(() => {
           const anchorId = cfg[idx - 1].id; // menu-time anchor; move applies to current
           this.persist((cur) => movePlotline(cur, col.id, anchorId, false));
         })
@@ -333,13 +333,13 @@ export class PlotGridPanel {
     }
     if (idx >= 0 && idx < cfg.length - 1) {
       menu.addItem((i) =>
-        i.setTitle("Move right").setIcon("arrow-right").onClick(() => {
+        i.setTitle("Nach rechts").setIcon("arrow-right").onClick(() => {
           const anchorId = cfg[idx + 1].id; // menu-time anchor; move applies to current
           this.persist((cur) => movePlotline(cur, col.id, anchorId, true));
         })
       );
     }
-    menu.addItem((i) => i.setTitle("Delete…").setIcon("trash").onClick(() => void this.deletePlotline(col)));
+    menu.addItem((i) => i.setTitle("Löschen…").setIcon("trash").onClick(() => void this.deletePlotline(col)));
     return menu;
   }
 
@@ -394,7 +394,7 @@ export class PlotGridPanel {
       const chev = label.createSpan({ cls: "inkswell-plotgrid__chev" });
       setIcon(chev, isExpanded ? "chevron-down" : "chevron-right");
       label.createSpan({ text: row.label });
-      if (row.kind === "planned") label.createSpan({ cls: "inkswell-stats__muted", text: " planned" });
+      if (row.kind === "planned") label.createSpan({ cls: "inkswell-stats__muted", text: " geplant" });
       else label.createSpan({ cls: "inkswell-plotgrid__rowcount", text: String(row.scenes.length) });
       label.onclick = () => {
         if (this.expanded.has(row.key)) this.expanded.delete(row.key);
@@ -520,7 +520,7 @@ export class PlotGridPanel {
     btn.onclick = (e) => {
       const menu = new Menu();
       menu.addItem((i) =>
-        i.setTitle("New scene here…").setIcon("plus").onClick(() => {
+        i.setTitle("Neue Szene hier…").setIcon("plus").onClick(() => {
           if (!this.project) return;
           // The plan-a-future-beat flow: an idea-status stub lands in the right
           // chapter and plotline in one step (works in planned chapters too).
@@ -734,10 +734,10 @@ export class PlotGridPanel {
 
   private async addPlotline(): Promise<void> {
     const name = await promptText(this.app, {
-      title: "New plotline",
+      title: "Neue Handlungslinie",
       value: "",
       multiline: false,
-      cta: "Add",
+      cta: "Hinzufügen",
     });
     const t = name?.trim();
     if (!t) return;
@@ -746,10 +746,10 @@ export class PlotGridPanel {
 
   private async renamePlotline(col: Plotline): Promise<void> {
     const input = await promptText(this.app, {
-      title: "Rename plotline",
+      title: "Handlungslinie umbenennen",
       value: col.title,
       multiline: false,
-      cta: "Rename",
+      cta: "Umbenennen",
     });
     const t = input?.trim();
     if (!t || t === col.title) return;

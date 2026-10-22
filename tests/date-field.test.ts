@@ -200,7 +200,7 @@ describe("date control", () => {
     const input = host.querySelector("input") as HTMLInputElement;
     expect(input.type).toBe("text");
     expect(input.value).toBe("Spring 1204");
-    expect(host.textContent).toContain("Not a calendar date");
+    expect(host.textContent).toContain("Kein Kalenderdatum");
     expect(saved).toEqual([]);
     // Typing a real date there saves the key.
     input.value = "2026-03-14";

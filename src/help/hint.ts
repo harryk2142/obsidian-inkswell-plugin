@@ -31,7 +31,7 @@ export function renderHint(host: HTMLElement, plugin: InkswellPlugin, key: strin
 
   const dismiss = summary.createEl("button", {
     cls: "inkswell-hint__dismiss",
-    attr: { "aria-label": "Dismiss this tip", title: "Dismiss this tip" },
+    attr: { "aria-label": "Dismiss this tip", title: "Diesen Tipp ausblenden" },
   });
   setIcon(dismiss, "x");
   dismiss.onclick = (e) => {

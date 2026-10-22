@@ -102,7 +102,7 @@ export function renderProfileFieldControl(control: HTMLElement, deps: ProfileFie
     };
     // Android IMEs often don't deliver an Enter keydown at all (key
     // "Unidentified"/229 while composing) — the button always works.
-    const addBtn = addRow.createEl("button", { text: "Add" });
+    const addBtn = addRow.createEl("button", { text: "Hinzufügen" });
     addBtn.onclick = commit;
     return;
   }
@@ -144,7 +144,7 @@ function renderDateControl(control: HTMLElement, deps: ProfileFieldDeps, tag: st
     t.onchange = () => deps.saveValue(normalizeDate(t.value) ?? t.value, false);
     control.createDiv({
       cls: "inkswell-stats__muted inkswell-inspector__hint",
-      text: "Not a calendar date. Clear it to use the date picker.",
+      text: "Kein Kalenderdatum. Lösche den Wert, um die Datumsauswahl zu verwenden.",
     });
     return;
   }
@@ -178,7 +178,7 @@ function renderLinkControl(control: HTMLElement, deps: ProfileFieldDeps): void {
     const cur = typeof value === "string" && value ? linkTarget(value) : "";
     const sel = control.createEl("select", { cls: "dropdown" });
     tagField(sel, tag);
-    sel.createEl("option", { text: "— none —", value: "" });
+    sel.createEl("option", { text: "— keine —", value: "" });
     for (const c of candidates) sel.createEl("option", { text: c.name, value: c.name });
     sel.value = candidates.some((c) => c.name === cur) ? cur : "";
     sel.onchange = () => deps.saveValue(sel.value ? toLink(sel.value) : "", true);
@@ -208,7 +208,7 @@ function renderLinkControl(control: HTMLElement, deps: ProfileFieldDeps): void {
             title: `Relationship to ${target}`,
             value: alias ?? "",
             multiline: false,
-            cta: "Save",
+            cta: "Speichern",
           });
           if (v === null) return; // cancelled; "" clears the label
           deps.updateList((cur) => cur.map((c) => (c === link ? toLink(target, v) : c)));

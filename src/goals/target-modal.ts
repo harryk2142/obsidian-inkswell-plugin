@@ -32,8 +32,8 @@ export class TargetModal extends FormModal {
     contentEl.createEl("h3", { text: `Word target: ${this.project.draft.title}` });
 
     new Setting(contentEl)
-      .setName("Target words")
-      .setDesc("Total word count goal for this project (0 to clear).")
+      .setName("Zielwörter")
+      .setDesc("Gesamtwortziel für dieses Projekt (0 zum Löschen).")
       .addText((t) =>
         t.setValue(`${this.value}`).onChange((v) => {
           const n = Math.floor(Number(v));
@@ -42,16 +42,16 @@ export class TargetModal extends FormModal {
       );
 
     new Setting(contentEl)
-      .setName("Deadline")
-      .setDesc("Optional finish date — drives the pace calculator on Track.")
+      .setName("Frist")
+      .setDesc("Optionales Abschlussdatum – steuert die Tempo-Berechnung unter Fortschritt.")
       .addText((t) => {
         t.inputEl.type = "date";
         t.setValue(this.deadline).onChange((v) => (this.deadline = v));
       });
 
     new Setting(contentEl)
-      .setName("Writing days per week")
-      .setDesc("How many days a week you write (1–7), for the pace calculation.")
+      .setName("Schreibtage pro Woche")
+      .setDesc("An wie vielen Tagen pro Woche du schreibst (1–7), für die Tempo-Berechnung.")
       .addText((t) => {
         t.inputEl.type = "number";
         t.setValue(`${this.daysPerWeek}`).onChange((v) => {
@@ -64,7 +64,7 @@ export class TargetModal extends FormModal {
   protected async submit(): Promise<boolean> {
     const file = this.app.vault.getAbstractFileByPath(this.project.vaultPath);
     if (!(file instanceof TFile)) {
-      new Notice("Project index not found.");
+      new Notice("Projektindex nicht gefunden.");
       return false;
     }
     // Field-level patch against the CURRENT stored goals (this modal edits all

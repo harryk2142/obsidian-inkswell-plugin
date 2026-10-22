@@ -24,7 +24,7 @@ export function renderIdeas(parent: HTMLElement, plugin: InkswellPlugin): void {
   head.setAttribute("aria-expanded", String(open));
   const chevron = head.createSpan({ cls: "inkswell-ideas__chevron" });
   setIcon(chevron, open ? "chevron-down" : "chevron-right");
-  head.createSpan({ cls: "inkswell-ideas__title", text: "Ideas" });
+  head.createSpan({ cls: "inkswell-ideas__title", text: "Ideen" });
   if (plugin.ideas.length > 0) {
     head.createSpan({ cls: "inkswell-ideas__count", text: String(plugin.ideas.length) });
   }
@@ -46,7 +46,7 @@ export function renderIdeas(parent: HTMLElement, plugin: InkswellPlugin): void {
   const input = body.createEl("input", {
     type: "text",
     cls: "inkswell-ideas__input",
-    placeholder: "Capture an idea… (Enter)",
+    placeholder: "Idee erfassen… (Eingabetaste)",
   });
   // Commits only on Enter — a rebuild mid-typing would otherwise drop the text.
   tagField(input, "ideas:capture");
@@ -120,21 +120,21 @@ function beginEdit(textEl: HTMLElement, idea: Idea, plugin: InkswellPlugin): voi
 
 function ideaMenu(idea: Idea, plugin: InkswellPlugin, startEdit: () => void): Menu {
   const menu = new Menu();
-  menu.addItem((i) => i.setTitle("Edit").setIcon("pencil").onClick(startEdit));
+  menu.addItem((i) => i.setTitle("Bearbeiten").setIcon("pencil").onClick(startEdit));
   menu.addItem((i) =>
     i
-      .setTitle("Copy")
+      .setTitle("Kopieren")
       .setIcon("copy")
       .onClick(() => {
         void navigator.clipboard.writeText(idea.text).then(
-          () => new Notice("Idea copied."),
-          () => new Notice("Couldn't copy the idea.")
+          () => new Notice("Idee kopiert."),
+          () => new Notice("Die Idee konnte nicht kopiert werden.")
         );
       })
   );
   menu.addItem((i) =>
     i
-      .setTitle("Save as note…")
+      .setTitle("Als Notiz speichern…")
       .setIcon("file-plus")
       .onClick(() => void plugin.saveIdeaAsNote(idea))
   );
@@ -147,7 +147,7 @@ function ideaMenu(idea: Idea, plugin: InkswellPlugin, startEdit: () => void): Me
   menu.addSeparator();
   menu.addItem((i) =>
     i
-      .setTitle("Delete")
+      .setTitle("Löschen")
       .setIcon("trash")
       .onClick(() => plugin.removeIdea(idea.id))
   );

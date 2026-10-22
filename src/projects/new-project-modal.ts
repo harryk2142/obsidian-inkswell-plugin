@@ -65,7 +65,7 @@ export async function createProject(
 ): Promise<TFile | null> {
   const safe = sanitizeSegment(opts.title);
   if (!safe) {
-    new Notice("Enter a project title.");
+    new Notice("Gib einen Projekttitel ein.");
     return null;
   }
 
@@ -126,25 +126,25 @@ export class NewProjectModal extends FormModal {
   }
 
   protected renderForm(contentEl: HTMLElement): void {
-    contentEl.createEl("h3", { text: "New project" });
+    contentEl.createEl("h3", { text: "Neues Projekt" });
 
     // FormModal autofocuses this first input and submits on Enter.
-    new Setting(contentEl).setName("Title").addText((t) => {
-      t.setPlaceholder("My Novel").onChange((v) => (this.title = v));
+    new Setting(contentEl).setName("Titel").addText((t) => {
+      t.setPlaceholder("Mein Roman").onChange((v) => (this.title = v));
     });
 
     new Setting(contentEl)
-      .setName("Base folder")
+      .setName("Basisordner")
       .setDesc("The project gets its own subfolder here. Blank = vault root.")
       .addText((t) =>
         t
-          .setPlaceholder("(vault root)")
+          .setPlaceholder("(Tresor-Stammordner)")
           .setValue(this.baseFolder)
           .onChange((v) => (this.baseFolder = v))
       );
 
     new Setting(contentEl)
-      .setName("Scene folder")
+      .setName("Szenenordner")
       .setDesc('Where scene files live, relative to the project folder. "/" = the folder itself.')
       .addText((t) => t.setValue(this.sceneFolder).onChange((v) => (this.sceneFolder = v)));
 

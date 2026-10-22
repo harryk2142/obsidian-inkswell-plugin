@@ -14,12 +14,12 @@ interface Phase {
 }
 
 const PHASES: Phase[] = [
-  { icon: "compass", name: "Plan", blurb: "Overview, beat sheet, and story structure." },
-  { icon: "pencil", name: "Write", blurb: "Focused editor with to-do markers." },
-  { icon: "git-compare", name: "Revise", blurb: "Audit, decision log, and sweeps." },
-  { icon: "upload", name: "Publish", blurb: "Compile and launch your book." },
-  { icon: "book-marked", name: "Codex", blurb: "Your story bible, used throughout." },
-  { icon: "bar-chart-3", name: "Track", blurb: "Word counts, streaks, and sprints." },
+  { icon: "compass", name: "Planen", blurb: "Übersicht, Beat-Sheet und Geschichtenstruktur." },
+  { icon: "pencil", name: "Schreiben", blurb: "Fokussierter Editor mit Aufgabenmarkierungen." },
+  { icon: "git-compare", name: "Überarbeiten", blurb: "Prüfung, Entscheidungsprotokoll und Durchgänge." },
+  { icon: "upload", name: "Veröffentlichen", blurb: "Kompiliere und veröffentliche dein Buch." },
+  { icon: "book-marked", name: "Kodex", blurb: "Deine überall verwendete Story-Bibel." },
+  { icon: "bar-chart-3", name: "Fortschritt", blurb: "Wortzahlen, Schreibserien und Sprints." },
 ];
 
 export class WelcomeModal extends Modal {
@@ -35,7 +35,7 @@ export class WelcomeModal extends Modal {
     contentEl.empty();
     contentEl.addClass("inkswell-welcome");
 
-    contentEl.createEl("h2", { text: "Welcome to Inkswell" });
+    contentEl.createEl("h2", { text: "Willkommen bei Inkswell" });
     contentEl.createEl("p", {
       cls: "inkswell-stats__muted",
       text:
@@ -59,7 +59,7 @@ export class WelcomeModal extends Modal {
     });
 
     const actions = contentEl.createDiv({ cls: "inkswell-welcome__actions" });
-    const start = actions.createEl("button", { cls: "mod-cta", text: "Get started" });
+    const start = actions.createEl("button", { cls: "mod-cta", text: "Loslegen" });
     start.onclick = () => this.close();
   }
 

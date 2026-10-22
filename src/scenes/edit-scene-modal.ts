@@ -51,7 +51,7 @@ export class EditSceneModal extends Modal {
 
     new Setting(contentEl)
       .addButton((b) =>
-        b.setButtonText("Open in tab").onClick(() => {
+        b.setButtonText("In Tab öffnen").onClick(() => {
           this.close();
           openScene(this.app, this.file);
         })
@@ -60,14 +60,14 @@ export class EditSceneModal extends Modal {
         // Cross-panel jump to the in-plugin Write editor (only when wired).
         if (this.plugin) {
           s.addButton((b) =>
-            b.setButtonText("Open in Write").onClick(() => {
+            b.setButtonText("In Schreiben öffnen").onClick(() => {
               this.close();
               this.plugin?.openSceneInWrite(this.file.path);
             })
           );
         }
       })
-      .addButton((b) => b.setButtonText("Done").setCta().onClick(() => this.close()));
+      .addButton((b) => b.setButtonText("Fertig").setCta().onClick(() => this.close()));
   }
 
   onClose(): void {

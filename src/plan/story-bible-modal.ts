@@ -90,7 +90,7 @@ export class StoryBibleModal extends FormModal {
 
   protected async submit(): Promise<boolean> {
     if (this.sections.size === 0) {
-      new Notice("Pick at least one section.");
+      new Notice("Wähle mindestens einen Abschnitt aus.");
       return false;
     }
     const allTypes = this.groups.every((g) => this.types.has(g.id));

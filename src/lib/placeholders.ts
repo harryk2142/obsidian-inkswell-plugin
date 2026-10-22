@@ -40,11 +40,11 @@ export const PLACEHOLDER_CLASS: Record<PlaceholderKind, string> = {
 
 /** User-facing label per kind — badges, filter chips, insert menus. */
 export const PLACEHOLDER_LABEL: Record<PlaceholderKind, string> = {
-  todo: "TODO",
-  research: "Research",
-  note: "Note",
-  dialogue: "Dialogue",
-  scene: "Scene",
+  todo: "AUFGABE",
+  research: "Recherche",
+  note: "Notiz",
+  dialogue: "Dialog",
+  scene: "Szene",
 };
 
 /** Canonical display order for kind lists (chips, pickers). */

@@ -16,17 +16,18 @@ export const featuresSection: CustomizeSection = {
       (f) => !featureEnabled(plugin.settings.disabledFeatures, f.id)
     ).length;
     return hidden === 0
-      ? "Everything shown"
-      : `${hidden} of ${OPTIONAL_FEATURES.length} hidden`;
+      ? "Alles eingeblendet"
+      : `${hidden} von ${OPTIONAL_FEATURES.length} ausgeblendet`;
   },
 
   render(host: HTMLElement, ctx: SectionCtx) {
     host.createEl("p", {
       cls: "inkswell-stats__muted",
       text:
-        "Hide surfaces you don't use to keep Inkswell lean. Hiding only hides — your notes " +
-        "and data are kept, and turning a feature back on restores everything. You can also " +
-        "right-click an optional tab anywhere in the app to hide it.",
+        "Blenden Sie nicht benötigte Bereiche aus, um Inkswell übersichtlich zu halten. Dabei " +
+        "bleiben Ihre Notizen und Daten erhalten; sobald Sie eine Funktion wieder einblenden, " +
+        "ist alles wieder verfügbar. Optionale Registerkarten können Sie außerdem überall in " +
+        "der App mit einem Rechtsklick ausblenden.",
     });
 
     let lastGroup: FeatureGroup | null = null;

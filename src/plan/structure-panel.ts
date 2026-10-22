@@ -35,9 +35,9 @@ export type StructureView = "tree" | "board" | "grid";
  */
 const VIEWS: { id: StructureView; label: string; icon: string; hint: string; feature?: FeatureId }[] =
   [
-    { id: "tree", label: "Tree", icon: "list-tree", hint: "plan/outline" },
+    { id: "tree", label: "Baum", icon: "list-tree", hint: "plan/outline" },
     { id: "board", label: "Board", icon: "square-kanban", hint: "plan/board", feature: "board" },
-    { id: "grid", label: "Grid", icon: "grid-3x3", hint: "plan/grid", feature: "plot-grid" },
+    { id: "grid", label: "Raster", icon: "grid-3x3", hint: "plan/grid", feature: "plot-grid" },
   ];
 
 export class StructurePanel {

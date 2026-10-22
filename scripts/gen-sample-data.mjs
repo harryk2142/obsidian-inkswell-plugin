@@ -132,7 +132,7 @@ const data = {
 const root = dirname(fileURLToPath(import.meta.url)) + "/..";
 const outDir =
   process.argv[2] ||
-  join(root, "examples", "sample-vault", ".obsidian", "plugins", "inkswell");
+  join(root, "examples", "sample-vault", ".obsidian", "plugins", "inkswell-de");
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, "data.json"), JSON.stringify(data, null, 2) + "\n");
 

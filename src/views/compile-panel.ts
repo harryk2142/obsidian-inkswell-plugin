@@ -63,18 +63,18 @@ export class CompilePanel {
     this.container = container;
     container.empty();
     container.addClass("inkswell-publish");
-    container.createEl("h3", { text: "Compile" });
+    container.createEl("h3", { text: "Kompilieren" });
 
     const project = resolveActive(this.store.getProjects(), this.plugin.activeProject.get());
     if (!project) {
-      container.createDiv({ cls: "inkswell-stats__muted", text: "No projects found." });
+      container.createDiv({ cls: "inkswell-stats__muted", text: "Keine Projekte gefunden." });
       return;
     }
 
     // Compile ships the manuscript; planning material goes out as a story bible (#50).
     const bible = container.createDiv({ cls: "inkswell-stats__muted inkswell-compile__bible" });
     bible.appendText("Sharing your planning rather than the manuscript? ");
-    const link = bible.createEl("a", { text: "Export a story bible…", href: "#" });
+    const link = bible.createEl("a", { text: "Story-Bibel exportieren…", href: "#" });
     link.onclick = (e) => {
       e.preventDefault();
       this.plugin.openStoryBible(project);
@@ -136,7 +136,7 @@ export class CompilePanel {
 
     // Output name
     const nameField = container.createDiv({ cls: "inkswell-publish__field" });
-    nameField.createSpan({ cls: "inkswell-stats__muted", text: "Output file name" });
+    nameField.createSpan({ cls: "inkswell-stats__muted", text: "Name der Ausgabedatei" });
     const name = nameField.createEl("input", { type: "text" });
     tagField(name, "compile:name");
     name.value = config.targetBasename;
@@ -152,7 +152,7 @@ export class CompilePanel {
     };
 
     // Compile
-    const run = container.createEl("button", { cls: "mod-cta", text: "Compile" });
+    const run = container.createEl("button", { cls: "mod-cta", text: "Kompilieren" });
     run.onclick = () => void this.compile(project);
 
     // Pre-export check.
@@ -189,20 +189,20 @@ export class CompilePanel {
   }
 
   private static readonly SEP_PRESETS: { label: string; value: string }[] = [
-    { label: "Blank line", value: "\n\n" },
-    { label: "* * * (scene break)", value: "\n\n* * *\n\n" },
-    { label: "--- (horizontal rule)", value: "\n\n---\n\n" },
-    { label: "# (centered break)", value: "\n\n#\n\n" },
+    { label: "Leerzeile", value: "\n\n" },
+    { label: "* * * (Szenentrenner)", value: "\n\n* * *\n\n" },
+    { label: "--- (horizontale Linie)", value: "\n\n---\n\n" },
+    { label: "# (zentrierter Trenner)", value: "\n\n#\n\n" },
   ];
 
   private renderSeparator(parent: HTMLElement, config: CompileConfig, project: Project): void {
     const field = parent.createDiv({ cls: "inkswell-publish__field" });
-    field.createSpan({ cls: "inkswell-stats__muted", text: "Scene separator" });
+    field.createSpan({ cls: "inkswell-stats__muted", text: "Szenentrenner" });
     const sel = field.createEl("select", { cls: "dropdown" });
     tagField(sel, "compile:separator");
     const presets = CompilePanel.SEP_PRESETS;
     const matched = presets.some((p) => p.value === config.separator);
-    if (!matched) sel.createEl("option", { text: "Custom (frontmatter)", value: config.separator });
+    if (!matched) sel.createEl("option", { text: "Benutzerdefiniert (Frontmatter)", value: config.separator });
     for (const p of presets) {
       const o = sel.createEl("option", { text: p.label, value: p.value });
       if (p.value === config.separator) o.selected = true;
@@ -218,14 +218,14 @@ export class CompilePanel {
 
   private renderReferenceDoc(parent: HTMLElement, config: CompileConfig, project: Project): void {
     const field = parent.createDiv({ cls: "inkswell-publish__field" });
-    field.createSpan({ cls: "inkswell-stats__muted", text: "Word reference doc (styles)" });
+    field.createSpan({ cls: "inkswell-stats__muted", text: "Word-Referenzdokument (Formatvorlagen)" });
 
     const args = config.pandoc?.extraArgs ?? [];
     const current = args.find((a) => a.startsWith("--reference-doc="));
     if (current) {
       const row = field.createDiv({ cls: "inkswell-publish__refrow" });
       row.createSpan({ text: current.replace("--reference-doc=", "") });
-      const clear = row.createEl("button", { text: "Clear" });
+      const clear = row.createEl("button", { text: "Leeren" });
       clear.onclick = () => {
         this.update(project, (cfg) => {
           if (cfg.pandoc) {
@@ -246,11 +246,11 @@ export class CompilePanel {
     }
 
     if (!vaultHasFilesystem(this.app)) {
-      field.createDiv({ cls: "inkswell-stats__muted", text: "Desktop only (needs pandoc)." });
+      field.createDiv({ cls: "inkswell-stats__muted", text: "Nur Desktop (pandoc erforderlich)." });
       return;
     }
     if (pandocAvailableCached()?.pandoc === false) {
-      field.createDiv({ cls: "inkswell-stats__muted", text: "Install pandoc to generate a reference doc." });
+      field.createDiv({ cls: "inkswell-stats__muted", text: "Installiere pandoc, um ein Referenzdokument zu erzeugen." });
       return;
     }
     const gen = field.createEl("button", {
@@ -280,11 +280,11 @@ export class CompilePanel {
 
   private renderPreflight(parent: HTMLElement, project: Project): void {
     const sec = parent.createDiv({ cls: "inkswell-publish__preflight" });
-    const btn = sec.createEl("button", { text: "Check manuscript before export" });
+    const btn = sec.createEl("button", { text: "Manuskript vor dem Export prüfen" });
     const results = sec.createDiv({ cls: "inkswell-publish__preflight-results" });
     btn.onclick = async () => {
       results.empty();
-      results.createDiv({ cls: "inkswell-stats__muted", text: "Checking…" });
+      results.createDiv({ cls: "inkswell-stats__muted", text: "Prüfung läuft…" });
       const scenes: SceneText[] = [];
       const missing: string[] = [];
       const sources = project.scenes.length
@@ -303,7 +303,7 @@ export class CompilePanel {
       const findings = preflight(scenes);
       results.empty();
       if (findings.length === 0 && missing.length === 0) {
-        results.createDiv({ cls: "inkswell-stats__muted", text: "No issues found. Ready to export." });
+        results.createDiv({ cls: "inkswell-stats__muted", text: "Keine Probleme gefunden. Bereit zum Export." });
         return;
       }
       if (missing.length > 0) {
@@ -367,7 +367,7 @@ export class CompilePanel {
     if (EXCLUSIVE_HEADING_STEPS.every((id) => steps.some((s) => s.id === id))) {
       group.createDiv({
         cls: "inkswell-stats__muted",
-        text: "“Prepend the scene title” and “Group scenes into chapters” both add headings — pick one.",
+        text: "„Szenentitel voranstellen“ und „Szenen zu Kapiteln gruppieren“ fügen beide Überschriften ein – wähle nur eine Option.",
       });
     }
   }

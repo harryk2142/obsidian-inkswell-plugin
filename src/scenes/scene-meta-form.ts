@@ -154,7 +154,7 @@ export function renderSceneMetaFields(
   render.status = (label) => field(container, label, (host) => {
     const sel = host.createEl("select", { cls: "dropdown" });
     tagField(sel, "scene:status");
-    sel.createEl("option", { text: "— none —", value: "" });
+    sel.createEl("option", { text: "— keine —", value: "" });
     // Visible statuses, plus the scene's CURRENT status if the writer hid it —
     // a real stored value must never render as a blank select.
     for (const s of statuses) {
@@ -433,7 +433,7 @@ export function renderSceneAuditFields(
   field(container, "Lift-out test", (host) => {
     const sel = host.createEl("select", { cls: "dropdown" });
     tagField(sel, "audit:verdict");
-    sel.createEl("option", { text: "— undecided —", value: "" });
+    sel.createEl("option", { text: "— unentschieden —", value: "" });
     for (const v of ["keep", "cut", "merge"] as const) {
       const o = sel.createEl("option", { text: v[0].toUpperCase() + v.slice(1), value: v });
       if (audit.verdict === v) o.selected = true;
@@ -455,7 +455,7 @@ export function renderSceneAuditFields(
   field(container, "Opening", (host) => {
     const sel = host.createEl("select", { cls: "dropdown" });
     tagField(sel, "audit:opening");
-    sel.createEl("option", { text: "— auto —", value: "" });
+    sel.createEl("option", { text: "— automatisch —", value: "" });
     for (const t of OPENING_TYPES) {
       if (t === "unknown") continue;
       const o = sel.createEl("option", { text: OPENING_LABEL[t], value: t });
@@ -491,7 +491,7 @@ export function renderSceneAuditFields(
   }
 
   const noteWrap = container.createDiv({ cls: "inkswell-inspector__field" });
-  noteWrap.createDiv({ cls: "inkswell-inspector__label", text: "Revision note" });
+  noteWrap.createDiv({ cls: "inkswell-inspector__label", text: "Überarbeitungsnotiz" });
   const ta = noteWrap.createDiv({ cls: "inkswell-inspector__control" }).createEl("textarea", {
     cls: "inkswell-inspector__textarea",
   });

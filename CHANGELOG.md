@@ -10,6 +10,11 @@ time the version bump renames that section to the new version and date.
 
 ## [Unreleased]
 
+### Changed
+- **German interface.** Commands, navigation, panels, dialogs, settings, notices, in-app help, built-in labels, beat-template content, complete revision-audit checklists, and writing workflow controls now use German text while stable ids and frontmatter keys remain compatible with existing vaults. Existing English Codex template filenames continue to resolve.
+- **Planning-note fields can now be hidden, renamed, and reordered** under **Customize → Planning-note fields**. Hiding a field such as Plot groundwork now removes its editor from Plan → Overview without deleting its heading or prose from the planning note; showing it again restores the existing content.
+- **Fork identity changed to `inkswell-de`.** Obsidian now installs and updates this fork independently from the upstream `inkswell` community plugin.
+
 ## [1.21.1] - 2026-10-17
 
 A safety fix. If Inkswell's data file was briefly unreadable, for example while a sync service was still writing it, your settings could reset to their defaults. That can no longer happen, and a new command brings your settings back from Inkswell's daily backups.

@@ -11,7 +11,7 @@ export class SprintModal extends FormModal {
   private sprints: SprintController;
   private minutes: number;
   private goal: number;
-  protected cta = "Start";
+  protected cta = "Beginn";
 
   constructor(
     app: App,
@@ -26,9 +26,9 @@ export class SprintModal extends FormModal {
   }
 
   protected renderForm(contentEl: HTMLElement): void {
-    contentEl.createEl("h3", { text: "Start a writing sprint" });
+    contentEl.createEl("h3", { text: "Schreibsprint starten" });
 
-    new Setting(contentEl).setName("Duration (minutes)").addText((t) =>
+    new Setting(contentEl).setName("Dauer (Minuten)").addText((t) =>
       t.setValue(`${this.minutes}`).onChange((v) => {
         const n = Math.floor(Number(v));
         if (Number.isFinite(n) && n > 0) this.minutes = n;
@@ -36,8 +36,8 @@ export class SprintModal extends FormModal {
     );
 
     new Setting(contentEl)
-      .setName("Word goal (optional)")
-      .setDesc("Leave at 0 for no goal.")
+      .setName("Wortziel (optional)")
+      .setDesc("Für kein Ziel auf 0 lassen.")
       .addText((t) =>
         t.setValue(`${this.goal}`).onChange((v) => {
           const n = Math.floor(Number(v));

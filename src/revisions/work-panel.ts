@@ -79,13 +79,13 @@ export class RevisionWorkPanel {
 
     const project = this.project();
     if (!project) {
-      container.createDiv({ cls: "inkswell-stats__muted", text: "No projects found." });
+      container.createDiv({ cls: "inkswell-stats__muted", text: "Keine Projekte gefunden." });
       return;
     }
 
     container.createDiv({
       cls: "inkswell-stats__muted",
-      text: "Everything left to revise — inline markers ([TODO: ], [RESEARCH: ], …) and logged decisions, grouped by scene. Click a marker to jump to it in Write; tick a decision once you've applied it.",
+      text: "Alles, was noch zu überarbeiten ist – Inline-Markierungen ([AUFGABE: ], [RECHERCHE: ], …) und protokollierte Entscheidungen, nach Szene gruppiert. Klicke auf eine Markierung, um in Schreiben dorthin zu springen; hake eine Entscheidung ab, sobald du sie umgesetzt hast.",
     });
 
     const bar = container.createDiv({ cls: "inkswell-revwork__toolbar" });
@@ -98,8 +98,8 @@ export class RevisionWorkPanel {
       this.renderChips();
       this.renderList();
     };
-    toggle.createSpan({ text: "Show applied" });
-    const add = bar.createEl("button", { cls: "inkswell-revwork__add", text: "Log a decision" });
+    toggle.createSpan({ text: "Umgesetzte anzeigen" });
+    const add = bar.createEl("button", { cls: "inkswell-revwork__add", text: "Entscheidung protokollieren" });
     setIcon(add.createSpan({ cls: "inkswell-revwork__addicon" }), "plus");
     // Anchor is chosen in the modal (scene picker), so no scene needs pre-selecting.
     add.onclick = () => {
@@ -108,7 +108,7 @@ export class RevisionWorkPanel {
     };
 
     this.listEl = container.createDiv({ cls: "inkswell-revwork__list" });
-    this.listEl.createDiv({ cls: "inkswell-stats__muted", text: "Scanning scenes…" });
+    this.listEl.createDiv({ cls: "inkswell-stats__muted", text: "Szenen werden durchsucht…" });
 
     const token = ++this.token;
     void scanProjectTodos(this.app, project.scenes).then((todos) => {

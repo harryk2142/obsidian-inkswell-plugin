@@ -433,7 +433,7 @@ describe("plot grid rows", () => {
       ["Alice", "sg-a", "s1"],
       ["Bob", "c:Bob", "s2"],
       ["Alice", "plan", "s3"],
-      ["No chapter", null, undefined],
+      ["Kein Kapitel", null, undefined],
     ]);
   });
 });

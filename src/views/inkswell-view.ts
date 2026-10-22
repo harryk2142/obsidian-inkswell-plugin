@@ -324,19 +324,19 @@ export class InkswellView extends ItemView {
     this.header.empty();
     const projects = this.plugin.store.getProjects();
     if (projects.length === 0) {
-      this.header.createSpan({ cls: "inkswell-stats__muted", text: "No project yet" });
+      this.header.createSpan({ cls: "inkswell-stats__muted", text: "Noch kein Projekt" });
       return;
     }
     const stories = groupIntoStories(projects);
     const activePath = this.plugin.activeProject.get();
     const activeStory = storyOf(stories, activePath);
 
-    this.header.createSpan({ cls: "inkswell-host__headerlabel", text: "Project" });
+    this.header.createSpan({ cls: "inkswell-host__headerlabel", text: "Projekt" });
     const sel = this.header.createEl("select", { cls: "dropdown" });
     // "All projects" (empty value) is the unfocused default: Home lists every
     // project. Project-scoped tabs fall back to the first project when nothing
     // specific is selected (see resolveActive).
-    sel.createEl("option", { text: "All projects", value: "" });
+    sel.createEl("option", { text: "Alle Projekte", value: "" });
     // Grouped by series (membership is story-level → read off each base draft),
     // in book order, so the switcher tells the same story as Home's shelves.
     const addStory = (parent: HTMLElement, story: Story) =>
@@ -378,7 +378,7 @@ export class InkswellView extends ItemView {
       activeStory.drafts.find((d) => d.vaultPath === activePath) ?? activeStory.drafts[0];
 
     if (activeStory.drafts.length > 1) {
-      this.header.createSpan({ cls: "inkswell-host__headerlabel", text: "Draft" });
+      this.header.createSpan({ cls: "inkswell-host__headerlabel", text: "Entwurf" });
       const dsel = this.header.createEl("select", { cls: "dropdown" });
       activeStory.drafts.forEach((d, i) => {
         dsel.createEl("option", { text: draftLabel(d, i), value: d.vaultPath });
@@ -402,26 +402,26 @@ export class InkswellView extends ItemView {
     const menu = new Menu();
     menu.addItem((i) =>
       i
-        .setTitle("Rename project")
+        .setTitle("Projekt umbenennen")
         .setIcon("text-cursor-input")
         .onClick(() => this.plugin.renameProject(active))
     );
     menu.addItem((i) =>
       i
-        .setTitle("Export story bible…")
+        .setTitle("Story-Bibel exportieren…")
         .setIcon("file-output")
         .onClick(() => this.plugin.openStoryBible(active))
     );
     menu.addSeparator();
     menu.addItem((i) =>
-      i.setTitle("New draft").setIcon("copy-plus").onClick(() => this.newDraftAction(active))
+      i.setTitle("Neuer Entwurf").setIcon("copy-plus").onClick(() => this.newDraftAction(active))
     );
     menu.addItem((i) =>
-      i.setTitle("Rename draft").setIcon("pencil").onClick(() => this.renameDraftAction(active))
+      i.setTitle("Entwurf umbenennen").setIcon("pencil").onClick(() => this.renameDraftAction(active))
     );
     menu.addItem((i) =>
       i
-        .setTitle("Delete draft")
+        .setTitle("Entwurf löschen")
         .setIcon("trash-2")
         .onClick(() => void this.deleteDraftAction(story, active))
     );
@@ -446,10 +446,10 @@ export class InkswellView extends ItemView {
 
   private renameDraftAction(project: Project): void {
     void promptText(this.app, {
-      title: "Rename draft",
+      title: "Entwurf umbenennen",
       value: project.draft.draftTitle ?? "",
       multiline: false,
-      cta: "Rename",
+      cta: "Umbenennen",
     }).then((name) => {
       if (name == null || !name.trim()) return;
       void renameDraft(this.app, project, name);
@@ -840,7 +840,7 @@ export class InkswellView extends ItemView {
       if (this.plugin.settings.railLayout) {
         menu.addItem((i) =>
           i
-            .setTitle("Reset rail order")
+            .setTitle("Reihenfolge der Seitenleiste zurücksetzen")
             .setIcon("rotate-ccw")
             .onClick(() => this.saveRail(resolveRailLayout(null)))
         );
@@ -1059,7 +1059,7 @@ export class InkswellView extends ItemView {
       // the same setting as Settings → Layout, and the mutator rebuilds this view.
       renderPhoneRedirect(content, label, () => {
         void this.plugin.setForceTabletLayout(true);
-        new Notice("Full layout on — switch back under Settings → Layout.");
+        new Notice("Vollständiges Layout aktiv – zurück unter Einstellungen → Layout.");
       });
       return;
     }

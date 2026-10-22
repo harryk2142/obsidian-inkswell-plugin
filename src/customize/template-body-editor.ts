@@ -40,7 +40,7 @@ export function renderTemplateBodyEditor(
   if (!file) {
     wrap.createDiv({ cls: "inkswell-stats__muted", text: opts.noneText });
     const row = wrap.createDiv({ cls: "inkswell-tplbody__actions" });
-    const create = row.createEl("button", { text: "Create template note" });
+    const create = row.createEl("button", { text: "Vorlagennotiz erstellen" });
     create.type = "button";
     create.onclick = async () => {
       const made = await tryFileOp(() => opts.create(), "Couldn't create the template note.");
@@ -70,7 +70,7 @@ export function renderTemplateBodyEditor(
   wrap.createDiv({ cls: "inkswell-stats__muted inkswell-tplbody__hint", text: opts.hint });
 
   const row = wrap.createDiv({ cls: "inkswell-tplbody__actions" });
-  const open = row.createEl("button", { text: "Open template note" });
+  const open = row.createEl("button", { text: "Vorlagennotiz öffnen" });
   open.type = "button";
   open.setAttribute("aria-label", `Open ${file.path} in a tab (for frontmatter edits)`);
   open.onclick = () => openScene(ctx.app, file);

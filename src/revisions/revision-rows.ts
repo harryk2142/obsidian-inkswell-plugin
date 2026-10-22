@@ -94,11 +94,11 @@ export function renderDecisionRow(
 
   attachRowMenu(row, row, () => {
     const menu = new Menu();
-    menu.addItem((i) => i.setTitle("Edit…").setIcon("pencil").onClick(openEdit));
+    menu.addItem((i) => i.setTitle("Bearbeiten…").setIcon("pencil").onClick(openEdit));
     menu.addSeparator();
     menu.addItem((i) =>
       i
-        .setTitle("Delete")
+        .setTitle("Löschen")
         .setIcon("trash")
         .onClick(() => ctx.persist(project, (cur) => removeDecision(cur, d.id)))
     );

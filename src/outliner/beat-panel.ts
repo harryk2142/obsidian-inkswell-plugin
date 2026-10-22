@@ -65,7 +65,7 @@ export class BeatPanel {
     const project = resolveActive(this.store.getProjects(), this.active.get());
     if (!project) {
       renderEmptyStateAction(container, "No projects yet — a project holds your scenes, plan, and goals.", [
-        { label: "Create a project", cta: true, onClick: () => this.plugin.newProject() },
+        { label: "Projekt erstellen", cta: true, onClick: () => this.plugin.newProject() },
       ]);
       return;
     }
@@ -85,7 +85,7 @@ export class BeatPanel {
           "been deleted under Customize → Beat templates. Your beat notes are preserved " +
           "below; re-create the template (same name) or pick another to continue. "
       );
-      const open = warn.createEl("button", { text: "Open Customize" });
+      const open = warn.createEl("button", { text: "Anpassen öffnen" });
       open.type = "button";
       open.onclick = () => void this.plugin.openCustomize("beat-templates");
     }
@@ -130,7 +130,7 @@ export class BeatPanel {
     // back so cancelling leaves the sheet's template untouched (same pattern as
     // the Codex panel's "New type…").
     const MANAGE = "__manage__";
-    tsel.createEl("option", { text: "Manage templates…", value: MANAGE });
+    tsel.createEl("option", { text: "Vorlagen verwalten…", value: MANAGE });
     const prev = tsel.value;
     tsel.onchange = () => {
       if (tsel.value === MANAGE) {
@@ -141,7 +141,7 @@ export class BeatPanel {
       this.setTemplate(project, tsel.value);
     };
 
-    const scaffold = bar.createEl("button", { text: "Scaffold structure" });
+    const scaffold = bar.createEl("button", { text: "Struktur anlegen" });
     scaffold.setAttribute(
       "aria-label",
       templateAvailable
@@ -154,7 +154,7 @@ export class BeatPanel {
       const analysis = analyzeScaffold(this.app, this.store, project, current, customs);
       if (!analysis) return;
       if (!analysis.structured && analysis.newScenes === 0 && analysis.willLink === 0) {
-        new Notice("Nothing to scaffold — every beat already has its scene.");
+        new Notice("Nichts anzulegen – jeder Beat hat bereits eine Szene.");
         return;
       }
       const label = metas.find((m) => m.id === current)?.label ?? current;
@@ -180,7 +180,7 @@ export class BeatPanel {
       } else if (r.scenes > 0) {
         new Notice(`Created ${r.scenes} scene(s). Existing structure left unchanged.`);
       } else {
-        new Notice("No new scenes to create.");
+        new Notice("Keine neuen Szenen zu erstellen.");
       }
     };
   }
@@ -277,7 +277,7 @@ export class BeatPanel {
     const remaining = sceneTitles.filter((t) => !attached.includes(t));
     if (remaining.length > 0) {
       const add = sceneRow.createEl("select", { cls: "dropdown inkswell-beat__addscene" });
-      add.createEl("option", { text: "+ add scene", value: "" });
+      add.createEl("option", { text: "+ Szene hinzufügen", value: "" });
       for (const t of remaining) add.createEl("option", { text: t, value: t });
       add.value = "";
       add.onchange = () => {
@@ -295,7 +295,7 @@ export class BeatPanel {
     // real file immediately.
     const create = sceneRow.createEl("button", {
       cls: "inkswell-beat__newscene",
-      text: "+ new scene",
+      text: "+ neue Szene",
     });
     create.setAttribute("aria-label", "Create a new scene attached to this beat");
     create.onclick = () => {

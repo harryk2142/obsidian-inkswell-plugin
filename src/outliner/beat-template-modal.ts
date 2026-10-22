@@ -49,7 +49,7 @@ export class BeatTemplateModal extends FormModal {
 
     new Setting(contentEl)
       .setName("Name")
-      .setDesc("Shown in the beat-sheet template picker, e.g. “Ten Things”.")
+      .setDesc("Wird in der Auswahl der Beat-Sheet-Vorlagen angezeigt, z. B. „Zehn Dinge“.")
       .addText((t) => {
         t.setValue(this.name).onChange((v) => {
           this.name = v;
@@ -89,12 +89,12 @@ export class BeatTemplateModal extends FormModal {
   protected async submit(): Promise<boolean> {
     const name = this.name.trim();
     if (!name) {
-      new Notice("Name is required.");
+      new Notice("Ein Name ist erforderlich.");
       return false;
     }
     const id = this.opts.existing?.id ?? slugify(name);
     if (!id || !/^[a-z]/.test(id)) {
-      new Notice("Name must start with a letter.");
+      new Notice("Der Name muss mit einem Buchstaben beginnen.");
       return false;
     }
     if (!this.opts.existing && this.opts.takenIds.includes(id)) {

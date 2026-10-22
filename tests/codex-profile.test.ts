@@ -68,7 +68,7 @@ describe("profile schema", () => {
       const fields = profileFields(cat);
       const images = fields.filter((f) => f.type === "image");
       expect(images).toHaveLength(1);
-      expect(fields[1]).toMatchObject({ key: "image", label: "Image", type: "image" });
+      expect(fields[1]).toMatchObject({ key: "image", label: "Bild", type: "image" });
       expect(isArrayField(images[0])).toBe(false);
       expect(coerceValue(images[0], "Attachments/a.png")).toBe("Attachments/a.png");
       expect(coerceValue(images[0], undefined)).toBe("");

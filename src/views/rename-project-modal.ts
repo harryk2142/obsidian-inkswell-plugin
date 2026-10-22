@@ -35,7 +35,7 @@ export class RenameProjectModal extends Modal {
 
   onOpen(): void {
     const { contentEl } = this;
-    contentEl.createEl("h3", { text: "Rename project" });
+    contentEl.createEl("h3", { text: "Projekt umbenennen" });
     contentEl.createEl("p", {
       cls: "inkswell-stats__muted",
       text:
@@ -44,7 +44,7 @@ export class RenameProjectModal extends Modal {
           : "Updates the title everywhere Inkswell records it.",
     });
 
-    new Setting(contentEl).setName("Title").addText((t) => {
+    new Setting(contentEl).setName("Titel").addText((t) => {
       t.setValue(this.title).onChange((v) => {
         this.title = v;
         this.validate();
@@ -59,9 +59,9 @@ export class RenameProjectModal extends Modal {
     });
 
     new Setting(contentEl)
-      .setName("Also rename the folder and notes")
+      .setName("Auch Ordner und Notizen umbenennen")
       .setDesc(
-        "Moves the project folder, index note, and planning note to match the new title. Scenes, codex entries, and the cover keep working either way."
+        "Benennt Projektordner, Indexnotiz und Planungsnotiz passend zum neuen Titel um. Szenen, Kodex-Einträge und Cover funktionieren in jedem Fall weiter."
       )
       .addToggle((tg) =>
         tg.setValue(this.renameFiles).onChange((v) => {
@@ -74,9 +74,9 @@ export class RenameProjectModal extends Modal {
 
     new Setting(contentEl)
       .addButton((b) => {
-        this.cta = b.setButtonText("Rename").setCta().onClick(() => this.submit()).buttonEl;
+        this.cta = b.setButtonText("Umbenennen").setCta().onClick(() => this.submit()).buttonEl;
       })
-      .addButton((b) => b.setButtonText("Cancel").onClick(() => this.close()));
+      .addButton((b) => b.setButtonText("Abbrechen").onClick(() => this.close()));
     this.validate();
   }
 

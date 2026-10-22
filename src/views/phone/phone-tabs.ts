@@ -31,7 +31,7 @@ export function buildBottomBar(parent: HTMLElement, handlers: BottomBarHandlers)
   more.type = "button";
   more.dataset.tab = "more";
   setIcon(more.createSpan({ cls: "inkswell-bottombar__icon" }), "more-horizontal");
-  more.createSpan({ cls: "inkswell-bottombar__label", text: "More" });
+  more.createSpan({ cls: "inkswell-bottombar__label", text: "Mehr" });
   more.setAttribute("aria-label", "More");
   more.onclick = (e) => handlers.onMore(e);
   return bar;

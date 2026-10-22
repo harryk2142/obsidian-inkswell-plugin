@@ -46,7 +46,7 @@ const RANGES: { label: string; days: number | null }[] = [
   { label: "7d", days: 7 },
   { label: "30d", days: 30 },
   { label: "90d", days: 90 },
-  { label: "All", days: null },
+  { label: "Alle", days: null },
 ];
 
 export class StatsPanel {
@@ -152,7 +152,7 @@ export class StatsPanel {
 
       // Optional daily mood (1–10) — light-touch, never required.
       const moodRow = body.createDiv({ cls: "inkswell-stats__row inkswell-mood" });
-      moodRow.createSpan({ cls: "inkswell-stats__muted", text: "Mood today:" });
+      moodRow.createSpan({ cls: "inkswell-stats__muted", text: "Stimmung heute:" });
       const todayKey = dateKey(new Date());
       const moodSel = moodRow.createEl("select", { cls: "dropdown" });
       moodSel.createEl("option", { text: "—", value: "" });
@@ -162,7 +162,7 @@ export class StatsPanel {
       if (!showChallenge) {
         const link = body.createEl("a", {
           cls: "inkswell-stats__link",
-          text: "Set up a writing challenge…",
+          text: "Schreibchallenge einrichten…",
           href: "#",
         });
         link.onclick = (e) => {
@@ -223,7 +223,7 @@ export class StatsPanel {
       total.onclick = () => {
         void navigator.clipboard.writeText(String(p.written)).then(
           () => new Notice(`Copied ${n(p.written)}`),
-          () => new Notice("Couldn't copy to the clipboard.")
+          () => new Notice("Konnte nicht in die Zwischenablage kopieren.")
         );
       };
       nums.createSpan({
@@ -256,14 +256,14 @@ export class StatsPanel {
       warn.createSpan({
         text: "Counting this device only — turn on Sync writing history to include your other devices. ",
       });
-      const on = warn.createEl("a", { text: "Turn it on", href: "#" });
+      const on = warn.createEl("a", { text: "Aktivieren", href: "#" });
       on.onclick = (e) => {
         e.preventDefault();
         void this.plugin.setSyncWritingHistory(true);
       };
     }
 
-    const edit = body.createEl("button", { cls: "inkswell-challenge__edit", text: "Edit" });
+    const edit = body.createEl("button", { cls: "inkswell-challenge__edit", text: "Bearbeiten" });
     edit.onclick = () => this.plugin.openChallengeModal();
   }
 
@@ -350,7 +350,7 @@ export class StatsPanel {
     const max = Math.max(1, ...series.map((p) => p.words));
     const chart = host.createDiv({ cls: "inkswell-chart" });
     if (series.length === 0) {
-      host.createDiv({ cls: "inkswell-stats__muted", text: "No writing logged yet." });
+      host.createDiv({ cls: "inkswell-stats__muted", text: "Noch kein Schreiben protokolliert." });
       return;
     }
     for (const p of series) {
@@ -371,7 +371,7 @@ export class StatsPanel {
     if (st.count === 0) {
       body.createDiv({
         cls: "inkswell-stats__muted",
-        text: "No sprints yet. Start one from Write or the command palette.",
+        text: "Noch keine Sprints. Starte einen unter Schreiben oder über die Befehlspalette.",
       });
       return;
     }
@@ -393,11 +393,11 @@ export class StatsPanel {
     const head = list.createDiv({
       cls: "inkswell-sprint-row inkswell-sprint-row--head",
     });
-    head.createSpan({ cls: "inkswell-sprint__date", text: "Date" });
-    head.createSpan({ cls: "inkswell-sprint__num", text: "Words" });
+    head.createSpan({ cls: "inkswell-sprint__date", text: "Datum" });
+    head.createSpan({ cls: "inkswell-sprint__num", text: "Wörter" });
     head.createSpan({ cls: "inkswell-sprint__num", text: "wpm" });
-    head.createSpan({ cls: "inkswell-sprint__num", text: "Time" });
-    head.createSpan({ cls: "inkswell-sprint__goal", text: "Goal" });
+    head.createSpan({ cls: "inkswell-sprint__num", text: "Zeit" });
+    head.createSpan({ cls: "inkswell-sprint__goal", text: "Ziel" });
 
     for (const r of records.slice(-8).reverse()) {
       const rowEl = list.createDiv({ cls: "inkswell-sprint-row" });
@@ -426,7 +426,7 @@ export class StatsPanel {
     const projects = this.store.getProjects().filter((p) => p.draft.format === "scenes");
     const project = resolveActive(projects, this.plugin.activeProject.get());
     if (!project) {
-      body.createDiv({ cls: "inkswell-stats__muted", text: "No multi-scene projects." });
+      body.createDiv({ cls: "inkswell-stats__muted", text: "Keine Projekte mit mehreren Szenen." });
       return;
     }
 
@@ -436,7 +436,7 @@ export class StatsPanel {
       return f instanceof TFile ? readSceneMeta(this.app, f) : ({});
     });
 
-    body.createDiv({ cls: "inkswell-stats__muted", text: "By status" });
+    body.createDiv({ cls: "inkswell-stats__muted", text: "Nach Status" });
     const statusOverride = this.plugin.settings.listOverrides["scene.status"];
     const statusOrder = visibleStatuses(statusOverride).map((s) => s.id);
     this.tallyBars(body, tallyBy(metas.map((m) => m.status), statusOrder), (k) =>
@@ -446,7 +446,7 @@ export class StatsPanel {
     // when no scene names a POV, so single-POV drafts see no noise.
     const povs = metas.map((m) => m.pov?.trim() || undefined);
     if (povs.some((p) => p)) {
-      body.createDiv({ cls: "inkswell-stats__muted", text: "By POV" });
+      body.createDiv({ cls: "inkswell-stats__muted", text: "Nach Perspektive" });
       const povTally = tallyBy(povs);
       const povOrder = povTally
         .filter((t) => t.key !== "None")
@@ -455,7 +455,7 @@ export class StatsPanel {
       this.tallyBars(body, tallyBy(povs, povOrder));
     }
 
-    body.createDiv({ cls: "inkswell-stats__muted", text: "By act" });
+    body.createDiv({ cls: "inkswell-stats__muted", text: "Nach Akt" });
     // Order acts by first appearance in manuscript order (metas is in scene
     // order), matching the Board and the compile group-by-chapter step — not
     // alphabetically, which mis-sorts spelled-out acts.
@@ -463,7 +463,7 @@ export class StatsPanel {
     const actOrder = [...new Set(acts.filter((a): a is string => !!a))];
     this.tallyBars(body, tallyBy(acts, actOrder));
 
-    body.createDiv({ cls: "inkswell-stats__muted", text: "By chapter" });
+    body.createDiv({ cls: "inkswell-stats__muted", text: "Nach Kapitel" });
     // One bar per chapter as it runs through the manuscript, never per chapter
     // string: two chapters may share a name (#58).
     const runs = chapterRuns(
@@ -489,7 +489,7 @@ export class StatsPanel {
       ...planned.map((p) => ({ cfg: p.cfg, paths: [] as Array<string | null> })),
     ].filter((r) => r.cfg?.targetWords);
     if (rows.length === 0) return;
-    body.createDiv({ cls: "inkswell-stats__muted", text: "Chapter targets" });
+    body.createDiv({ cls: "inkswell-stats__muted", text: "Kapitelziele" });
     for (const { cfg, paths } of rows) {
       const target = cfg?.targetWords ?? 0;
       let words = 0;
@@ -533,12 +533,12 @@ export class StatsPanel {
 
       const table = body.createDiv({ cls: "inkswell-drafttable" });
       const head = table.createDiv({ cls: "inkswell-draft-row inkswell-draft-row--head" });
-      head.createSpan({ cls: "inkswell-draft__label", text: "Draft" });
-      head.createSpan({ cls: "inkswell-draft__num", text: "Words" });
+      head.createSpan({ cls: "inkswell-draft__label", text: "Entwurf" });
+      head.createSpan({ cls: "inkswell-draft__num", text: "Wörter" });
       head.createSpan({ cls: "inkswell-draft__num", text: "Δ" });
-      head.createSpan({ cls: "inkswell-draft__num", text: "Scenes" });
-      head.createSpan({ cls: "inkswell-draft__mix", text: "Status mix" });
-      head.createSpan({ cls: "inkswell-draft__num", text: "Age" });
+      head.createSpan({ cls: "inkswell-draft__num", text: "Szenen" });
+      head.createSpan({ cls: "inkswell-draft__mix", text: "Statusverteilung" });
+      head.createSpan({ cls: "inkswell-draft__num", text: "Alter" });
 
       const wordCells: HTMLElement[] = [];
       const deltaCells: HTMLElement[] = [];
@@ -578,7 +578,7 @@ export class StatsPanel {
   /** A compact stacked bar of a draft's scene statuses (revision progress at a glance). */
   private statusMix(host: HTMLElement, project: Project): void {
     if (!isMultiScene(project.draft)) {
-      host.createSpan({ cls: "inkswell-stats__muted", text: "single note" });
+      host.createSpan({ cls: "inkswell-stats__muted", text: "Einzelnotiz" });
       return;
     }
     const statuses = project.scenes.map((s) => {
@@ -643,7 +643,7 @@ export class StatsPanel {
     if (withTargets.length === 0) {
       body.createDiv({
         cls: "inkswell-stats__muted",
-        text: "No project word targets set. Use the 'Set word target' command.",
+        text: "Keine Projekt-Wortziele festgelegt. Verwende den Befehl „Wortziel festlegen“.",
       });
       return;
     }

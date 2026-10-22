@@ -10,7 +10,7 @@ import { backupPluginData, keepDataCopy, listBackups } from "../src/lib/data-bac
 import { isUsableData, settingsSummary } from "../src/lib/stored-data";
 import type { App } from "obsidian";
 
-const DIR = ".obsidian/plugins/inkswell";
+const DIR = ".obsidian/plugins/inkswell-de";
 
 /** Minimal in-memory DataAdapter covering exactly what backupPluginData uses. */
 function fakeAdapterApp() {

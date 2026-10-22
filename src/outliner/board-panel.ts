@@ -35,8 +35,8 @@ import type InkswellPlugin from "../../main";
 
 const FIELDS: { id: GroupField; label: string }[] = [
   { id: "status", label: "Status" },
-  { id: "act", label: "Act" },
-  { id: "chapter", label: "Chapter" },
+  { id: "act", label: "Akt" },
+  { id: "chapter", label: "Kapitel" },
   { id: "pov", label: "POV" },
 ];
 
@@ -97,8 +97,8 @@ export class BoardPanel {
 
     if (items.length === 0) {
       renderEmptyStateAction(container, "No scenes yet — cards appear here as you create scenes.", [
-        { label: "New scene", cta: true, onClick: () => promptNewScene(this.app, this.store, this.plugin.settings, project) },
-        { label: "Go to Beats", onClick: () => void this.plugin.openBeats() },
+        { label: "Neue Szene", cta: true, onClick: () => promptNewScene(this.app, this.store, this.plugin.settings, project) },
+        { label: "Zu Beats", onClick: () => void this.plugin.openBeats() },
       ]);
       return;
     }
@@ -126,7 +126,7 @@ export class BoardPanel {
 
   private renderToolbar(root: HTMLElement, project: Project): void {
     const bar = root.createDiv({ cls: "inkswell-board__toolbar" });
-    bar.createSpan({ cls: "inkswell-stats__muted", text: "Group by:" });
+    bar.createSpan({ cls: "inkswell-stats__muted", text: "Gruppieren nach:" });
     const fsel = bar.createEl("select", { cls: "dropdown" });
     for (const f of FIELDS) {
       const o = fsel.createEl("option", { text: f.label, value: f.id });
@@ -137,7 +137,7 @@ export class BoardPanel {
       this.rerender();
     };
 
-    const add = bar.createEl("button", { text: "New scene" });
+    const add = bar.createEl("button", { text: "Neue Szene" });
     add.setAttribute("aria-label", "Create a new scene");
     add.onclick = () => promptNewScene(this.app, this.store, this.plugin.settings, project);
   }

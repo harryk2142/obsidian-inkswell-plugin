@@ -82,7 +82,7 @@ export function normalizeChallenge(raw: unknown): WritingChallenge | null {
  *  has passed), 50,000 words. */
 export function novemberPreset(today: Date = new Date()): WritingChallenge {
   const year = today.getMonth() === 11 ? today.getFullYear() + 1 : today.getFullYear();
-  return { name: "November novel", start: `${year}-11-01`, end: `${year}-11-30`, target: 50_000 };
+  return { name: "Novemberroman", start: `${year}-11-01`, end: `${year}-11-30`, target: 50_000 };
 }
 
 export function challengeProgress(

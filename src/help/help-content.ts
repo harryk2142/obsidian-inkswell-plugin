@@ -56,277 +56,286 @@ export function hintKey(mode: string, subtab?: string): string {
  */
 export const HINTS: Record<string, HintEntry> = {
   write: {
-    title: "How drafting & to-do markers work",
+    title: "So funktionieren Entwurf und Aufgabenmarkierungen",
     body: (el) => {
       p(
         el,
-        "Write is a focused editor: pick a scene on the left, draft in the centre, and " +
-          "use the right column on the right. That column has two tabs — Scene (metadata " +
-          "for the scene you're on) and Revision (this project's outstanding to-do markers " +
-          "and logged revision decisions, current scene first — click a marker to jump to " +
-          "it). Edits save on blur and when you switch scenes — never mid-keystroke."
+        "Schreiben ist ein konzentrierter Editor: Wählen Sie links eine Szene, schreiben Sie " +
+          "in der Mitte und nutzen Sie die rechte Seitenleiste. Dort gibt es zwei Registerkarten: " +
+          "Szene zeigt die Metadaten der aktuellen Szene; Überarbeitung zeigt die offenen " +
+          "Aufgabenmarkierungen und protokollierten Überarbeitungsentscheidungen dieses Projekts, " +
+          "beginnend mit der aktuellen Szene. Klicken Sie auf eine Markierung, um zu ihr zu springen. " +
+          "Änderungen werden beim Verlassen des Editors und beim Szenenwechsel gespeichert – niemals mitten im Tippen."
       );
       p(
         el,
-        "Don't stop to research or perfect a hard bit. Drop a bracketed marker and " +
-          "keep moving — they're highlighted in the editor and swept up later in " +
-          "Revise → To-dos. The keyword is case-insensitive and the “: text” is optional."
+        "Unterbrechen Sie den Schreibfluss nicht für Recherchen oder schwierige Stellen. Setzen Sie " +
+          "eine Markierung in eckigen Klammern und schreiben Sie weiter. Markierungen werden im Editor " +
+          "hervorgehoben und später unter Überarbeiten → Aufgaben gesammelt. Beim Schlüsselwort wird " +
+          "die Groß- und Kleinschreibung ignoriert; „: Text“ ist optional."
       );
       examples(el, ["[TODO: ]", "[RESEARCH: ]", "[NOTE: ]", "[DIALOGUE: ]", "[SCENE: ]"]);
-      p(el, 'Run “Insert a to-do marker…” for a picker that drops one at the cursor.');
+      p(el, "Führen Sie „Aufgabenmarkierung einfügen…“ aus, um eine Markierung an der Cursorposition einzusetzen.");
     },
   },
   "track/sync": {
-    title: "Writing on more than one device?",
+    title: "Auf mehreren Geräten schreiben?",
     body: (el) => {
       p(
         el,
-        "Words are counted on the device where you type them, so this dashboard only " +
-          "knows about this device. To make streaks and totals include every device, turn " +
-          "on Settings → Inkswell → “Sync writing history across devices”. Inkswell then " +
-          "keeps a small log note per device under your base folder's “Writing log” folder " +
-          "and merges them here — your vault's own sync (Obsidian Sync, iCloud, …) carries " +
-          "the notes."
+        "Wörter werden auf dem Gerät gezählt, auf dem Sie sie schreiben. Deshalb kennt diese " +
+          "Übersicht zunächst nur dieses Gerät. Aktivieren Sie unter Einstellungen → Inkswell " +
+          "„Schreibverlauf geräteübergreifend synchronisieren“, damit Serien und Summen alle Geräte " +
+          "berücksichtigen. Inkswell führt dann pro Gerät eine kleine Protokollnotiz im Ordner " +
+          "„Schreibprotokoll“ unter Ihrem Basisordner und führt sie hier zusammen. Die Synchronisierung " +
+          "Ihres Vaults, etwa Obsidian Sync oder iCloud, überträgt diese Notizen."
       );
     },
   },
   "plan/beats": {
-    title: "How the beat sheet works",
+    title: "So funktioniert das Beat-Sheet",
     body: (el) => {
       p(
         el,
-        "A structural outline for the active project, built from a beat template you pick " +
-          "from the Template dropdown. Eight are included:"
+        "Eine strukturelle Gliederung für das aktive Projekt. Wählen Sie dazu eine Beat-Vorlage " +
+          "im Auswahlfeld „Vorlage“. Acht Vorlagen sind enthalten:"
       );
       steps(el, [
-        "Save the Cat (15 beats)",
-        "Three-Act (7)",
-        "Hero's Journey (12)",
-        "Seven-Point (7)",
+        "Save the Cat (15 Beats)",
+        "Drei-Akt-Struktur (7)",
+        "Heldenreise (12)",
+        "Sieben-Punkte-Struktur (7)",
         "Story Circle (8)",
         "Romancing the Beat (14)",
-        "27-Chapter (27)",
-        "Ten-Point Outline (10) — list the ten things that must happen in your story",
+        "27-Kapitel-Methode (27)",
+        "Zehn-Punkte-Gliederung (10) – die zehn unverzichtbaren Ereignisse Ihrer Geschichte",
       ]);
       p(
         el,
-        "You can also add your own structures under Customize → Beat templates — " +
-          "they appear in the dropdown next to the built-ins."
+        "Unter Anpassen → Beat-Vorlagen können Sie außerdem eigene Strukturen hinzufügen. " +
+          "Sie erscheinen neben den mitgelieferten Vorlagen in der Auswahl."
       );
       p(
         el,
-        "Each beat carries its purpose, a planning note, an optional linked scene, and a " +
-          "done toggle; the bar across the top tracks how many are complete. Switch " +
-          "templates anytime — each keeps its own notes and links, so nothing is lost if " +
-          "you switch back."
+        "Jeder Beat enthält seinen Zweck, eine Planungsnotiz, eine optional verknüpfte Szene " +
+          "und ein Erledigt-Feld. Der Balken am oberen Rand zeigt den Fortschritt. Sie können " +
+          "jederzeit die Vorlage wechseln: Jede behält ihre eigenen Notizen und Verknüpfungen, " +
+          "sodass beim Zurückwechseln nichts verloren geht."
       );
       steps(el, [
-        "Type directly into a beat's planning note — it's inline, not a separate file.",
-        "Link a beat to the scene that delivers it so Plan and Write stay in sync.",
-        "Scaffold generates scene stubs for any unlinked beats in one step.",
+        "Schreiben Sie direkt in die Planungsnotiz eines Beats – sie steht eingebettet und nicht in einer separaten Datei.",
+        "Verknüpfen Sie einen Beat mit der Szene, die ihn umsetzt, damit Planung und Manuskript übereinstimmen.",
+        "„Gerüst erstellen“ erzeugt in einem Schritt Szenenentwürfe für alle noch nicht verknüpften Beats.",
       ]);
     },
   },
   "plan/board": {
-    title: "How the board works",
+    title: "So funktioniert das Board",
     body: (el) => {
       p(
         el,
-        "A Kanban view of your scenes. Use the Group by selector to organise columns by " +
-          "Status, Act, Chapter, or POV."
+        "Eine Kanban-Ansicht Ihrer Szenen. Mit „Gruppieren nach“ ordnen Sie die Spalten nach " +
+          "Status, Akt, Kapitel oder Perspektive."
       );
       p(
         el,
-        "Drag a card to another column to change that scene's value (e.g. move it from " +
-          "Draft to Revised). Click a card to open the scene; right-click (or the ⋯ button) " +
-          "for rename, edit, and delete. Card colour comes from the scene's colour field."
+        "Ziehen Sie eine Karte in eine andere Spalte, um den Wert der Szene zu ändern, etwa von " +
+          "Entwurf zu Überarbeitet. Ein Klick öffnet die Szene. Über einen Rechtsklick oder die " +
+          "Schaltfläche ⋯ können Sie sie umbenennen, bearbeiten oder löschen. Die Kartenfarbe stammt " +
+          "aus dem Farbfeld der Szene."
       );
     },
   },
   "plan/grid": {
-    title: "How the plot grid works",
+    title: "So funktioniert das Plot-Raster",
     body: (el) => {
       p(
         el,
-        "A plotline × chapter matrix for tracking subplots and arcs. Columns are your " +
-          "plotlines; rows are your chapters; each cell shows the scenes that advance that " +
-          "plotline there. Cells are your real scenes — the grid derives from scene " +
-          "frontmatter, so it always matches the manuscript, and an empty stretch in a " +
-          "column is a pacing signal, not a bookkeeping gap."
+        "Eine Matrix aus Handlungssträngen und Kapiteln zum Verfolgen von Nebenhandlungen und " +
+          "Entwicklungsbögen. Die Spalten sind Ihre Handlungsstränge, die Zeilen Ihre Kapitel. " +
+          "Jede Zelle zeigt die Szenen, die den jeweiligen Handlungsstrang dort voranbringen. " +
+          "Die Zellen sind Ihre tatsächlichen Szenen: Das Raster wird aus dem Frontmatter der " +
+          "Szenen abgeleitet und entspricht daher immer dem Manuskript. Eine längere Lücke in " +
+          "einer Spalte ist ein Hinweis auf die Dramaturgie, kein Buchungsfehler."
       );
       p(
         el,
-        "Click a cell's + to tag an existing scene or create a stub scene (status Idea) " +
-          "right there — that's how you plan a beat you haven't written yet. Expand a " +
-          "chapter row to toggle every scene's membership without dragging. Drag a chip " +
-          "to another cell to move it between plotlines or chapters; a scene can belong " +
-          "to several plotlines at once."
+        "Klicken Sie in einer Zelle auf +, um eine vorhandene Szene zuzuordnen oder direkt einen " +
+          "Szenenentwurf mit dem Status Idee anzulegen. So planen Sie einen noch nicht geschriebenen " +
+          "Beat. Klappen Sie eine Kapitelzeile auf, um die Zugehörigkeit jeder Szene ohne Ziehen zu " +
+          "ändern. Ziehen Sie einen Chip in eine andere Zelle, um ihn zwischen Handlungssträngen oder " +
+          "Kapiteln zu verschieben. Eine Szene kann mehreren Handlungssträngen zugleich angehören."
       );
       steps(el, [
-        "Manage plotlines from the column headers: rename (updates every tagged scene), recolor, reorder, focus, or delete.",
-        "Big book? Compact mode shows cells as colored dots (automatic on large grids), and act rows collapse to per-column counts.",
-        "Tags that match no plotline appear as “untracked” columns — adopt them into your list or clear them from all scenes.",
+        "Verwalten Sie Handlungsstränge über die Spaltenüberschriften: umbenennen (aktualisiert alle zugeordneten Szenen), umfärben, neu anordnen, fokussieren oder löschen.",
+        "Bei großen Büchern zeigt der Kompaktmodus die Zellen als farbige Punkte; in großen Rastern geschieht dies automatisch. Eingeklappte Aktzeilen zeigen die Anzahl je Spalte.",
+        "Tags ohne passenden Handlungsstrang erscheinen als „nicht verfolgt“. Übernehmen Sie sie in Ihre Liste oder entfernen Sie sie aus allen Szenen.",
       ]);
     },
   },
   "plan/outline": {
-    title: "How the outline works",
+    title: "So funktioniert die Gliederung",
     body: (el) => {
       p(
         el,
-        "The Tree view of Structure: organise your book as acts holding chapters holding " +
-          "scenes. Drag a scene into a chapter (or a chapter into an act), and drop above " +
-          "or below a row to reorder. This tree is the source of truth — arranging it also " +
-          "sets the manuscript's reading order, so each chapter's scenes stay together. " +
-          "The Board and Grid views (top of the tab) show the same scenes a different way."
+        "Die Baumansicht der Struktur ordnet Ihr Buch in Akte, Kapitel und Szenen. Ziehen Sie " +
+          "eine Szene in ein Kapitel oder ein Kapitel in einen Akt. Legen Sie ein Element ober- " +
+          "oder unterhalb einer Zeile ab, um die Reihenfolge zu ändern. Dieser Baum ist maßgeblich: " +
+          "Seine Anordnung bestimmt auch die Lesereihenfolge des Manuskripts und hält die Szenen " +
+          "eines Kapitels zusammen. Board und Raster zeigen dieselben Szenen auf andere Weise."
       );
       p(
         el,
-        "Structure comes last in Plan on purpose. The usual flow is to sketch your Beats " +
-          "first, spin scenes off those beats, and draft them in Write — structure can " +
-          "wait. Once you have real scenes, come back here to group them into acts and " +
-          "chapters."
+        "Die Struktur steht beim Planen bewusst an letzter Stelle. Üblicherweise skizzieren Sie " +
+          "zuerst Ihre Beats, entwickeln daraus Szenen und schreiben diese unter Schreiben. Die " +
+          "Struktur kann warten. Sobald echte Szenen vorhanden sind, gruppieren Sie sie hier in " +
+          "Akte und Kapitel."
       );
       steps(el, [
-        "Nesting is optional — a scene can sit outside any chapter and a chapter outside any act (the “Chapters with no act” / “Unassigned scenes” buckets).",
-        "Give a chapter a word target to track its progress; the same targets show on Track.",
-        "Click a scene to open it in Write; use the ⋯ menu (or right-click) to rename, move, or delete.",
+        "Die Verschachtelung ist optional: Eine Szene kann außerhalb aller Kapitel und ein Kapitel außerhalb aller Akte liegen. Dafür gibt es die Bereiche „Kapitel ohne Akt“ und „Nicht zugewiesene Szenen“.",
+        "Geben Sie einem Kapitel ein Wortziel, um seinen Fortschritt zu verfolgen. Dieselben Ziele erscheinen unter Fortschritt.",
+        "Klicken Sie auf eine Szene, um sie unter Schreiben zu öffnen. Über das Menü ⋯ oder einen Rechtsklick können Sie sie umbenennen, verschieben oder löschen.",
       ]);
     },
   },
   codex: {
-    title: "How the codex works",
+    title: "So funktioniert der Kodex",
     body: (el) => {
       p(
         el,
-        "Your story bible: characters, locations, factions, items, events, and concepts, " +
-          "each with a structured profile that auto-saves to the note's frontmatter."
+        "Ihre Geschichtenbibel: Figuren, Orte, Fraktionen, Gegenstände, Ereignisse und Konzepte. " +
+          "Jeder Eintrag besitzt ein strukturiertes Profil, das automatisch im Frontmatter der " +
+          "Notiz gespeichert wird."
       );
-      p(el, "Every entry has a scope that controls where it shows up:");
+      p(el, "Jeder Eintrag hat einen Geltungsbereich, der bestimmt, wo er angezeigt wird:");
       steps(el, [
-        "Global (default) — available in every project.",
-        "Project — set codex-project on the note; only that book sees it. Under Scope, click Change…, choose Books and tick the books to share an entry between some books of a series without making it series-wide.",
-        "Series — set codex-series; shared across the books in a series.",
+        "Global (Standard) – in jedem Projekt verfügbar.",
+        "Projekt – setzen Sie codex-project in der Notiz; dann sieht nur dieses Buch den Eintrag. Klicken Sie unter Geltungsbereich auf Ändern…, wählen Sie Bücher und markieren Sie die gewünschten Bücher, um einen Eintrag nur zwischen bestimmten Büchern einer Reihe zu teilen.",
+        "Reihe – setzen Sie codex-series; der Eintrag wird von allen Büchern einer Reihe gemeinsam verwendet.",
       ]);
       p(
         el,
-        "Each entry's “Appears in” list updates itself: it shows every scene whose text " +
-          "mentions the entry by name or alias, plus any scene that links it in its " +
-          "metadata (Characters, Location, POV), for every category — so a new entry " +
-          "finds its scenes with no tagging step. Filled chips are linked scenes (the " +
-          "writer put the entry there); outlined chips are text-only mentions (someone " +
-          "talks about them). The per-book line counts both, plus POV scenes."
+        "Die Liste „Erscheint in“ jedes Eintrags aktualisiert sich selbst. Sie zeigt alle Szenen, " +
+          "deren Text den Namen oder einen Alias des Eintrags erwähnt, sowie Szenen, die ihn in " +
+          "ihren Metadaten verknüpfen – etwa unter Figuren, Ort oder Perspektive. Das gilt für jede " +
+          "Kategorie, sodass ein neuer Eintrag seine Szenen ohne zusätzliches Tagging findet. " +
+          "Ausgefüllte Chips stehen für verknüpfte Szenen; umrandete Chips für reine Texterwähnungen. " +
+          "Die Zeile je Buch zählt beides sowie Perspektivszenen."
       );
       p(
         el,
-        "An image you upload as an entry's portrait is saved where Obsidian puts new " +
-          "attachments (Settings → Files and links → Default location for new attachments). " +
-          "Choose “In subfolder under current folder” to keep each entry's images in a " +
-          "folder beside it."
+        "Ein als Porträt hochgeladenes Bild wird dort gespeichert, wo Obsidian neue Anhänge ablegt " +
+          "(Einstellungen → Dateien und Links → Standardspeicherort für neue Anhänge). Wählen Sie " +
+          "„In Unterordner des aktuellen Ordners“, um die Bilder eines Eintrags in einem Ordner " +
+          "neben ihm aufzubewahren."
       );
     },
   },
   "revise/audit": {
-    title: "How the revision audit works",
+    title: "So funktioniert die Überarbeitungsprüfung",
     body: (el) => {
-      p(el, "A three-tier checklist that takes a draft from messy to finished:");
+      p(el, "Eine dreistufige Checkliste, die einen unfertigen Entwurf bis zur Endfassung begleitet:");
       steps(el, [
-        "Story — 18 manuscript-wide checkpoints (saved on the project).",
-        "Prose — 32 line-level checks, grouped.",
-        "Scene — a 14-point pass per scene (saved on each scene's frontmatter).",
+        "Geschichte – 18 Prüfpunkte für das gesamte Manuskript, gespeichert im Projekt.",
+        "Prosa – 32 gruppierte Prüfungen auf Textebene.",
+        "Szene – 14 Prüfpunkte je Szene, gespeichert im Frontmatter der Szene.",
       ]);
       p(
         el,
-        "The per-scene pass classifies each opening (Action / Dialogue / Thought / " +
-          "Reflection) automatically — override it if the guess is wrong. Click a scene " +
-          "to expand and edit its checklist inline, or jump to it in Write."
+        "Die szenenweise Prüfung klassifiziert jeden Einstieg automatisch als Handlung, Dialog, " +
+          "Gedanke oder Reflexion. Ist die Einschätzung falsch, können Sie sie überschreiben. " +
+          "Klicken Sie auf eine Szene, um ihre Checkliste direkt aufzuklappen und zu bearbeiten " +
+          "oder unter Schreiben zu ihr zu springen."
       );
     },
   },
   "revise/todos": {
-    title: "How revision to-dos work",
+    title: "So funktionieren Überarbeitungsaufgaben",
     body: (el) => {
       p(
         el,
-        "Everything left to revise, in one scene-grouped list: the bracketed markers you " +
-          "dropped while drafting, and the revision decisions you logged along the way. " +
-          "Use the chips to filter by marker kind or decision type."
+        "Alles, was noch überarbeitet werden muss, in einer nach Szenen gruppierten Liste: die beim " +
+          "Schreiben gesetzten Markierungen in eckigen Klammern und die protokollierten " +
+          "Überarbeitungsentscheidungen. Mit den Chips filtern Sie nach Markierungs- oder Entscheidungstyp."
       );
       examples(el, ["[TODO]", "[RESEARCH: ]", "[NOTE: ]", "[DIALOGUE: ]", "[SCENE: ]"]);
       p(
         el,
-        "Click a marker to jump straight to that spot in Write — it flashes so you can " +
-          "resolve it fast; edit the prose to remove it and the list updates on the next scan."
+        "Klicken Sie auf eine Markierung, um direkt zur betreffenden Stelle unter Schreiben zu " +
+          "springen. Sie blinkt kurz auf, damit Sie sie schnell finden. Entfernen Sie die Markierung " +
+          "beim Bearbeiten des Textes; beim nächsten Durchlauf wird die Liste aktualisiert."
       );
       p(
         el,
-        "Decisions are the story-level rulings (“from now on, the brother is dead”): log " +
-          "one with “Log a decision”, give it a type, and anchor it to a scene " +
-          "or the whole project. Tick it applied once you've made the change; click its text " +
-          "to edit it. Prefer a [RESEARCH: ] or [SCENE: ] marker for research questions and " +
-          "missing scenes — it marks the exact spot in the prose."
+        "Entscheidungen sind Festlegungen für die gesamte Geschichte, etwa „Ab jetzt ist der Bruder " +
+          "tot“. Erfassen Sie eine über „Entscheidung protokollieren“, weisen Sie ihr einen Typ zu " +
+          "und verankern Sie sie in einer Szene oder im gesamten Projekt. Markieren Sie sie als " +
+          "angewendet, sobald die Änderung umgesetzt ist; mit einem Klick auf den Text bearbeiten " +
+          "Sie sie. Für Recherchefragen und fehlende Szenen eignen sich [RESEARCH: ]- oder " +
+          "[SCENE: ]-Markierungen besser, weil sie die genaue Stelle im Text kennzeichnen."
       );
     },
   },
   search: {
-    title: "How search works",
+    title: "So funktioniert die Suche",
     body: (el) => {
       p(
         el,
-        "Full-text search across your scenes' prose and their synopses. Pick a scope — " +
-          "this draft, the whole story, the series, or the whole vault — and narrow with " +
-          "the metadata filters (status, POV, chapter, plotline, character)."
+        "Volltextsuche im Text und in den Zusammenfassungen Ihrer Szenen. Wählen Sie einen " +
+          "Geltungsbereich – diesen Entwurf, die gesamte Geschichte, die Reihe oder den gesamten " +
+          "Vault – und grenzen Sie die Ergebnisse mit Metadatenfiltern wie Status, Perspektive, " +
+          "Kapitel, Handlungsstrang und Figur ein."
       );
       p(
         el,
-        "Results group by scene. Click a hit to jump straight to it in Write, where it " +
-          "flashes so you can find it fast. A synopsis hit opens the scene without a flash " +
-          "(the synopsis isn't part of the editable body). Set only a filter, with no query, " +
-          "to list every scene that matches — a quick structured finder."
+        "Ergebnisse werden nach Szene gruppiert. Klicken Sie auf einen Treffer, um unter Schreiben " +
+          "direkt zu ihm zu springen; dort blinkt er kurz auf. Ein Treffer in der Zusammenfassung " +
+          "öffnet die Szene ohne Hervorhebung, da die Zusammenfassung nicht zum bearbeitbaren Text " +
+          "gehört. Verwenden Sie nur einen Filter ohne Suchbegriff, um alle passenden Szenen als " +
+          "schnelle strukturierte Suche aufzulisten."
       );
       p(
         el,
-        "Matching is literal (not a wildcard or regex), with optional Match case and Whole " +
-          "word toggles; archived scenes are included only when you tick “Include archived”."
+        "Gesucht wird wörtlich, nicht mit Platzhaltern oder regulären Ausdrücken. Optional stehen " +
+          "„Groß-/Kleinschreibung beachten“ und „Ganzes Wort“ zur Verfügung. Archivierte Szenen " +
+          "werden nur mit „Archivierte einbeziehen“ berücksichtigt."
       );
     },
   },
   "publish/compile": {
-    title: "How compile works",
+    title: "So funktioniert das Kompilieren",
     body: (el) => {
       p(
         el,
-        "Assemble the active project's scenes into one manuscript file. Pick a format — " +
-          "Markdown, HTML, or Word/PDF/EPUB via Pandoc — set the output name, and compile."
+        "Fügen Sie die Szenen des aktiven Projekts zu einer Manuskriptdatei zusammen. Wählen Sie " +
+          "ein Format – Markdown, HTML oder über Pandoc Word, PDF beziehungsweise EPUB –, legen Sie " +
+          "den Ausgabenamen fest und starten Sie die Kompilierung."
       );
       p(
         el,
-        "The pipeline runs in steps you can toggle: per-scene steps (strip to-do markers, " +
-          "filter metadata) and manuscript-level steps (headings, page breaks, tidy blank " +
-          "lines). Your choices are remembered per project."
+        "Die Verarbeitung erfolgt in ein- und ausschaltbaren Schritten: Schritte je Szene entfernen " +
+          "beispielsweise Aufgabenmarkierungen oder filtern Metadaten; Schritte für das gesamte " +
+          "Manuskript erzeugen Überschriften und Seitenumbrüche oder bereinigen Leerzeilen. Ihre " +
+          "Auswahl wird für jedes Projekt gespeichert."
       );
     },
   },
   customize: {
-    title: "How Customize works",
+    title: "So funktioniert Anpassen",
     body: (el) => {
       p(
         el,
-        "Customize changes the SHAPE of Inkswell — which codex types exist and what " +
-          "fields each shows, what a new entry or scene starts with, beat structures, " +
-          "scene statuses, writing prompts, the revision and publishing checklists, and " +
-          "which optional features are shown. Preferences (goals, editor behaviour, " +
-          "folders) stay in Settings."
+        "Anpassen verändert die Struktur von Inkswell: vorhandene Kodex-Typen und ihre Felder, " +
+          "Startinhalte neuer Einträge oder Szenen, Beat-Strukturen, Szenenstatus, Schreibimpulse, " +
+          "Überarbeitungs- und Veröffentlichungschecklisten sowie die sichtbaren optionalen " +
+          "Funktionen. Persönliche Einstellungen wie Ziele, Editorverhalten und Ordner bleiben " +
+          "unter Einstellungen."
       );
       steps(el, [
-        "Pick a section on the left; edit on the right. Changes save as you go.",
-        "Codex fields and starter content are stored in ordinary template notes under " +
-          "your base folder's Templates folder — editing here edits those notes, and you " +
-          "can still open them directly.",
-        "Built-in items are never deleted: hiding is lossless, renames keep the stored " +
-          "id, and every section has a reset back to Inkswell's defaults.",
-        "Your own items (a custom type, a checklist item, a prompt) live in the plugin's " +
-          "data.json and travel with your vault's configuration folder.",
+        "Wählen Sie links einen Bereich und bearbeiten Sie ihn rechts. Änderungen werden fortlaufend gespeichert.",
+        "Kodex-Felder und Startinhalte liegen in gewöhnlichen Vorlagennotizen im Ordner „Vorlagen“ Ihres Basisordners. Eine Bearbeitung hier ändert diese Notizen; Sie können sie weiterhin direkt öffnen.",
+        "Mitgelieferte Elemente werden nie gelöscht: Ausblenden ist verlustfrei, Umbenennungen behalten die gespeicherte ID und jeder Bereich kann auf die Inkswell-Standards zurückgesetzt werden.",
+        "Eigene Elemente wie benutzerdefinierte Typen, Checklistenpunkte oder Schreibimpulse liegen in der data.json des Plugins und werden mit dem Konfigurationsordner Ihres Vaults übertragen.",
       ]);
     },
   },
@@ -346,71 +355,73 @@ export interface HelpSection {
 /** Ordered phases for the Help index destination. */
 export const HELP_SECTIONS: HelpSection[] = [
   {
-    phase: "Home",
+    phase: "Beginn",
     icon: "home",
-    summary: "Your books on shelves, one book's scene tree, and an inbox for story ideas.",
+    summary: "Ihre Bücher in Regalen, der Szenenbaum eines Buchs und ein Eingang für Geschichtenideen.",
     body: (el) => {
       p(
         el,
-        "Your hub. All projects shows your books as cards on shelves — one shelf per " +
-          "series, in book order, plus one for standalone books — each with its cover " +
-          "(or a generated stand-in), book number, scenes and words, progress toward the " +
-          "target, and when you last edited it. Click a card to focus on that book; its " +
-          "⋯ menu (hover on desktop, always on touch) renames it, sets its series, or " +
-          "changes the cover."
+        "Ihre Zentrale. „Alle Projekte“ zeigt Ihre Bücher als Karten in Regalen – ein Regal je " +
+          "Reihe in Buchreihenfolge sowie eines für Einzelbände. Jede Karte zeigt das Cover oder " +
+          "einen erzeugten Platzhalter, die Buchnummer, Szenen und Wörter, den Fortschritt zum Ziel " +
+          "und den Zeitpunkt der letzten Bearbeitung. Klicken Sie auf eine Karte, um das Buch zu " +
+          "fokussieren. Über das Menü ⋯ – am Desktop beim Darüberfahren, auf Touchgeräten immer " +
+          "sichtbar – können Sie es umbenennen, einer Reihe zuordnen oder das Cover ändern."
       );
       p(
         el,
-        "A focused book shows the hero card (cover, logline, theme, target), a strip of " +
-          "the other covers in its series (click one to switch), and its scene tree; " +
-          "drag scene rows to reorder, or use the ⋯ menu to move, rename, or delete. The " +
-          "Inspector on the right edits the selected scene's metadata."
+        "Ein fokussiertes Buch zeigt die Hauptkarte mit Cover, Logline, Thema und Ziel, daneben " +
+          "die übrigen Cover seiner Reihe zum schnellen Wechseln sowie seinen Szenenbaum. Ziehen " +
+          "Sie Szenenzeilen, um sie neu anzuordnen, oder verwenden Sie das Menü ⋯ zum Verschieben, " +
+          "Umbenennen und Löschen. Im Inspektor rechts bearbeiten Sie die Metadaten der ausgewählten Szene."
       );
       p(
         el,
-        "Capture story ideas in the inbox below the shelves without leaving the page — " +
-          "press Enter to save. Click an idea to edit it in place; its ⋯ / right-click " +
-          "menu copies it, saves it as a note under your base folder's Ideas folder " +
-          "(and clears it from the inbox), pins it to the top, or deletes it. Click the " +
-          "Ideas header to collapse the section."
+        "Halten Sie Geschichtenideen direkt im Eingang unter den Regalen fest und drücken Sie zum " +
+          "Speichern die Eingabetaste. Klicken Sie auf eine Idee, um sie an Ort und Stelle zu " +
+          "bearbeiten. Über das Menü ⋯ oder einen Rechtsklick können Sie sie kopieren, als Notiz im " +
+          "Ordner „Ideen“ Ihres Basisordners speichern und damit aus dem Eingang entfernen, oben " +
+          "anheften oder löschen. Klicken Sie auf die Überschrift „Ideen“, um den Bereich einzuklappen."
       );
-      el.createEl("h4", { text: "Series" });
+      el.createEl("h4", { text: "Reihe" });
       p(
         el,
-        "A series is a set of books sharing a name — no extra note, just a tag on each " +
-          "book. Add a book to one from its ⋯ / right-click menu (Series…) or the series " +
-          "line under the title on its hero card: pick an existing series or start a new " +
-          "one, and set the book number (it defaults to the next free slot). New project " +
-          "has the same fields, so a book can be created straight into a series."
+        "Eine Reihe besteht aus Büchern mit einem gemeinsamen Namen. Dafür gibt es keine eigene " +
+          "Notiz, sondern nur eine Kennzeichnung an jedem Buch. Ordnen Sie ein Buch über sein Menü ⋯ " +
+          "oder den Rechtsklick-Eintrag „Reihe…“ zu. Alternativ klicken Sie auf der Hauptkarte unter " +
+          "dem Titel auf die Reihenzeile. Wählen Sie eine vorhandene Reihe oder erstellen Sie eine " +
+          "neue und legen Sie die Buchnummer fest; standardmäßig wird der nächste freie Platz gewählt. " +
+          "„Neues Projekt“ bietet dieselben Felder, sodass ein Buch direkt in einer Reihe angelegt werden kann."
       );
       p(
         el,
-        "The series header's ⋯ / right-click menu manages the whole set: New book in this " +
-          "series, Add existing project, Rename series (every book and every series-scoped " +
-          "codex entry follow), and Reorder books (drag, then Save renumbers 1, 2, 3…)."
+        "Über das Menü ⋯ oder den Rechtsklick auf die Reihenüberschrift verwalten Sie die gesamte " +
+          "Reihe: neues Buch in dieser Reihe, vorhandenes Projekt hinzufügen, Reihe umbenennen – " +
+          "alle Bücher und reihenweiten Kodex-Einträge werden mitgeführt – sowie Bücher neu anordnen. " +
+          "Nach dem Ziehen nummeriert „Speichern“ sie als 1, 2, 3 und so weiter."
       );
     },
   },
   {
-    phase: "Plan",
+    phase: "Planen",
     icon: "compass",
-    summary: "Overview fields, the beat sheet, and Structure (outline tree, board, and plot grid).",
+    summary: "Übersichtsfelder, Beat-Sheet und Struktur mit Gliederungsbaum, Board und Plot-Raster.",
     body: (el) => {
       p(
         el,
-        "Overview holds novel-level fields (logline, theme, genre) and long-form prose " +
-          "(synopsis, three-act sketch). Beats is the beat sheet. Structure combines the " +
-          "outline tree, the Kanban board, and the plot grid behind one Tree | Board | " +
-          "Grid switcher — three views of the same scenes. All are detailed below."
+        "Die Übersicht enthält Felder für den gesamten Roman wie Logline, Thema und Genre sowie " +
+          "längere Texte wie Zusammenfassung und Drei-Akt-Skizze. Beats ist das Beat-Sheet. Die " +
+          "Struktur vereint Gliederungsbaum, Kanban-Board und Plot-Raster hinter der Umschaltung " +
+          "Baum | Board | Raster – drei Ansichten derselben Szenen. Alle werden unten erläutert."
       );
       p(
         el,
-        "Migrating a numbered manuscript whose scenes landed out of order? Structure → " +
-          "Tree has a “Sort by chapter” button (also on a book's ⋯ menu on Home and as the " +
-          "“Sort scenes by chapter number” command): it reorders the manuscript once by " +
-          "the number in each scene's chapter label — digits or spelled out — and leaves " +
-          "unnumbered scenes in their current order at the end. It's a one-time action, " +
-          "not a mode; drag order stays yours afterwards."
+        "Übernehmen Sie ein nummeriertes Manuskript, dessen Szenen in falscher Reihenfolge gelandet " +
+          "sind? Unter Struktur → Baum gibt es die Schaltfläche „Nach Kapitel sortieren“. Sie ist " +
+          "auch im Menü ⋯ eines Buchs auf Beginn und als Befehl „Szenen nach Kapitelnummer sortieren“ " +
+          "verfügbar. Die Aktion ordnet das Manuskript einmalig anhand der Ziffer oder ausgeschriebenen " +
+          "Zahl in der Kapitelbezeichnung. Unnummerierte Szenen bleiben am Ende in ihrer bisherigen " +
+          "Reihenfolge. Es handelt sich nicht um einen Modus; anschließend gilt wieder Ihre Ziehreihenfolge."
       );
       el.createEl("h4", { text: HINTS["plan/beats"].title });
       HINTS["plan/beats"].body(el);
@@ -423,150 +434,153 @@ export const HELP_SECTIONS: HelpSection[] = [
     },
   },
   {
-    phase: "Write",
+    phase: "Schreiben",
     icon: "pencil",
-    summary: "The focused manuscript editor and to-do markers.",
+    summary: "Der fokussierte Manuskripteditor und Aufgabenmarkierungen.",
     body: HINTS["write"].body,
   },
   {
-    phase: "Codex",
+    phase: "Kodex",
     icon: "book-marked",
-    summary: "Your story bible, scoped global / project / series.",
+    summary: "Ihre Geschichtenbibel mit globalem, projekt- oder reihenweitem Geltungsbereich.",
     body: HINTS["codex"].body,
   },
   {
-    phase: "Search",
+    phase: "Suche",
     icon: "search",
-    summary: "Full-text search across scenes, scoped and filterable.",
+    summary: "Volltextsuche in Szenen mit Geltungsbereich und Filtern.",
     body: HINTS["search"].body,
   },
   {
-    phase: "Track",
+    phase: "Fortschritt",
     icon: "bar-chart-3",
-    summary: "Word counts, streaks, pace, sprints, and structure.",
+    summary: "Wortzahlen, Serien, Tempo, Sprints und Struktur.",
     body: (el) => {
       p(
         el,
-        "A dashboard of your writing: daily/weekly/monthly counts, streaks, a 26-week " +
-          "heatmap, sprint history, and a scene-structure breakdown. The status bar at the " +
-          "bottom mirrors today's progress and any running sprint — click it to open Track."
+        "Eine Übersicht Ihres Schreibfortschritts mit Tages-, Wochen- und Monatszahlen, Serien, " +
+          "einer Heatmap über 26 Wochen, dem Sprintverlauf und einer Aufschlüsselung der Szenenstruktur. " +
+          "Die Statusleiste unten zeigt den heutigen Fortschritt und einen laufenden Sprint. Klicken " +
+          "Sie darauf, um Fortschritt zu öffnen."
       );
       p(
         el,
-        "Only project writing counts toward goals — manuscript scenes by default. " +
-          "Settings → What counts toward goals can also include planning notes, codex " +
-          "notes, or other project notes; the rest of your vault never counts."
+        "Nur Texte eines Projekts zählen für Ziele, standardmäßig die Manuskriptszenen. Unter " +
+          "Einstellungen → Was für Ziele zählt können Sie zusätzlich Planungsnotizen, Kodex-Notizen " +
+          "oder andere Projektnotizen einbeziehen. Der übrige Vault wird niemals mitgezählt."
       );
       p(
         el,
-        "Start a timed sprint from the rail (or the “Start a writing sprint” command) to " +
-          "write against a clock and a word goal."
+        "Starten Sie über die Seitenleiste oder den Befehl „Schreibsprint starten“ einen zeitlich " +
+          "begrenzten Sprint, um gegen die Uhr und auf ein Wortziel hin zu schreiben."
       );
       p(
         el,
-        "A writing challenge (“Set up writing challenge”, or the link in the Goals card) is a " +
-          "date range and a word target — say 50,000 words in November. It counts every " +
-          "goal-counted word you write in that range, in any project, and shows where you " +
-          "should be by today, how far ahead or behind you are, and what you need to write " +
-          "today. Click the total to copy it for an event's website. Writing on more than " +
-          "one device? Turn on history sync so the count includes all of them."
+        "Eine Schreibchallenge – über „Schreibchallenge einrichten“ oder den Link auf der Zielkarte – " +
+          "besteht aus einem Zeitraum und einem Wortziel, etwa 50.000 Wörter im November. Sie zählt " +
+          "jedes zielrelevante Wort, das Sie in diesem Zeitraum in einem beliebigen Projekt schreiben. " +
+          "Angezeigt werden der heutige Sollstand, Ihr Vor- oder Rückstand und das heutige Pensum. " +
+          "Klicken Sie auf die Gesamtsumme, um sie für die Website einer Veranstaltung zu kopieren. " +
+          "Wenn Sie auf mehreren Geräten schreiben, aktivieren Sie die Verlaufssynchronisierung."
       );
     },
   },
   {
-    phase: "Revise",
+    phase: "Überarbeiten",
     icon: "git-compare",
-    summary: "Audit checklists, revision to-dos, and prose analysis.",
+    summary: "Prüfchecklisten, Überarbeitungsaufgaben und Prosaanalyse.",
     body: (el) => {
       el.createEl("h4", { text: HINTS["revise/audit"].title });
       HINTS["revise/audit"].body(el);
       el.createEl("h4", { text: HINTS["revise/todos"].title });
       HINTS["revise/todos"].body(el);
-      el.createEl("h4", { text: "Analysis" });
+      el.createEl("h4", { text: "Analyse" });
       p(
         el,
-        "Readability grades, your most-used words, and repeated-phrase (echo) detection " +
-          "across the whole manuscript — run on demand for a style pass."
+        "Lesbarkeitswerte, Ihre häufigsten Wörter und die Erkennung wiederholter Formulierungen " +
+          "im gesamten Manuskript. Starten Sie die Analyse bei Bedarf für einen Stildurchgang."
       );
     },
   },
   {
-    phase: "Publish",
+    phase: "Veröffentlichen",
     icon: "upload",
-    summary: "Compile, the self-publishing checklist, and launch planning.",
+    summary: "Kompilieren, Selbstveröffentlichungscheckliste und Veröffentlichungsplanung.",
     body: (el) => {
       el.createEl("h4", { text: HINTS["publish/compile"].title });
       HINTS["publish/compile"].body(el);
-      el.createEl("h4", { text: "Checklist & launch" });
+      el.createEl("h4", { text: "Checkliste & Veröffentlichung" });
       p(
         el,
-        "Checklist tracks ~50 self-publishing tasks plus a per-format metadata worksheet " +
-          "(ISBN, blurb, keywords). Launch plans a pre-order timeline with auto-computed " +
-          "milestone dates and trackers for budget, cover, marketing, and ARC readers."
+        "Die Checkliste verfolgt rund 50 Aufgaben zur Selbstveröffentlichung sowie ein Metadatenblatt " +
+          "je Format, etwa für ISBN, Klappentext und Schlüsselwörter. Die Veröffentlichung plant " +
+          "einen Zeitablauf für Vorbestellungen mit automatisch berechneten Meilensteinen und " +
+          "Übersichten für Budget, Cover, Marketing und Vorabrezensionen."
       );
     },
   },
   {
-    phase: "Customize",
+    phase: "Anpassen",
     icon: "sliders-horizontal",
-    summary: "Shape Inkswell to your process — types, fields, templates, structures, checklists, prompts.",
+    summary: "Passen Sie Inkswell an Ihren Ablauf an: Typen, Felder, Vorlagen, Strukturen, Checklisten und Impulse.",
     body: HINTS["customize"].body,
   },
   {
-    phase: "Your data & backups",
+    phase: "Ihre Daten und Sicherungen",
     icon: "shield-check",
-    summary: "Where everything is stored, and how to recover it.",
+    summary: "Wo alles gespeichert wird und wie Sie es wiederherstellen.",
     body: (el) => {
       p(
         el,
-        "Everything Inkswell stores is plain text. Scene prose is ordinary notes in your " +
-          "project's scene folder. Plan data — beats, outline structure, goals, the " +
-          "revision log, audit checklists, compile and publishing settings — lives in the " +
-          "frontmatter of your PROJECT INDEX NOTE: the note named after your project, next " +
-          "to your scenes. Codex entries are ordinary notes with a codex key. Plugin " +
-          "settings, writing history, sprints, and the ideas inbox live in the plugin's " +
-          "data.json."
+        "Alles, was Inkswell speichert, ist Klartext. Der Szenentext liegt als gewöhnliche Notizen " +
+          "im Szenenordner Ihres Projekts. Planungsdaten – Beats, Gliederungsstruktur, Ziele, " +
+          "Überarbeitungsprotokoll, Prüfchecklisten sowie Kompilierungs- und Veröffentlichungseinstellungen – " +
+          "liegen im Frontmatter der Projektindexnotiz. Das ist die nach Ihrem Projekt benannte Notiz " +
+          "neben den Szenen. Kodex-Einträge sind gewöhnliche Notizen mit einem codex-Schlüssel. " +
+          "Plugin-Einstellungen, Schreibverlauf, Sprints und Ideeneingang liegen in der data.json des Plugins."
       );
       p(
         el,
-        "Writing history counts the words you type in Obsidian — in its editors and in " +
-          "the Write panel. A file that changes outside Obsidian, or that arrives from " +
-          "another device via sync, only resets that file's starting point; those words " +
-          "are never logged as written on this device."
+        "Der Schreibverlauf zählt die Wörter, die Sie in Obsidian eingeben – sowohl in dessen Editoren " +
+          "als auch unter Schreiben. Wird eine Datei außerhalb von Obsidian geändert oder über die " +
+          "Synchronisierung von einem anderen Gerät empfangen, setzt Inkswell lediglich ihren " +
+          "Ausgangspunkt neu. Diese Wörter werden niemals als auf diesem Gerät geschrieben protokolliert."
       );
       p(
         el,
-        "To see every device's history together, turn on “Sync writing history across " +
-          "devices” in Settings. Each device then keeps one small, machine-written log " +
-          "note (an inkswell-log key in its frontmatter) under your base folder's " +
-          "“Writing log” folder, and Track merges them. Rename a device via that note's " +
-          "device property; if a device is gone, delete its note."
+        "Aktivieren Sie in den Einstellungen „Schreibverlauf geräteübergreifend synchronisieren“, " +
+          "um die Verläufe aller Geräte gemeinsam zu sehen. Jedes Gerät führt dann im Ordner " +
+          "„Schreibprotokoll“ unter Ihrem Basisordner eine kleine maschinell erstellte Protokollnotiz " +
+          "mit einem inkswell-log-Schlüssel im Frontmatter. Fortschritt führt diese Notizen zusammen. " +
+          "Benennen Sie ein Gerät über die Eigenschaft device dieser Notiz um. Wird ein Gerät nicht " +
+          "mehr verwendet, löschen Sie seine Notiz."
       );
-      el.createEl("h4", { text: "If something goes wrong" });
+      el.createEl("h4", { text: "Wenn etwas schiefgeht" });
       p(
         el,
-        "Obsidian's File Recovery (Settings → File Recovery → View) keeps periodic " +
-          "snapshots of every note that changes, including ones Inkswell writes. Its " +
-          "search matches FILE NAMES: for plan data, search for your project's name and " +
-          "open the index note's snapshots; for prose, search the scene's name."
-      );
-      p(
-        el,
-        "Whenever Inkswell must displace a version of your text — resolving an " +
-          "editor-vs-disk conflict, or overwriting a file during compile at your request " +
-          "— the displaced version is saved to the “Inkswell conflicts” folder first. " +
-          "Nothing is silently discarded."
+        "Obsidians Dateiwiederherstellung (Einstellungen → Dateiwiederherstellung → Anzeigen) erstellt " +
+          "regelmäßig Schnappschüsse jeder geänderten Notiz, auch der von Inkswell geschriebenen. " +
+          "Die Suche gleicht Dateinamen ab: Suchen Sie für Planungsdaten nach dem Projektnamen und " +
+          "öffnen Sie die Schnappschüsse der Indexnotiz; suchen Sie für Prosatext nach dem Szenennamen."
       );
       p(
         el,
-        "Inkswell also keeps a daily backup of data.json (the last 7 days) in a " +
-          "backups folder next to it — inside the plugin's own folder under your " +
-          "vault's configuration directory. To bring back just your settings (custom " +
-          "codex types, renamed types, Customize changes, the rail), run the command " +
-          "“Restore settings from a backup” and pick a day; your writing history stays " +
-          "as it is. To restore everything: disable Inkswell, copy the backup over " +
-          "data.json, and re-enable. If data.json can't be read when Obsidian starts, " +
-          "Inkswell loads the newest backup by itself and tells you."
+        "Wann immer Inkswell eine Version Ihres Textes verdrängen muss – etwa beim Lösen eines " +
+          "Konflikts zwischen Editor und Datenträger oder beim von Ihnen angeforderten Überschreiben " +
+          "einer Datei während der Kompilierung –, wird diese Version zuerst im Ordner " +
+          "„Inkswell-Konflikte“ gespeichert. Nichts wird unbemerkt verworfen."
+      );
+      p(
+        el,
+        "Inkswell bewahrt außerdem tägliche Sicherungen der data.json aus den letzten sieben Tagen " +
+          "in einem danebenliegenden Ordner backups auf. Dieser befindet sich im Plugin-Ordner im " +
+          "Konfigurationsverzeichnis Ihres Vaults. Um nur Ihre Einstellungen wiederherzustellen – " +
+          "etwa eigene oder umbenannte Kodex-Typen, Änderungen unter Anpassen und die Seitenleiste –, " +
+          "führen Sie den Befehl „Einstellungen aus einer Sicherung wiederherstellen“ aus und wählen " +
+          "Sie einen Tag. Ihr Schreibverlauf bleibt unverändert. Für eine vollständige Wiederherstellung " +
+          "deaktivieren Sie Inkswell, kopieren die Sicherung über data.json und aktivieren das Plugin " +
+          "erneut. Kann data.json beim Start von Obsidian nicht gelesen werden, lädt Inkswell selbstständig " +
+          "die neueste Sicherung und informiert Sie darüber."
       );
     },
   },

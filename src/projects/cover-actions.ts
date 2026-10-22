@@ -44,7 +44,7 @@ export function addCoverMenuItems(
   if (hasCover) {
     if (opts.inline) menu.addSeparator();
     menu.addItem((i) =>
-      i.setTitle("Remove cover").setIcon("trash").onClick(() => void removeCover(app, base, mark))
+      i.setTitle("Cover entfernen").setIcon("trash").onClick(() => void removeCover(app, base, mark))
     );
   }
 }
@@ -71,7 +71,7 @@ export function uploadCover(app: App, base: Project, mark: Mark): void {
       await persistOverview(app, index, { cover: path });
     } catch (e) {
       console.error(e);
-      new Notice("Couldn't set the cover image.");
+      new Notice("Das Coverbild konnte nicht festgelegt werden.");
     }
   };
   input.click();

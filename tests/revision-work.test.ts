@@ -50,7 +50,7 @@ describe("buildRevisionGroups", () => {
     const groups = buildRevisionGroups(scenes, [], [decision("a", null)], "Book/1.md");
     const project = groups.find((g) => g.key === PROJECT_GROUP_KEY);
     expect(project).toBeDefined();
-    expect(project?.title).toBe("Whole project");
+    expect(project?.title).toBe("Gesamtes Projekt");
     expect(project?.decisions.map((d) => d.id)).toEqual(["a"]);
   });
 
@@ -102,7 +102,7 @@ describe("buildRevisionGroups", () => {
     );
     expect(groups.some((g) => g.isCurrent)).toBe(false);
     expect(groups[0].key).toBe(PROJECT_GROUP_KEY); // project group precedes scene groups
-    expect(groups.map((g) => g.title)).toEqual(["Whole project", "Two"]);
+    expect(groups.map((g) => g.title)).toEqual(["Gesamtes Projekt", "Two"]);
   });
 });
 
@@ -125,21 +125,21 @@ describe("buildWorkChips", () => {
       [todos("Book/1.md", kindGap("todo"), kindGap("research", 20))],
       [typed("a"), typed("b", "plot-hole")]
     );
-    expect(chips.map((c) => c.label)).toEqual(["All", "TODO", "Research", "Continuity", "Plot hole"]);
+    expect(chips.map((c) => c.label)).toEqual(["Alle", "AUFGABE", "Recherche", "Kontinuität", "Logikfehler"]);
     expect(chips[0].count).toBe(4); // All = markers + decisions
     expect(chips.map((c) => c.decision)).toEqual([false, false, false, true, true]);
   });
 
   it("shows legacy decision-type chips only when such decisions exist", () => {
     const none = buildWorkChips([], [typed("a", "continuity")]);
-    expect(none.some((c) => c.label === "New scene")).toBe(false);
+    expect(none.some((c) => c.label === "Neue Szene")).toBe(false);
     const some = buildWorkChips([], [typed("a", "new-scene"), typed("b", "research")]);
-    expect(some.filter((c) => c.decision).map((c) => c.label)).toEqual(["Research", "New scene"]);
+    expect(some.filter((c) => c.decision).map((c) => c.label)).toEqual(["Recherche", "Neue Szene"]);
   });
 
   it("buckets untyped decisions as Continuity", () => {
     const chips = buildWorkChips([], [typed("a"), typed("b")]);
-    expect(chips.find((c) => c.label === "Continuity")?.count).toBe(2);
+    expect(chips.find((c) => c.label === "Kontinuität")?.count).toBe(2);
   });
 });
 

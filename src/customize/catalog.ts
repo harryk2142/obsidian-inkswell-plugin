@@ -19,11 +19,11 @@ export type CustomizeGroup = "codex" | "plan" | "write" | "revise" | "publish" |
 
 /** Group order + display labels for the catalog column. */
 export const CUSTOMIZE_GROUP_ORDER: { id: CustomizeGroup; label: string }[] = [
-  { id: "codex", label: "Codex" },
-  { id: "plan", label: "Plan" },
-  { id: "write", label: "Write" },
-  { id: "revise", label: "Revise" },
-  { id: "publish", label: "Publish" },
+  { id: "codex", label: "Kodex" },
+  { id: "plan", label: "Planen" },
+  { id: "write", label: "Schreiben" },
+  { id: "revise", label: "Überarbeiten" },
+  { id: "publish", label: "Veröffentlichen" },
   { id: "inkswell", label: "Inkswell" },
 ];
 
@@ -43,15 +43,16 @@ export interface CustomizeEntry {
 
 /** Every section, in catalog order (groups must be contiguous runs). */
 export const CUSTOMIZE_CATALOG: CustomizeEntry[] = [
-  { id: "codex-types", label: "Codex types & fields", icon: "book-marked", group: "codex" },
-  { id: "beat-templates", label: "Beat templates", icon: "list-ordered", group: "plan", feature: "beats" },
-  { id: "scene-template", label: "Scene template", icon: "file-plus", group: "write" },
-  { id: "scene-statuses", label: "Scene statuses", icon: "tag", group: "write" },
-  { id: "scene-fields", label: "Scene inspector fields", icon: "panel-right", group: "write" },
-  { id: "writing-prompts", label: "Writing prompts", icon: "lightbulb", group: "write", feature: "prompts" },
-  { id: "revision-checklists", label: "Revision checklists", icon: "list-checks", group: "revise", feature: "audit" },
-  { id: "publishing-checklist", label: "Publishing checklist", icon: "clipboard-check", group: "publish", feature: "checklist" },
-  { id: "features", label: "Features", icon: "eye", group: "inkswell" },
+  { id: "codex-types", label: "Kodex-Typen & -Felder", icon: "book-marked", group: "codex" },
+  { id: "planning-note-fields", label: "Felder der Planungsnotiz", icon: "file-text", group: "plan" },
+  { id: "beat-templates", label: "Beat-Vorlagen", icon: "list-ordered", group: "plan", feature: "beats" },
+  { id: "scene-template", label: "Szenenvorlage", icon: "file-plus", group: "write" },
+  { id: "scene-statuses", label: "Szenenstatus", icon: "tag", group: "write" },
+  { id: "scene-fields", label: "Felder im Szeneninspektor", icon: "panel-right", group: "write" },
+  { id: "writing-prompts", label: "Schreibimpulse", icon: "lightbulb", group: "write", feature: "prompts" },
+  { id: "revision-checklists", label: "Überarbeitungschecklisten", icon: "list-checks", group: "revise", feature: "audit" },
+  { id: "publishing-checklist", label: "Veröffentlichungscheckliste", icon: "clipboard-check", group: "publish", feature: "checklist" },
+  { id: "features", label: "Funktionen", icon: "eye", group: "inkswell" },
 ];
 
 /** The section shown when Customize opens with no deep link. */

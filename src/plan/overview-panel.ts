@@ -20,20 +20,19 @@ import { Project, ProjectOverview } from "../projects/types";
 import { openScene } from "../scenes/scene-actions";
 import { renderEmptyStateAction } from "../views/panel-kit";
 import {
-  PLAN_SECTIONS,
-  PlanSection,
   ensurePlanningNote,
   findPlanningNote,
   readSection,
   writeSection,
 } from "./planning-note";
+import { PlanSection, planningSections } from "./sections";
 import type InkswellPlugin from "../../main";
 
 export const OVERVIEW_FIELDS: { key: keyof ProjectOverview; label: string; placeholder: string }[] = [
-  { key: "logline", label: "Logline", placeholder: "One sentence: who wants what, against what odds…" },
-  { key: "theme", label: "Theme", placeholder: "The deeper meaning / life lesson…" },
-  { key: "genre", label: "Genre", placeholder: "e.g. Epic fantasy" },
-  { key: "audience", label: "Audience", placeholder: "e.g. Adult, YA…" },
+  { key: "logline", label: "Logline", placeholder: "Ein Satz: Wer will was und gegen welche Widerstände…" },
+  { key: "theme", label: "Thema", placeholder: "Die tiefere Bedeutung / Lebenslektion…" },
+  { key: "genre", label: "Genre", placeholder: "z. B. epische Fantasy" },
+  { key: "audience", label: "Zielgruppe", placeholder: "z. B. Erwachsene, Jugendbuch…" },
 ];
 
 /**
@@ -43,7 +42,7 @@ export const OVERVIEW_FIELDS: { key: keyof ProjectOverview; label: string; place
  */
 const SECTION_PROMPTS: Partial<Record<PlanSection, string>> = {
   "Plot groundwork":
-    "e.g. What are 5 key moments, scenes, or events you know will happen? (They don't need to be in order or connected yet.)",
+    "Welche fünf Schlüsselmomente, Szenen oder Ereignisse werden sicher stattfinden? Sie müssen noch weder geordnet noch miteinander verbunden sein.",
 };
 
 export class OverviewPanel {
@@ -76,8 +75,8 @@ export class OverviewPanel {
 
     const active = resolveActive(this.store.getProjects(), this.active.get());
     if (!active) {
-      renderEmptyStateAction(container, "No projects yet — a project holds your scenes, plan, and goals.", [
-        { label: "Create a project", cta: true, onClick: () => this.plugin.newProject() },
+      renderEmptyStateAction(container, "Noch keine Projekte – ein Projekt enthält Ihre Szenen, Ihre Planung und Ihre Ziele.", [
+        { label: "Projekt erstellen", cta: true, onClick: () => this.plugin.newProject() },
       ]);
       return;
     }
@@ -106,7 +105,7 @@ export class OverviewPanel {
           this.plugin.selfWrites.mark(indexFile.path);
           void tryFileOp(
             () => persistOverview(this.app, indexFile, { [f.key]: input.value.trim() }),
-            `Couldn't save the ${f.label.toLowerCase()}.`
+            `${f.label} konnte nicht gespeichert werden.`
           );
         }
       };
@@ -117,26 +116,29 @@ export class OverviewPanel {
   private renderProse(root: HTMLElement, project: Project): void {
     const sec = root.createDiv({ cls: "inkswell-overview__prose" });
     const head = sec.createDiv({ cls: "inkswell-overview__prosehead" });
-    head.createSpan({ cls: "inkswell-overview__prosetitle", text: "Planning note" });
-    const open = head.createEl("button", { text: "Open planning note" });
-    open.setAttribute("aria-label", "Open the planning note in an editor tab");
+    head.createSpan({ cls: "inkswell-overview__prosetitle", text: "Planungsnotiz" });
+    const open = head.createEl("button", { text: "Planungsnotiz öffnen" });
+    open.setAttribute("aria-label", "Planungsnotiz in einer Editor-Registerkarte öffnen");
     open.onclick = async () => {
       const file = await tryFileOp(async () => {
         const f = await ensurePlanningNote(this.app, project);
         await this.rememberNote(project, f);
         return f;
-      }, "Couldn't open the planning note.");
+      }, "Die Planungsnotiz konnte nicht geöffnet werden.");
       if (file) openScene(this.app, file);
     };
 
     const editors = new Map<PlanSection, HTMLTextAreaElement>();
-    for (const heading of PLAN_SECTIONS) {
+    const fields = planningSections(this.plugin.settings.listOverrides["plan.sections"])
+      .filter((field) => !field.hidden);
+    for (const field of fields) {
+      const { heading } = field;
       const block = sec.createDiv({ cls: "inkswell-overview__section" });
-      block.createDiv({ cls: "inkswell-overview__label", text: heading });
+      block.createDiv({ cls: "inkswell-overview__label", text: field.label });
       const ta = block.createEl("textarea", { cls: "inkswell-overview__textarea" });
-      tagField(ta, `overview:section:${heading}`);
-      ta.rows = heading === "Synopsis" || heading === "Plot groundwork" ? 5 : 3;
-      ta.placeholder = SECTION_PROMPTS[heading] ?? `${heading}…`;
+      tagField(ta, `overview:section:${field.id}`);
+      ta.rows = field.rows;
+      ta.placeholder = SECTION_PROMPTS[heading] ?? `${field.label}…`;
       ta.onchange = () => void this.saveSection(project, heading, ta.value);
       editors.set(heading, ta);
     }
@@ -167,7 +169,7 @@ export class OverviewPanel {
       const file = await ensurePlanningNote(this.app, project);
       await this.rememberNote(project, file);
       await writeSection(this.app, file, heading, text);
-    }, "Couldn't save the planning note.");
+    }, "Die Planungsnotiz konnte nicht gespeichert werden.");
   }
 
   /** Persist the planning-note path the first time we create/use it. */

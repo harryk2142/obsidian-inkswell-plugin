@@ -9,6 +9,7 @@ import type { CustomizeSection } from "../section";
 import { beatTemplatesSection } from "./beat-templates";
 import { codexTypesSection } from "./codex-types";
 import { featuresSection } from "./features";
+import { planningNoteFieldsSection } from "./planning-note-fields";
 import { publishingChecklistSection } from "./publishing-checklist";
 import { revisionChecklistsSection } from "./revision-checklists";
 import { sceneFieldsSection } from "./scene-fields";
@@ -18,6 +19,7 @@ import { writingPromptsSection } from "./writing-prompts";
 
 export const SECTIONS: Record<string, CustomizeSection> = {
   [codexTypesSection.id]: codexTypesSection,
+  [planningNoteFieldsSection.id]: planningNoteFieldsSection,
   [beatTemplatesSection.id]: beatTemplatesSection,
   [sceneTemplateSection.id]: sceneTemplateSection,
   [sceneStatusesSection.id]: sceneStatusesSection,

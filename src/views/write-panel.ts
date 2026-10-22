@@ -116,26 +116,26 @@ interface TodoType {
   icon: string;
 }
 const TODO_TYPES: TodoType[] = [
-  { kind: "todo", label: "TODO", desc: "A generic to-do", icon: "list-todo" },
-  { kind: "research", label: "Research", desc: "A fact or detail to look up / verify", icon: "search" },
-  { kind: "note", label: "Note", desc: "A note or reminder to yourself", icon: "sticky-note" },
-  { kind: "dialogue", label: "Dialogue", desc: "Dialogue to write later", icon: "message-square" },
-  { kind: "scene", label: "Scene", desc: "A scene to write or expand", icon: "clapperboard" },
+  { kind: "todo", label: "AUFGABE", desc: "Eine allgemeine Aufgabe", icon: "list-todo" },
+  { kind: "research", label: "Recherche", desc: "Eine Tatsache oder ein Detail zum Nachschlagen oder Prüfen", icon: "search" },
+  { kind: "note", label: "Notiz", desc: "Eine Notiz oder Erinnerung an dich selbst", icon: "sticky-note" },
+  { kind: "dialogue", label: "Dialog", desc: "Später zu schreibender Dialog", icon: "message-square" },
+  { kind: "scene", label: "Szene", desc: "Eine zu schreibende oder auszubauende Szene", icon: "clapperboard" },
 ];
 
 /** Inline formatting toggles offered in the collapsed Insert menu (phones have
  *  no Mod key and Obsidian's mobile toolbar doesn't attach to this editor). */
 const FORMAT_ACTIONS: { kind: MarkKind; label: string; icon: string }[] = [
-  { kind: "bold", label: "Bold", icon: "bold" },
-  { kind: "italic", label: "Italic", icon: "italic" },
-  { kind: "strike", label: "Strikethrough", icon: "strikethrough" },
+  { kind: "bold", label: "Fett", icon: "bold" },
+  { kind: "italic", label: "Kursiv", icon: "italic" },
+  { kind: "strike", label: "Durchgestrichen", icon: "strikethrough" },
 ];
 
 /** Quick picker for "Insert a to-do marker…" (command palette + toolbar). */
 class TodoPickerModal extends FuzzySuggestModal<TodoType> {
   constructor(app: App, private onPick: (kind: PlaceholderKind) => void) {
     super(app);
-    this.setPlaceholder("Insert a to-do marker…");
+    this.setPlaceholder("Aufgabenmarkierung einfügen…");
   }
   getItems(): TodoType[] {
     return TODO_TYPES;
@@ -351,38 +351,38 @@ export class WritePanel implements HoverParent {
     menu.addSeparator();
     menu.addItem((item) =>
       item
-        .setTitle("Split scene here…")
+        .setTitle("Szene hier teilen…")
         .setIcon("scissors")
         .onClick(() => void this.splitScene("cursor"))
     );
     menu.addItem((item) =>
       item
-        .setTitle("Move selection to new scene…")
+        .setTitle("Auswahl in neue Szene verschieben…")
         .setIcon("file-output")
         .onClick(() => void this.splitScene("selection"))
     );
     menu.addSeparator();
     menu.addItem((item) =>
       item
-        .setTitle("New Codex entry from selection…")
+        .setTitle("Neuer Kodex-Eintrag aus Auswahl…")
         .setIcon("book-user")
         .onClick(() => this.quickCodex())
     );
     menu.addItem((item) =>
       item
-        .setTitle("Open link at cursor")
+        .setTitle("Link am Cursor öffnen")
         .setIcon("link")
         .onClick(() => this.openLinkAtCursor())
     );
     menu.addItem((item) =>
       item
-        .setTitle("Find to-dos")
+        .setTitle("Aufgaben suchen")
         .setIcon("list-checks")
         .onClick(() => void this.plugin.openTodos())
     );
     menu.addItem((item) =>
       item
-        .setTitle("Log issue")
+        .setTitle("Problem protokollieren")
         .setIcon("flag")
         .onClick(() => this.logIssue())
     );
@@ -481,7 +481,7 @@ export class WritePanel implements HoverParent {
         title: mode === "selection" ? "Move selection to a new scene" : "Split scene here",
         value: "",
         multiline: false,
-        cta: "Create scene",
+        cta: "Szene erstellen",
       });
     } finally {
       this.suppressBlurSave = false;
@@ -525,7 +525,7 @@ export class WritePanel implements HoverParent {
     const { from, to } = view.state.selection.main;
     const doc = view.state.doc.toString();
     if (selectionInsideWikilink(doc, from, to)) {
-      new Notice("That's already a link.");
+      new Notice("Das ist bereits ein Link.");
       return;
     }
     const seed = seedFromSelection(doc, from, to);
@@ -654,7 +654,7 @@ export class WritePanel implements HoverParent {
     if (!this.editor) return;
     const linktext = linkAtCursor(this.editor);
     if (!linktext) {
-      new Notice("No link at the cursor.");
+      new Notice("Kein Link am Cursor.");
       return;
     }
     this.openLink(linktext);
@@ -845,10 +845,10 @@ export class WritePanel implements HoverParent {
           cls: "inkswell-stats__muted",
           text: `Sprint: ${active.words}w · ${this.sprints.remainingSec()}s`,
         });
-        const end = sprintGroup.createEl("button", { text: "End sprint" });
+        const end = sprintGroup.createEl("button", { text: "Sprint beenden" });
         end.onclick = () => this.sprints.finish();
       } else {
-        const sprint = sprintGroup.createEl("button", { text: "Start sprint" });
+        const sprint = sprintGroup.createEl("button", { text: "Sprint starten" });
         sprint.onclick = () => this.plugin.startSprint();
         attachHideMenu(sprint, this.plugin, "tracking", "tracking");
       }
@@ -861,7 +861,7 @@ export class WritePanel implements HoverParent {
       const promptGroup = bar.createDiv({
         cls: "inkswell-write__group inkswell-write__group--prompt",
       });
-      const promptBtn = promptGroup.createEl("button", { text: "Prompt" });
+      const promptBtn = promptGroup.createEl("button", { text: "Schreibimpuls" });
       promptBtn.onclick = () => this.openPromptModal();
       // Right-click to hide (turn back on under Customize → Features).
       attachHideMenu(promptBtn, this.plugin, "prompts", "writing prompts");
@@ -881,7 +881,7 @@ export class WritePanel implements HoverParent {
       const insertGroup = bar.createDiv({
         cls: "inkswell-write__group inkswell-write__group--insert",
       });
-      insertGroup.createSpan({ cls: "inkswell-stats__muted", text: "Insert:" });
+      insertGroup.createSpan({ cls: "inkswell-stats__muted", text: "Einfügen:" });
       for (const { kind, label } of TODO_TYPES) {
         const btn = insertGroup.createEl("button", { text: label });
         // Insert WITHOUT stealing focus from the editor. If the button took focus,
@@ -894,17 +894,17 @@ export class WritePanel implements HoverParent {
           if (this.editor) insertPlaceholder(this.editor, kind);
         };
       }
-      const gaps = insertGroup.createEl("button", { text: "Find to-dos" });
+      const gaps = insertGroup.createEl("button", { text: "Aufgaben suchen" });
       gaps.setAttribute("aria-label", "Open to-dos (Revise)");
       gaps.onclick = () => void this.plugin.openTodos();
-      const issue = insertGroup.createEl("button", { text: "Log issue" });
+      const issue = insertGroup.createEl("button", { text: "Problem protokollieren" });
       issue.setAttribute("aria-label", "Log a revision issue for this scene (Mod-Shift-L)");
       issue.onclick = () => this.logIssue();
 
       // Collapsed form: a single dropdown holding the same actions. Hidden by CSS
       // on a wide bar, shown when the container query collapses the inline row.
       const menuBtn = bar.createEl("button", { cls: "inkswell-write__insertmenu" });
-      menuBtn.createSpan({ text: "Insert" });
+      menuBtn.createSpan({ text: "Einfügen" });
       setIcon(menuBtn.createSpan({ cls: "inkswell-write__caret" }), "chevron-down");
       menuBtn.setAttribute("aria-label", "Insert a to-do marker, format text, or log an issue");
       menuBtn.onmousedown = (e) => e.preventDefault();
@@ -975,7 +975,7 @@ export class WritePanel implements HoverParent {
 
     // Start the next scene without leaving Write (#47): appended at the end of
     // the manuscript; a row's menu offers "New scene after this" for elsewhere.
-    const add = nav.createEl("button", { cls: "inkswell-write__addscene", text: "New scene" });
+    const add = nav.createEl("button", { cls: "inkswell-write__addscene", text: "Neue Szene" });
     add.setAttribute("aria-label", "Create a new scene at the end of this project");
     add.onclick = () => this.newSceneFromWrite(project);
   }
@@ -1054,7 +1054,7 @@ export class WritePanel implements HoverParent {
         const menu = new Menu();
         menu.addItem((i) =>
           i
-            .setTitle("New scene after this")
+            .setTitle("Neue Szene danach")
             .setIcon("file-plus")
             .onClick(() => this.newSceneFromWrite(project, { title: scene.title, file }))
         );
@@ -1111,7 +1111,7 @@ export class WritePanel implements HoverParent {
     // a collapsed disclosure above the editor (reusing the same Inspector renderer).
     if (isPhone()) {
       const details = wrap.createEl("details", { cls: "inkswell-write__scenemeta" });
-      details.createEl("summary", { text: "Scene details" });
+      details.createEl("summary", { text: "Szenendetails" });
       this.inspector.render(details.createDiv(), file);
     }
 
@@ -1205,28 +1205,28 @@ export class WritePanel implements HoverParent {
     banner.addClass("is-visible");
     banner.createSpan({
       cls: "inkswell-write__conflicttext",
-      text: "This scene changed on disk while you were editing.",
+      text: "Diese Szene wurde auf dem Datenträger geändert, während du sie bearbeitet hast.",
     });
     const actions = banner.createDiv({ cls: "inkswell-write__conflictactions" });
-    const loadDisk = actions.createEl("button", { text: "Load disk version" });
+    const loadDisk = actions.createEl("button", { text: "Version vom Datenträger laden" });
     loadDisk.onclick = () =>
       void session
         .resolveReloadFromDisk()
         .then((backup) => {
           if (backup) new Notice(`Your unsaved text was backed up to "${backup}".`);
         })
-        .catch(() => new Notice("Couldn't resolve the conflict — nothing was changed."));
-    const keepMine = actions.createEl("button", { cls: "mod-cta", text: "Keep my version" });
+        .catch(() => new Notice("Der Konflikt konnte nicht gelöst werden – es wurde nichts geändert."));
+    const keepMine = actions.createEl("button", { cls: "mod-cta", text: "Meine Version behalten" });
     keepMine.onclick = () =>
       void session
         .resolveKeepMine()
         .then((backup) => {
           if (backup) new Notice(`The disk version was backed up to "${backup}".`);
         })
-        .catch(() => new Notice("Couldn't resolve the conflict — nothing was changed."));
+        .catch(() => new Notice("Der Konflikt konnte nicht gelöst werden – es wurde nichts geändert."));
     banner.createDiv({
       cls: "inkswell-stats__muted",
-      text: "Either way, the other version is backed up to the “Inkswell conflicts” folder.",
+      text: "In beiden Fällen wird die andere Version im Ordner „Inkswell conflicts“ gesichert.",
     });
   }
 
@@ -1433,7 +1433,7 @@ export class WritePanel implements HoverParent {
    */
   private renderNextUp(container: HTMLElement, project: Project): void {
     const card = container.createDiv({ cls: "inkswell-write__nextup" });
-    card.createSpan({ cls: "inkswell-stats__muted", text: "Next up:" });
+    card.createSpan({ cls: "inkswell-stats__muted", text: "Als Nächstes:" });
     const input = card.createEl("input", { type: "text", cls: "inkswell-write__nextupinput" });
     tagField(input, "write:next-up");
     input.value = project.inkswell?.nextUp ?? this.plugin.tracker.getNextUp();

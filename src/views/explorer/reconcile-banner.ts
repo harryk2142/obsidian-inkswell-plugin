@@ -42,7 +42,7 @@ export class ReconcileBanner {
     if (missing.length === 0 && orphans.length === 0) return;
 
     const box = section.createDiv({ cls: "inkswell-reconcile" });
-    box.createDiv({ cls: "inkswell-reconcile__head", text: "Scene files out of sync" });
+    box.createDiv({ cls: "inkswell-reconcile__head", text: "Szenendateien sind nicht synchron" });
     box.createDiv({
       cls: "inkswell-reconcile__summary",
       text: `${plural(missing.length, "scene")} missing · ${plural(orphans.length, "unindexed file")} in this folder.`,
@@ -55,7 +55,7 @@ export class ReconcileBanner {
         cls: "inkswell-reconcile__label",
         text: `“${autoMatch.oldTitle}” looks renamed to “${autoMatch.newBasename}”.`,
       });
-      const btn = row.createEl("button", { cls: "mod-cta", text: "Relink" });
+      const btn = row.createEl("button", { cls: "mod-cta", text: "Neu verknüpfen" });
       btn.onclick = () => void this.relink(project, autoMatch.oldTitle, autoMatch.newBasename);
       return;
     }
@@ -66,18 +66,18 @@ export class ReconcileBanner {
       if (orphans.length > 0) {
         const sel = row.createEl("select", { cls: "dropdown" });
         for (const o of orphans) sel.createEl("option", { text: o, value: o });
-        const relink = row.createEl("button", { text: "Relink to…" });
+        const relink = row.createEl("button", { text: "Neu verknüpfen mit…" });
         relink.onclick = () => void this.relink(project, title, sel.value);
       }
-      const rm = row.createEl("button", { text: "Remove from project" });
+      const rm = row.createEl("button", { text: "Aus Projekt entfernen" });
       rm.onclick = () => void this.removeFromProject(project, title);
     }
     for (const basename of orphans) {
       const row = box.createDiv({ cls: "inkswell-reconcile__row" });
       row.createSpan({ cls: "inkswell-reconcile__label", text: `Unindexed: ${basename}` });
-      const add = row.createEl("button", { text: "Add as scene" });
+      const add = row.createEl("button", { text: "Als Szene hinzufügen" });
       add.onclick = () => void this.addAsScene(project, basename);
-      const ign = row.createEl("button", { text: "Ignore" });
+      const ign = row.createEl("button", { text: "Ignorieren" });
       ign.onclick = () => void this.ignoreFile(project, basename);
     }
   }

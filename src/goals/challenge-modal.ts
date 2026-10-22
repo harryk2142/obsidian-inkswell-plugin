@@ -37,27 +37,27 @@ export class ChallengeModal extends FormModal {
     new Setting(contentEl).setName("Name").addText((t) =>
       t.setValue(this.draft.name).onChange((v) => (this.draft.name = v))
     );
-    new Setting(contentEl).setName("Start").addText((t) => {
+    new Setting(contentEl).setName("Beginn").addText((t) => {
       t.inputEl.type = "date";
       t.setValue(this.draft.start).onChange((v) => (this.draft.start = v));
     });
-    new Setting(contentEl).setName("End").setDesc("Inclusive.").addText((t) => {
+    new Setting(contentEl).setName("Ende").setDesc("Einschließlich.").addText((t) => {
       t.inputEl.type = "date";
       t.setValue(this.draft.end).onChange((v) => (this.draft.end = v));
     });
-    new Setting(contentEl).setName("Target words").addText((t) => {
+    new Setting(contentEl).setName("Zielwörter").addText((t) => {
       t.inputEl.type = "number";
       t.inputEl.min = "1";
       t.setValue(String(this.draft.target)).onChange((v) => (this.draft.target = Number(v)));
     });
 
     const buttons = new Setting(contentEl);
-    buttons.addButton((b) => b.setButtonText("Save").setCta().onClick(() => void this.trySubmit()));
+    buttons.addButton((b) => b.setButtonText("Speichern").setCta().onClick(() => void this.trySubmit()));
     if (this.editing) {
       buttons.addButton((b) => {
-        b.setButtonText("Clear challenge").onClick(async () => {
+        b.setButtonText("Challenge löschen").onClick(async () => {
           await this.save(null);
-          new Notice("Writing challenge cleared.");
+          new Notice("Schreibchallenge gelöscht.");
           this.close();
         });
         // Destructive styling via the class directly — setWarning() is deprecated
@@ -65,13 +65,13 @@ export class ChallengeModal extends FormModal {
         b.buttonEl.addClass("mod-warning");
       });
     }
-    buttons.addButton((b) => b.setButtonText("Cancel").onClick(() => this.close()));
+    buttons.addButton((b) => b.setButtonText("Abbrechen").onClick(() => this.close()));
   }
 
   protected async submit(): Promise<boolean> {
     const valid = normalizeChallenge(this.draft);
     if (!valid) {
-      new Notice("Check the dates (end on or after start, at most 400 days) and a target above 0.");
+      new Notice("Prüfe die Daten (Ende nicht vor Beginn, höchstens 400 Tage) und ein Ziel über 0.");
       return false;
     }
     await this.save(valid);

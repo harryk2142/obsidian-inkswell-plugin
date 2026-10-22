@@ -118,7 +118,7 @@ export function renderFieldSpecEditor(body: HTMLElement, ctx: SectionCtx, opts: 
 
       if (row.kind === "links" || row.kind === "link") {
         const restrict = taggedSelect(el, `${prefix}:cat:${row.key}`, { cls: "dropdown" });
-        restrict.createEl("option", { text: "Any type", value: "" });
+        restrict.createEl("option", { text: "Beliebiger Typ", value: "" });
         for (const c of types()) restrict.createEl("option", { text: c.label, value: c.id });
         restrict.value = row.linkCategory ?? "";
         restrict.setAttribute("aria-label", `Restrict ${row.key} to a type`);
@@ -135,7 +135,7 @@ export function renderFieldSpecEditor(body: HTMLElement, ctx: SectionCtx, opts: 
     onReorder: (next) => save(next),
     onRemove: (item) => save(rows.filter((r) => r.id !== item.id)),
     add: {
-      label: "Add field…",
+      label: "Feld hinzufügen…",
       action: () =>
         new AddFieldModal(app, {
           existingKeys: rows.map((r) => r.key),
@@ -196,19 +196,19 @@ class AddFieldModal extends FormModal {
   }
 
   protected renderForm(contentEl: HTMLElement): void {
-    contentEl.createEl("h3", { text: "Add field" });
+    contentEl.createEl("h3", { text: "Feld hinzufügen" });
     new Setting(contentEl)
-      .setName("Label")
+      .setName("Bezeichnung")
       .setDesc(this.opts.labelDesc)
       .addText((t) =>
-        t.setPlaceholder("e.g. Birth date").onChange((v) => {
+        t.setPlaceholder("z. B. Geburtsdatum").onChange((v) => {
           this.label = v;
           this.refreshKeyLine();
         })
       );
     this.keyLine = contentEl.createDiv({ cls: "setting-item-description" });
     this.refreshKeyLine();
-    new Setting(contentEl).setName("Kind").addDropdown((d) => {
+    new Setting(contentEl).setName("Art").addDropdown((d) => {
       for (const k of this.opts.kinds) d.addOption(k, FIELD_KIND_LABELS[k]);
       d.setValue(this.kind).onChange((v) => (this.kind = v as FieldKind));
     });
@@ -216,8 +216,8 @@ class AddFieldModal extends FormModal {
     const options = this.opts.catalog?.(new Set(this.opts.existingKeys)) ?? [];
     if (options.length > 0) {
       new Setting(contentEl)
-        .setName("Or add one of Inkswell's built-in fields")
-        .setDesc("Keeps its label and picker — a bestiary can borrow Relationships, for example.")
+        .setName("Oder füge eines der mitgelieferten Inkswell-Felder hinzu")
+        .setDesc("Behält Bezeichnung und Auswahl – ein Bestiarium kann zum Beispiel „Beziehungen“ übernehmen.")
         .addDropdown((d) => {
           d.addOption("", "—");
           for (const o of options) d.addOption(o.value, o.label);

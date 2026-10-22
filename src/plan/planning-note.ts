@@ -11,16 +11,11 @@
 import { App, TFile, normalizePath } from "obsidian";
 import { Project } from "../projects/types";
 import { sanitizeSegment } from "../settings/folders";
+import { PLAN_SECTIONS } from "./sections";
 
 /** Ordered H2 sections the Overview panel manages. Heading text is the key. */
-export const PLAN_SECTIONS = [
-  "Synopsis",
-  "Plot groundwork",
-  "Act I",
-  "Act II",
-  "Act III",
-] as const;
-export type PlanSection = (typeof PLAN_SECTIONS)[number];
+export { PLAN_SECTIONS } from "./sections";
+export type { PlanSection } from "./sections";
 
 /** Default planning-note path: sibling of the index note, "<Title> — Plan.md". */
 export function planningNotePath(project: Project): string {

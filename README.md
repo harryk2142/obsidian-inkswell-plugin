@@ -85,21 +85,21 @@ Everything Inkswell stores is plain text you can inspect, sync, and back up like
 | Scene prose | Ordinary notes in your project's scene folder |
 | Plan data — beats, outline structure, goals, revision log, audit checklists, compile & publishing settings | Frontmatter of the **project index note** (the note named after your project) |
 | Codex entries | Ordinary notes with a `codex` frontmatter key |
-| Plugin settings, writing history, sprints, ideas inbox | The plugin's `data.json` (inside `.obsidian/plugins/inkswell/`) |
+| Plugin settings, writing history, sprints, ideas inbox | The plugin's `data.json` (inside `.obsidian/plugins/inkswell-de/`) |
 | Other devices' writing history (opt-in: *Sync writing history across devices*) | One small machine-written note per device under `<base folder>/Writing log/`, merged on Track |
 
 Recovery options, should anything ever go wrong:
 
 - **Obsidian's File Recovery** (Settings → File Recovery → *View*) keeps periodic snapshots of every note that changes — including plugin-written ones. The search is by **file name**: for plan data (beats, goals, revision log), search for your **project's name** and look at the index note's snapshots; for prose, search the scene's name.
 - **The "Inkswell conflicts" folder**: whenever Inkswell must displace a version of your text (resolving an editor/disk conflict, or overwriting a file during compile at your request), the displaced version is saved there first — nothing is ever silently discarded.
-- **Daily `data.json` backups**: on each load, Inkswell keeps a daily copy of its `data.json` in `.obsidian/plugins/inkswell/backups/` (the last 7 days). To bring back **settings only** (custom codex types, renamed types, Customize changes, the rail arrangement) without touching your writing history, run the command **Restore settings from a backup** and pick a day. To restore everything, including writing history: disable Inkswell, copy the backup over `data.json`, re-enable. If `data.json` can't be read when Obsidian starts, Inkswell loads the newest backup by itself, keeps the unreadable file as `data-unreadable-<date>.json`, and shows a notice.
+- **Daily `data.json` backups**: on each load, Inkswell keeps a daily copy of its `data.json` in `.obsidian/plugins/inkswell-de/backups/` (the last 7 days). To bring back **settings only** (custom codex types, renamed types, Customize changes, the rail arrangement) without touching your writing history, run the command **Restore settings from a backup** and pick a day. To restore everything, including writing history: disable Inkswell, copy the backup over `data.json`, re-enable. If `data.json` can't be read when Obsidian starts, Inkswell loads the newest backup by itself, keeps the unreadable file as `data-unreadable-<date>.json`, and shows a notice.
 
 ## Install
 
 **Requirements:** Obsidian 1.7.4+ (pandoc optional, for `.docx` / `.pdf` / `.epub`).
 
 - **Community plugins:** Settings → *Community plugins* → *Browse* → search **Inkswell** → Install → Enable.
-- **Manual:** download `main.js`, `manifest.json`, and `styles.css` from the latest [release](https://github.com/leethobbit/obsidian-inkswell-plugin/releases) into `<vault>/.obsidian/plugins/inkswell/`, then enable Inkswell in *Community plugins*.
+- **Manual:** copy `main.js`, `manifest.json`, and `styles.css` into `<vault>/.obsidian/plugins/inkswell-de/`, then enable `inkswell-de` in *Community plugins*.
 
 Open Inkswell from the pen-tip ribbon icon or the *"Open Inkswell"* command.
 
@@ -116,7 +116,7 @@ npm run build    # typecheck + production bundle
 npm test         # unit tests (vitest)
 ```
 
-Copy `main.js`, `manifest.json`, and `styles.css` into `<vault>/.obsidian/plugins/inkswell/` to test in a real vault. Architecture, conventions, and the compile/version workflows are documented in [AGENTS.md](AGENTS.md).
+Copy `main.js`, `manifest.json`, and `styles.css` into `<vault>/.obsidian/plugins/inkswell-de/` to test in a real vault. Architecture, conventions, and the compile/version workflows are documented in [AGENTS.md](AGENTS.md).
 
 ## AI disclosure
 

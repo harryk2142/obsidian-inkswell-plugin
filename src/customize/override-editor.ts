@@ -96,10 +96,10 @@ export function renderOverrideEditor<X extends object>(
     for (const g of groups) renderGroup(host, ctx, opts, o, g, groups, save);
     if (opts.allowAddGroup) {
       const foot = host.createDiv({ cls: "inkswell-listedit__foot" });
-      const add = foot.createEl("button", { text: "Add group…" });
+      const add = foot.createEl("button", { text: "Gruppe hinzufügen…" });
       add.type = "button";
       add.onclick = async () => {
-        const label = await promptText(ctx.app, { title: "New group", value: "", multiline: false, cta: "Add" });
+        const label = await promptText(ctx.app, { title: "Neue Gruppe", value: "", multiline: false, cta: "Hinzufügen" });
         if (!label?.trim()) return;
         save(ops.addGroup(o, { id: newListItemId(meta.groupPrefix ?? "pg"), label: label.trim() }));
       };
@@ -129,8 +129,8 @@ function renderGroup<X extends object>(
   card.addEventListener("toggle", () => ctx.cards.setOpen(`${opts.listId}:${g.id}`, card.open));
   const summary = card.createEl("summary", { cls: "inkswell-customize__groupsum" });
   summary.createSpan({ text: g.label });
-  if (g.hidden) summary.createSpan({ cls: "inkswell-customize__badge", text: "hidden" });
-  if (g.custom) summary.createSpan({ cls: "inkswell-customize__badge", text: "yours" });
+  if (g.hidden) summary.createSpan({ cls: "inkswell-customize__badge", text: "ausgeblendet" });
+  if (g.custom) summary.createSpan({ cls: "inkswell-customize__badge", text: "eigene" });
   const body = card.createDiv({ cls: "inkswell-customize__cardbody" });
 
   // Group header controls: rename + hide/show (+ remove for custom groups).
@@ -143,7 +143,7 @@ function renderGroup<X extends object>(
   hide.type = "button";
   hide.onclick = () => save(ops.setGroupHidden(o, g.id, !g.hidden));
   if (g.custom) {
-    const rm = head.createEl("button", { text: "Remove group" });
+    const rm = head.createEl("button", { text: "Gruppe entfernen" });
     rm.type = "button";
     rm.onclick = () => {
       if (g.items.some((i) => !i.custom)) return; // can't happen — shipped items never sit in custom groups
@@ -190,8 +190,8 @@ function renderItems<X extends object>(
       if (it.shippedLabel && it.shippedLabel !== it.label) {
         el.createSpan({ cls: "inkswell-stats__muted inkswell-customize__was", text: `was “${it.shippedLabel}”` });
       }
-      if (it.custom) el.createSpan({ cls: "inkswell-customize__badge", text: "yours" });
-      if (it.hidden) el.createSpan({ cls: "inkswell-customize__badge", text: "hidden" });
+      if (it.custom) el.createSpan({ cls: "inkswell-customize__badge", text: "eigene" });
+      if (it.hidden) el.createSpan({ cls: "inkswell-customize__badge", text: "ausgeblendet" });
       opts.renderExtra?.(el, it, (p) => save(ops.patchItem(o, it.id, p)));
     },
     extendMenu(menu: Menu, it) {
@@ -204,7 +204,7 @@ function renderItems<X extends object>(
       if (it.shippedLabel && it.shippedLabel !== it.label) {
         menu.addItem((i) =>
           i
-            .setTitle("Restore shipped name")
+            .setTitle("Mitgelieferten Namen wiederherstellen")
             .setIcon("rotate-ccw")
             .onClick(() => save(ops.setItemLabel(o, it.id, it.shippedLabel ?? "", it.shippedLabel)))
         );
@@ -224,7 +224,7 @@ function renderItems<X extends object>(
               title: `New ${opts.noun}`,
               value: "",
               multiline: false,
-              cta: "Add",
+              cta: "Hinzufügen",
             });
             if (!label?.trim()) return;
             const extra = opts.newItemExtra ? await opts.newItemExtra() : ({} as X);
@@ -251,7 +251,7 @@ function resetOption<X>(
 ): { label: string; action(): void } | undefined {
   if (!o) return undefined;
   return {
-    label: "Reset to Inkswell's defaults",
+    label: "Auf Inkswells Standardwerte zurücksetzen",
     action: () => void persist(ctx, listId, undefined, spec),
   };
 }

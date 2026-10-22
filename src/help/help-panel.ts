@@ -20,7 +20,7 @@ export class HelpPanel {
     container.empty();
     container.addClass("inkswell-help");
 
-    container.createEl("h2", { cls: "inkswell-help__title", text: "How Inkswell works" });
+    container.createEl("h2", { cls: "inkswell-help__title", text: "So funktioniert Inkswell" });
     container.createEl("p", {
       cls: "inkswell-stats__muted",
       text:
@@ -29,7 +29,7 @@ export class HelpPanel {
     });
     const shape = container.createEl("p", { cls: "inkswell-stats__muted" });
     shape.appendText("Shape Inkswell to your process under ");
-    const link = shape.createEl("a", { text: "Customize" });
+    const link = shape.createEl("a", { text: "Anpassen" });
     link.onclick = (e) => {
       e.preventDefault();
       void this.plugin.openCustomize();
@@ -51,11 +51,11 @@ export class HelpPanel {
     }
 
     const footer = container.createDiv({ cls: "inkswell-help__footer" });
-    const reset = footer.createEl("button", { text: "Reset tips & replay welcome" });
+    const reset = footer.createEl("button", { text: "Tipps zurücksetzen und Begrüßung erneut anzeigen" });
     reset.onclick = async () => {
       await resetHelpState(this.plugin);
       this.plugin.refreshExplorer();
-      new Notice("Tips reset.");
+      new Notice("Tipps zurückgesetzt.");
       new WelcomeModal(this.app, this.plugin).open();
     };
   }

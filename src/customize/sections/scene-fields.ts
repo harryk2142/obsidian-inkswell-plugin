@@ -93,9 +93,9 @@ export const sceneFieldsSection: CustomizeSection = {
         reserved: SCENE_RESERVED_KEYS,
         defaultLabel: humanizeKey,
         kinds: SCENE_FIELD_KINDS,
-        emptyText: "No fields of your own yet.",
+        emptyText: "Noch keine eigenen Felder.",
         reset: {
-          label: "Remove all your fields",
+          label: "Alle eigenen Felder entfernen",
           confirm:
             `Remove every field of your own? This deletes the ${SCENE_FIELDS_KEY} property from ` +
             `${template?.basename ?? "the scene template"} — scenes keep the values they already store.`,

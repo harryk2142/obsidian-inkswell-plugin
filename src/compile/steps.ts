@@ -69,7 +69,7 @@ export function flattenLinkSyntax(text: string): string {
  *  the compiled manuscript instead of losing it as fake "frontmatter". */
 const stripFrontmatter: SceneStep = {
   id: "strip-frontmatter",
-  description: "Strip YAML frontmatter from each scene",
+  description: "YAML-Frontmatter aus jeder Szene entfernen",
   kind: "scene",
   run: (scenes) =>
     scenes.map((s) => ({ ...s, contents: stripLeadingFrontmatter(s.contents) })),
@@ -78,7 +78,7 @@ const stripFrontmatter: SceneStep = {
 /** Remove Obsidian `%% ... %%` comments from each scene. */
 const removeComments: SceneStep = {
   id: "remove-comments",
-  description: "Remove %% Obsidian comments %% from each scene",
+  description: "%% Obsidian-Kommentare %% aus jeder Szene entfernen",
   kind: "scene",
   run: (scenes) =>
     scenes.map((s) => ({
@@ -94,7 +94,7 @@ const removeComments: SceneStep = {
  */
 const removeTodos: SceneStep = {
   id: "remove-todos",
-  description: "Remove drafting markers ([TODO], [NOTE], [SCENE]…) — unfinished spots",
+  description: "Entwurfsmarkierungen ([AUFGABE], [NOTIZ], [SZENE]…) entfernen – unfertige Stellen",
   kind: "scene",
   run: (scenes) =>
     scenes.map((s) => ({ ...s, contents: stripPlaceholders(s.contents) })),
@@ -110,7 +110,7 @@ const removeTodos: SceneStep = {
  */
 const flattenLinks: SceneStep = {
   id: "flatten-links",
-  description: "Flatten links to plain text ([[wikilinks]] and [markdown](links))",
+  description: "Links in Klartext umwandeln ([[Wikilinks]] und [Markdown](Links))",
   kind: "scene",
   run: (scenes) =>
     scenes.map((s) => ({ ...s, contents: flattenLinkSyntax(s.contents) })),
@@ -136,7 +136,7 @@ const htmlAlign: SceneStep = {
 /** Prepend a markdown heading (scene title) to each scene. */
 const prependTitle: SceneStep = {
   id: "prepend-title",
-  description: "Prepend the scene title as a heading",
+  description: "Szenentitel als Überschrift voranstellen",
   kind: "scene",
   run: (scenes, options) => {
     const level = clampLevel(options.level);
@@ -158,7 +158,7 @@ const prependTitle: SceneStep = {
  */
 const groupByChapter: SceneStep = {
   id: "group-by-chapter",
-  description: "Group scenes into chapters (heading per chapter, scene breaks between)",
+  description: "Szenen zu Kapiteln gruppieren (Überschrift je Kapitel, dazwischen Szenentrenner)",
   kind: "scene",
   run: (scenes, options) => {
     const hashes = "#".repeat(clampLevel(options.level));
@@ -189,7 +189,7 @@ const groupByChapter: SceneStep = {
 /** Collapse 3+ consecutive blank lines and trim leading/trailing whitespace. */
 const trimBlankLines: ManuscriptStep = {
   id: "trim-blank-lines",
-  description: "Collapse excess blank lines and trailing whitespace",
+  description: "Überzählige Leerzeilen und nachgestellte Leerzeichen entfernen",
   kind: "manuscript",
   run: (manuscript) =>
     manuscript

@@ -48,14 +48,14 @@ export class SeriesMenu {
     const menu = new Menu();
     menu.addItem((i) =>
       i
-        .setTitle("Rename project")
+        .setTitle("Projekt umbenennen")
         .setIcon("text-cursor-input")
         .onClick(() => this.cb.renameProject(row))
     );
     if (isMultiScene(row.draft)) {
       menu.addItem((i) =>
         i
-          .setTitle("Sort scenes by chapter number…")
+          .setTitle("Szenen nach Kapitelnummer sortieren…")
           .setIcon("arrow-down-0-1")
           .onClick(() => this.cb.sortByChapter(row))
       );
@@ -78,7 +78,7 @@ export class SeriesMenu {
     if (info) {
       menu.addItem((i) =>
         i
-          .setTitle("Remove from series")
+          .setTitle("Aus Reihe entfernen")
           .setIcon("link-2-off")
           .onClick(() => {
             const file = this.indexFile(project);
@@ -104,20 +104,20 @@ export class SeriesMenu {
     menu.addSeparator();
     menu.addItem((i) =>
       i
-        .setTitle("Rename series…")
+        .setTitle("Reihe umbenennen…")
         .setIcon("text-cursor-input")
         .onClick(() => void promptRenameSeries(this.app, projects, series, (from, to) => this.cb.seriesRenamed(from, to)))
     );
     menu.addItem((i) =>
       i
-        .setTitle("Reorder books…")
+        .setTitle("Bücher neu anordnen…")
         .setIcon("list-ordered")
         .onClick(() => new ReorderBooksModal(this.app, projects, series).open())
     );
     if (groupIntoSeries(projects).series.length > 1) {
       menu.addItem((i) =>
         i
-          .setTitle("Reorder series…")
+          .setTitle("Reihen neu anordnen…")
           .setIcon("arrow-up-down")
           .onClick(() => this.cb.reorderSeries())
       );
@@ -135,7 +135,7 @@ export class SeriesMenu {
   private addBookItems(menu: Menu, series: Series, projects: Project[]): void {
     menu.addItem((i) =>
       i
-        .setTitle("New book in this series…")
+        .setTitle("Neues Buch in dieser Reihe…")
         .setIcon("book-plus")
         .onClick(() =>
           this.cb.newProject({ series: { name: series.name, order: nextBookOrder(series.books) } })
@@ -143,7 +143,7 @@ export class SeriesMenu {
     );
     menu.addItem((i) =>
       i
-        .setTitle("Add existing project…")
+        .setTitle("Vorhandenes Projekt hinzufügen…")
         .setIcon("book-copy")
         .onClick(() => addExistingToSeries(this.app, projects, this.cb.activePath(), series))
     );

@@ -145,7 +145,7 @@ export class CodexPanel {
     const bar = container.createDiv({ cls: "inkswell-codex__toolbar" });
     const searchInput = bar.createEl("input", {
       type: "search",
-      placeholder: "Search codex…",
+      placeholder: "Kodex durchsuchen…",
     });
     tagField(searchInput, "codex:search");
     searchInput.value = this.search;
@@ -159,8 +159,8 @@ export class CodexPanel {
     // active project there is nothing to scope by, so the control is moot.
     const active = this.activeProject();
     const scopeSel = bar.createEl("select", { cls: "dropdown" });
-    scopeSel.createEl("option", { text: "In scope", value: "scope" });
-    scopeSel.createEl("option", { text: "All projects", value: "all" });
+    scopeSel.createEl("option", { text: "Im Geltungsbereich", value: "scope" });
+    scopeSel.createEl("option", { text: "Alle Projekte", value: "all" });
     scopeSel.value = this.showAll || !active ? "all" : "scope";
     scopeSel.disabled = !active;
     scopeSel.onchange = () => {
@@ -182,11 +182,11 @@ export class CodexPanel {
     }
     const catSel = bar.createEl("select", { cls: "dropdown" });
     catSel.setAttribute("aria-label", "Show one type");
-    catSel.createEl("option", { text: "All types", value: "" });
+    catSel.createEl("option", { text: "Alle Typen", value: "" });
     for (const c of cats) {
       catSel.createEl("option", { text: c.plural, value: c.id });
     }
-    catSel.createEl("option", { text: "New type…", value: NEW_TYPE });
+    catSel.createEl("option", { text: "Neuer Typ…", value: NEW_TYPE });
     catSel.value = this.categoryFilter;
     // Picking "New type…" opens the add dialog instead of being a selection; the
     // select snaps back so cancel leaves the current filter active.
@@ -199,7 +199,7 @@ export class CodexPanel {
       this.categoryFilter = catSel.value;
       this.renderList();
     };
-    const newBtn = bar.createEl("button", { cls: "mod-cta", text: "New" });
+    const newBtn = bar.createEl("button", { cls: "mod-cta", text: "Neu" });
     // New entries inherit the active project's scope: its series if it belongs to
     // one, else the book itself. With no active project they are created global.
     const projects = this.plugin.store.getProjects();
@@ -210,7 +210,7 @@ export class CodexPanel {
         title: `New ${def.label}`,
         value: "",
         multiline: false,
-        cta: "Create",
+        cta: "Erstellen",
       });
       if (!name) return;
       // The same pipeline Quick Codex (Write editor) uses — scope, folder
@@ -347,17 +347,17 @@ export class CodexPanel {
     attachRowMenu(row, row, () => {
       const menu = new Menu();
       menu.addItem((i) =>
-        i.setTitle("Open note").setIcon("file-text").onClick(() => openScene(this.app, file))
+        i.setTitle("Notiz öffnen").setIcon("file-text").onClick(() => openScene(this.app, file))
       );
       menu.addItem((i) =>
-        i.setTitle("Copy as text").setIcon("copy").onClick(() => this.copyAsText(entity))
+        i.setTitle("Als Text kopieren").setIcon("copy").onClick(() => this.copyAsText(entity))
       );
       menu.addItem((i) =>
-        i.setTitle("Rename…").setIcon("pencil").onClick(() => this.rename(file))
+        i.setTitle("Umbenennen…").setIcon("pencil").onClick(() => this.rename(file))
       );
       menu.addSeparator();
       menu.addItem((i) =>
-        i.setTitle("Delete").setIcon("trash").onClick(() => this.remove(file, entity.name))
+        i.setTitle("Löschen").setIcon("trash").onClick(() => this.remove(file, entity.name))
       );
       return menu;
     });
@@ -370,7 +370,7 @@ export class CodexPanel {
     if (!data) return;
     void navigator.clipboard.writeText(codexEntryText(data, { title: true })).then(
       () => new Notice(`Copied ${entity.name}`),
-      () => new Notice("Couldn't copy to the clipboard.")
+      () => new Notice("Konnte nicht in die Zwischenablage kopieren.")
     );
   }
 
@@ -387,7 +387,7 @@ export class CodexPanel {
     if (!entity || !(file instanceof TFile)) {
       host.createDiv({
         cls: "inkswell-inspector__empty",
-        text: "Select a codex entry to edit its profile.",
+        text: "Wähle einen Kodex-Eintrag aus, um sein Profil zu bearbeiten.",
       });
       return;
     }
@@ -409,7 +409,7 @@ export class CodexPanel {
       cls: "inkswell-inspector__project",
       text: this.label(entity.category),
     });
-    const openBtn = meta.createEl("button", { text: "Open note" });
+    const openBtn = meta.createEl("button", { text: "Notiz öffnen" });
     openBtn.onclick = () => openScene(this.app, file);
 
     this.renderScopeField(host, file, entity);
@@ -430,13 +430,13 @@ export class CodexPanel {
         customize();
       };
       src.appendText(" · ");
-      const note = src.createEl("a", { text: "open note" });
+      const note = src.createEl("a", { text: "Notiz öffnen" });
       note.onclick = (e) => {
         e.preventDefault();
         openScene(this.app, template);
       };
     } else {
-      const link = src.createEl("a", { text: "Customize fields…" });
+      const link = src.createEl("a", { text: "Felder anpassen…" });
       link.onclick = (e) => {
         e.preventDefault();
         customize();
@@ -449,7 +449,7 @@ export class CodexPanel {
     // the token drops the result if the pane re-rendered or another entry was picked.
     const token = ++this.appearsToken;
     this.field(host, "Appears in", (control) => {
-      control.createSpan({ cls: "inkswell-stats__muted", text: "Scanning scenes…" });
+      control.createSpan({ cls: "inkswell-stats__muted", text: "Szenen werden durchsucht…" });
       void appearancesForEntity(
         this.app,
         this.plugin.store.getProjects(),
@@ -459,7 +459,7 @@ export class CodexPanel {
         if (token !== this.appearsToken) return;
         control.empty();
         if (books.length === 0) {
-          control.createSpan({ cls: "inkswell-stats__muted", text: "No scenes mention this yet." });
+          control.createSpan({ cls: "inkswell-stats__muted", text: "Noch keine Szene erwähnt diesen Eintrag." });
           return;
         }
         // Grouped by book (a series character reads per book), scenes in
@@ -505,7 +505,7 @@ export class CodexPanel {
         if (books.some((b) => b.linkedCount > 0 && b.linkedCount < b.scenes.length)) {
           control.createDiv({
             cls: "inkswell-codex__reflegend inkswell-stats__muted",
-            text: "Filled = linked in scene metadata · outlined = mentioned in the text",
+            text: "Ausgefüllt = in Szenenmetadaten verknüpft · umrandet = im Text erwähnt",
           });
         }
       });
@@ -578,7 +578,7 @@ export class CodexPanel {
       const menu = new Menu();
       menu.addItem((i) =>
         i
-          .setTitle("Choose from vault…")
+          .setTitle("Aus Tresor wählen…")
           .setIcon("image")
           .onClick(() => {
             void (async () => {
@@ -589,7 +589,7 @@ export class CodexPanel {
       );
       menu.addItem((i) =>
         i
-          .setTitle("Upload…")
+          .setTitle("Hochladen…")
           .setIcon("upload")
           .onClick(() => this.uploadImage(file, save))
       );
@@ -597,7 +597,7 @@ export class CodexPanel {
         menu.addSeparator();
         menu.addItem((i) =>
           i
-            .setTitle("Remove image")
+            .setTitle("Bild entfernen")
             .setIcon("trash")
             .onClick(() => void save(""))
         );
@@ -736,7 +736,7 @@ export class CodexPanel {
         cls: "inkswell-scope__text",
         text: scopeSummary(scope, books, (name) => series.find((s) => s.name === name)?.books ?? null),
       });
-      const change = row.createEl("button", { text: "Change…" });
+      const change = row.createEl("button", { text: "Ändern…" });
       change.setAttribute("aria-label", `Change where “${entity.name}” is visible`);
       change.onclick = () => {
         // Defaults when the user switches kind: the active story's series/book wins.
@@ -765,15 +765,15 @@ export class CodexPanel {
 
   private async rename(file: TFile): Promise<void> {
     const next = await promptText(this.app, {
-      title: "Rename codex entry",
+      title: "Kodex-Eintrag umbenennen",
       value: file.basename,
       multiline: false,
-      cta: "Rename",
+      cta: "Umbenennen",
     });
     if (next === null) return;
     const safe = sanitizeSegment(next);
     if (!safe) {
-      if (next.trim()) new Notice("That name can't be used as a file name.");
+      if (next.trim()) new Notice("Dieser Name kann nicht als Dateiname verwendet werden.");
       return;
     }
     if (safe === file.basename) return;

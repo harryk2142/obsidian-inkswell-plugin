@@ -59,7 +59,7 @@ export class LaunchPanel {
 
     const active = resolveActive(this.store.getProjects(), this.plugin.activeProject.get());
     if (!active) {
-      container.createDiv({ cls: "inkswell-stats__muted", text: "No project selected." });
+      container.createDiv({ cls: "inkswell-stats__muted", text: "Kein Projekt ausgewählt." });
       return;
     }
     // Launch plan describes the BOOK, not one draft — read/write the story's base
@@ -103,17 +103,17 @@ export class LaunchPanel {
 
     const ctl = host.createDiv({ cls: "inkswell-publishing__preorderctl" });
     const dateF = ctl.createDiv({ cls: "inkswell-inspector__field" });
-    dateF.createDiv({ cls: "inkswell-inspector__label", text: "Release date" });
+    dateF.createDiv({ cls: "inkswell-inspector__label", text: "Veröffentlichungsdatum" });
     const date = dateF.createEl("input", { type: "date" });
     tagField(date, "pub:launch:date");
     date.value = launch.releaseDate ?? "";
     date.onchange = () => this.saveLaunch(file, { releaseDate: date.value || undefined });
 
     const stratF = ctl.createDiv({ cls: "inkswell-inspector__field" });
-    stratF.createDiv({ cls: "inkswell-inspector__label", text: "Strategy" });
+    stratF.createDiv({ cls: "inkswell-inspector__label", text: "Strategie" });
     const strat = stratF.createEl("select", { cls: "dropdown" });
     tagField(strat, "pub:launch:strategy");
-    strat.createEl("option", { text: "— none —", value: "" });
+    strat.createEl("option", { text: "— keine —", value: "" });
     for (const s of Object.values(STRATEGIES)) strat.createEl("option", { text: s.label, value: s.id });
     strat.value = launch.strategy ?? "";
     strat.onchange = () =>
@@ -122,7 +122,7 @@ export class LaunchPanel {
     if (!launch.releaseDate || !launch.strategy) {
       host.createDiv({
         cls: "inkswell-stats__muted",
-        text: "Set a release date and strategy to compute the milestone calendar.",
+        text: "Lege Veröffentlichungsdatum und Strategie fest, um den Meilensteinkalender zu berechnen.",
       });
       return;
     }
@@ -146,7 +146,7 @@ export class LaunchPanel {
     }
     host.createDiv({
       cls: "inkswell-stats__muted",
-      text: "Dates are computed from your release date. Verification/approval/delivery are manual — Inkswell doesn't talk to platforms.",
+      text: "Die Termine werden aus dem Veröffentlichungsdatum berechnet. Prüfung, Freigabe und Auslieferung erfolgen manuell – Inkswell kommuniziert nicht mit Plattformen.",
     });
   }
 
@@ -156,24 +156,24 @@ export class LaunchPanel {
     const items = (data?.budget?.items ?? []) as unknown as TrackerRow[];
     renderTrackerSection(host, {
       columns: [
-        { key: "label", label: "Item", type: "text", placeholder: "Editor, cover…" },
+        { key: "label", label: "Gegenstand", type: "text", placeholder: "Lektorat, Cover…" },
         {
           key: "category",
-          label: "Type",
+          label: "Typ",
           type: "select",
           options: [
-            { value: "need", label: "Need" },
-            { value: "want", label: "Want" },
+            { value: "need", label: "Notwendig" },
+            { value: "want", label: "Wunsch" },
           ],
         },
-        { key: "estimate", label: "Estimate", type: "number" },
-        { key: "actual", label: "Actual", type: "number" },
+        { key: "estimate", label: "Schätzung", type: "number" },
+        { key: "actual", label: "Tatsächlich", type: "number" },
       ],
       rows: items,
       newRow: () => ({ id: newPublishingId(), label: "", category: "need" }),
       keyPrefix: "pub:budget",
       addLabel: "+ Budget line",
-      emptyText: "Track what this book costs — needs vs. wants.",
+      emptyText: "Verfolge die Kosten dieses Buchs – Notwendiges und Wünsche.",
       ...this.trackerOps(file, {
         get: (pub) => (pub.budget?.items ?? []) as unknown as TrackerRow[],
         set: (pub, rows) => {
@@ -194,7 +194,7 @@ export class LaunchPanel {
   private renderCover(host: HTMLElement, file: TFile, data: PublishingData | undefined): void {
     const cover = data?.cover ?? {};
     const planF = host.createDiv({ cls: "inkswell-inspector__field" });
-    planF.createDiv({ cls: "inkswell-inspector__label", text: "Design direction" });
+    planF.createDiv({ cls: "inkswell-inspector__label", text: "Gestaltungsrichtung" });
     const plan = planF.createDiv({ cls: "inkswell-inspector__control" }).createEl("textarea", {
       cls: "inkswell-inspector__textarea",
     });
@@ -208,13 +208,13 @@ export class LaunchPanel {
         if (!pub.cover.plan && !(pub.cover.comps?.length)) delete pub.cover;
       });
 
-    host.createDiv({ cls: "inkswell-audit__grouplabel", text: "Comparison covers" });
+    host.createDiv({ cls: "inkswell-audit__grouplabel", text: "Vergleichscover" });
     const comps = (cover.comps ?? []) as unknown as TrackerRow[];
     renderTrackerSection(host, {
       columns: [
-        { key: "title", label: "Comp cover", type: "text", placeholder: "Title / author" },
-        { key: "note", label: "Note", type: "text" },
-        { key: "done", label: "Got it", type: "checkbox" },
+        { key: "title", label: "Vergleichscover", type: "text", placeholder: "Titel / Autor:in" },
+        { key: "note", label: "Notiz", type: "text" },
+        { key: "done", label: "Erledigt", type: "checkbox" },
       ],
       rows: comps,
       newRow: () => ({ id: newPublishingId(), title: "" }),
@@ -237,17 +237,17 @@ export class LaunchPanel {
     const items = (data?.marketing?.items ?? []) as unknown as TrackerRow[];
     renderTrackerSection(host, {
       columns: [
-        { key: "strategy", label: "Strategy", type: "text", placeholder: "ARC blast, BookBub…" },
-        { key: "date", label: "Date", type: "date" },
+        { key: "strategy", label: "Strategie", type: "text", placeholder: "ARC blast, BookBub…" },
+        { key: "date", label: "Datum", type: "date" },
         { key: "budget", label: "Budget", type: "number" },
-        { key: "result", label: "Result", type: "text" },
-        { key: "done", label: "Done", type: "checkbox" },
+        { key: "result", label: "Ergebnis", type: "text" },
+        { key: "done", label: "Fertig", type: "checkbox" },
       ],
       rows: items,
       newRow: () => ({ id: newPublishingId(), strategy: "" }),
       keyPrefix: "pub:marketing",
       addLabel: "+ Marketing action",
-      emptyText: "Plan launch actions; record results to learn for the next book.",
+      emptyText: "Plane Veröffentlichungsaktionen und halte Ergebnisse fest, um für das nächste Buch zu lernen.",
       ...this.trackerOps(file, {
         get: (pub) => (pub.marketing?.items ?? []) as unknown as TrackerRow[],
         set: (pub, rows) => {
@@ -262,17 +262,17 @@ export class LaunchPanel {
     const readers = (data?.arcs?.readers ?? []) as unknown as TrackerRow[];
     renderTrackerSection(host, {
       columns: [
-        { key: "name", label: "Reader", type: "text" },
-        { key: "contact", label: "Contact", type: "text" },
-        { key: "sent", label: "Sent", type: "checkbox" },
-        { key: "reviewed", label: "Reviewed", type: "checkbox" },
-        { key: "note", label: "Note", type: "text" },
+        { key: "name", label: "Leser:in", type: "text" },
+        { key: "contact", label: "Kontakt", type: "text" },
+        { key: "sent", label: "Gesendet", type: "checkbox" },
+        { key: "reviewed", label: "Rezensiert", type: "checkbox" },
+        { key: "note", label: "Notiz", type: "text" },
       ],
       rows: readers,
       newRow: () => ({ id: newPublishingId(), name: "" }),
       keyPrefix: "pub:arcs",
       addLabel: "+ ARC reader",
-      emptyText: "Track who got an advance copy and who has reviewed.",
+      emptyText: "Verfolge, wer ein Vorabexemplar erhalten und wer rezensiert hat.",
       ...this.trackerOps(file, {
         get: (pub) => (pub.arcs?.readers ?? []) as unknown as TrackerRow[],
         set: (pub, rows) => {

@@ -119,7 +119,7 @@ export class ExplorerPanel {
     container.addClass("inkswell-explorer");
 
     const toolbar = container.createDiv({ cls: "inkswell-explorer__toolbar" });
-    const newBtn = toolbar.createEl("button", { cls: "mod-cta", text: "New project" });
+    const newBtn = toolbar.createEl("button", { cls: "mod-cta", text: "Neues Projekt" });
     newBtn.onclick = () => this.plugin.newProject();
 
     const projects = this.store.getProjects();
@@ -128,7 +128,7 @@ export class ExplorerPanel {
       renderIdeas(container, this.plugin);
       container.createDiv({
         cls: "inkswell-explorer__empty",
-        text: 'No writing projects yet. Click "New project" above to create one (or add a `longform` key to a note\'s frontmatter).',
+        text: 'Noch keine Schreibprojekte. Klicke oben auf „Neues Projekt“ (oder füge dem Frontmatter einer Notiz den Schlüssel `longform` hinzu).',
       });
       return;
     }
@@ -157,7 +157,7 @@ export class ExplorerPanel {
       const bar = container.createDiv({ cls: "inkswell-explorer__focus" });
       const back = bar.createEl("button", {
         cls: "inkswell-explorer__showall",
-        text: "← All projects",
+        text: "← Alle Projekte",
       });
       back.onclick = () => this.plugin.activeProject.set(null);
 
@@ -202,7 +202,7 @@ export class ExplorerPanel {
     const grid = parent.createDiv({ cls: "inkswell-shelf__grid" });
     const ctx = this.cardContext();
     for (const book of books) renderBookCard(grid, book, ctx);
-    const ghost = grid.createDiv({ cls: "inkswell-card inkswell-card--ghost", text: "+ Add book" });
+    const ghost = grid.createDiv({ cls: "inkswell-card inkswell-card--ghost", text: "+ Buch hinzufügen" });
     ghost.setAttribute("role", "button");
     ghost.tabIndex = 0;
     ghost.setAttribute("aria-label", series ? `Add a book to ${series.name}` : "Start a new book");
@@ -298,7 +298,7 @@ export class ExplorerPanel {
     if (isMultiScene(project.draft)) {
       const add = right.createEl("button", {
         cls: "inkswell-project__addscene",
-        text: "+ scene",
+        text: "+ Szene",
       });
       add.setAttribute("aria-label", "Create a new scene in this project");
       add.onclick = (e) => {
@@ -322,7 +322,7 @@ export class ExplorerPanel {
       if (project.scenes.length === 0) {
         list.createDiv({
           cls: "inkswell-explorer__empty",
-          text: "No scenes yet.",
+          text: "Noch keine Szenen.",
         });
       }
     }

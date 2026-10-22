@@ -282,7 +282,7 @@ export function buildPlotGrid(
         .filter((s): s is PlotGridScene => !!s);
       looseRows.push({
         key: "unassigned",
-        label: "No chapter",
+        label: "Kein Kapitel",
         kind: "unassigned",
         chapterTitle: "",
         chapterId: null,

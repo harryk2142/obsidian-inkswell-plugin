@@ -71,50 +71,50 @@ export const DESTINATIONS: Destination[] = [
   // Hub — the entry point.
   {
     id: "home",
-    label: "Home",
+    label: "Beginn",
     icon: "home",
     group: "hub",
-    phone: { slot: "bar", order: 2, label: "Scenes" },
+    phone: { slot: "bar", order: 2, label: "Szenen" },
   },
   // Pipeline — the writing lifecycle, in order.
   {
     id: "plan",
-    label: "Plan",
+    label: "Planen",
     icon: "compass",
     group: "pipeline",
     subtabs: [
-      { id: "overview", label: "Overview" },
+      { id: "overview", label: "Übersicht" },
       { id: "beats", label: "Beats", feature: "beats" },
-      { id: "structure", label: "Structure" },
+      { id: "structure", label: "Struktur" },
     ],
     phone: { slot: "more", order: 5 },
     phoneRedirect: true,
   },
-  { id: "write", label: "Write", icon: "pencil", group: "pipeline", phone: { slot: "bar", order: 1 } },
+  { id: "write", label: "Schreiben", icon: "pencil", group: "pipeline", phone: { slot: "bar", order: 1 } },
   {
     id: "revise",
-    label: "Revise",
+    label: "Überarbeiten",
     icon: "git-compare",
     group: "pipeline",
     subtabs: [
-      { id: "audit", label: "Audit", feature: "audit" },
+      { id: "audit", label: "Prüfung", feature: "audit" },
       // The merged worklist: inline prose markers + logged decisions in one
       // scene-grouped view (the old separate Log subtab folded into it).
-      { id: "todos", label: "To-dos" },
-      { id: "analysis", label: "Analysis", feature: "analysis" },
+      { id: "todos", label: "Aufgaben" },
+      { id: "analysis", label: "Analyse", feature: "analysis" },
     ],
     // Only the To-dos slice is phone-usable; the sheet row jumps straight to it.
-    phone: { slot: "more", order: 2, label: "To-dos", subtab: "todos" },
+    phone: { slot: "more", order: 2, label: "Aufgaben", subtab: "todos" },
   },
   {
     id: "publish",
-    label: "Publish",
+    label: "Veröffentlichen",
     icon: "upload",
     group: "pipeline",
     subtabs: [
-      { id: "compile", label: "Compile" },
-      { id: "checklist", label: "Checklist", feature: "checklist" },
-      { id: "launch", label: "Launch", feature: "launch" },
+      { id: "compile", label: "Kompilieren" },
+      { id: "checklist", label: "Checkliste", feature: "checklist" },
+      { id: "launch", label: "Veröffentlichung", feature: "launch" },
     ],
     phone: { slot: "more", order: 6 },
     phoneRedirect: true,
@@ -122,14 +122,14 @@ export const DESTINATIONS: Destination[] = [
   // Insight — reference material consulted across any pipeline phase.
   {
     id: "codex",
-    label: "Codex",
+    label: "Kodex",
     icon: "book-marked",
     group: "insight",
     phone: { slot: "bar", order: 3 },
   },
   {
     id: "track",
-    label: "Track",
+    label: "Fortschritt",
     icon: "bar-chart-3",
     group: "insight",
     phone: { slot: "more", order: 1 },
@@ -138,7 +138,7 @@ export const DESTINATIONS: Destination[] = [
   // Tools — occasional utilities, floated to the bottom of the rail.
   {
     id: "search",
-    label: "Search",
+    label: "Suche",
     icon: "search",
     group: "tools",
     phone: { slot: "more", order: 4 },
@@ -148,7 +148,7 @@ export const DESTINATIONS: Destination[] = [
   // catalog. Multi-pane editors → redirected on phones.
   {
     id: "customize",
-    label: "Customize",
+    label: "Anpassen",
     icon: "sliders-horizontal",
     group: "tools",
     phone: { slot: "more", order: 7 },
@@ -156,7 +156,7 @@ export const DESTINATIONS: Destination[] = [
   },
   {
     id: "help",
-    label: "Help",
+    label: "Hilfe",
     icon: "help-circle",
     group: "tools",
     phone: { slot: "more", order: 3 },

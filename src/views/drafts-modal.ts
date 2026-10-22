@@ -31,11 +31,11 @@ export class NewDraftModal extends Modal {
     contentEl.createEl("h3", { text: `New draft of "${this.opts.title}"` });
     contentEl.createEl("p", {
       cls: "inkswell-stats__muted",
-      text: "Copies the manuscript and all planning so you can revise the copy freely. The original is untouched.",
+      text: "Kopiert das Manuskript und die gesamte Planung, damit du die Kopie frei überarbeiten kannst. Das Original bleibt unverändert.",
     });
 
-    new Setting(contentEl).setName("New draft name").addText((t) => {
-      t.setPlaceholder("Editor pass").onChange((v) => (this.newName = v));
+    new Setting(contentEl).setName("Name des neuen Entwurfs").addText((t) => {
+      t.setPlaceholder("Lektoratsfassung").onChange((v) => (this.newName = v));
       window.setTimeout(() => t.inputEl.focus(), 0);
       t.inputEl.onkeydown = (e) => {
         if (e.key === "Enter") this.submit();
@@ -44,16 +44,16 @@ export class NewDraftModal extends Modal {
 
     if (this.opts.isFirstSplit) {
       new Setting(contentEl)
-        .setName("Name for the current draft")
-        .setDesc("Your existing manuscript becomes a named draft.")
+        .setName("Name des aktuellen Entwurfs")
+        .setDesc("Dein vorhandenes Manuskript wird zu einem benannten Entwurf.")
         .addText((t) =>
           t.setValue(this.originalName).onChange((v) => (this.originalName = v))
         );
     }
 
     new Setting(contentEl)
-      .addButton((b) => b.setButtonText("Create draft").setCta().onClick(() => this.submit()))
-      .addButton((b) => b.setButtonText("Cancel").onClick(() => this.close()));
+      .addButton((b) => b.setButtonText("Entwurf erstellen").setCta().onClick(() => this.submit()))
+      .addButton((b) => b.setButtonText("Abbrechen").onClick(() => this.close()));
   }
 
   private submit(): void {

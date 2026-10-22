@@ -16,6 +16,7 @@
 
 import { PROMPT_CATEGORIES, PromptCategory, PromptExtra, PromptPhase, WRITING_PROMPTS } from "../ideation/prompts";
 import { ListItem, ListOverride, ListSpec, normalizeListOverride } from "../lib/list-override";
+import { PLAN_SECTION_DEFS } from "../plan/sections";
 import { PUBLISHING_CHECKLIST, PublishingExtra } from "../publishing/checklist-def";
 import { PAGE_GROUPS, SCENE_CHECKPOINTS, STORY_CHECKPOINTS } from "../revisions/audit";
 import { INSPECTOR_FIELDS, SCENE_STATUSES, statusLabel } from "../scenes/scene-meta";
@@ -26,6 +27,7 @@ export type OverridableListId =
   | "audit.page"
   | "publishing"
   | "prompts"
+  | "plan.sections"
   | "scene.status"
   | "scene.fields";
 
@@ -36,6 +38,7 @@ export interface ListOverrides {
   "audit.page"?: ListOverride;
   publishing?: ListOverride<PublishingExtra>;
   prompts?: ListOverride<PromptExtra>;
+  "plan.sections"?: ListOverride;
   "scene.status"?: ListOverride;
   "scene.fields"?: ListOverride;
 }
@@ -57,13 +60,14 @@ const flatten = (groups: readonly { id: string; items: readonly ListItem[] }[]):
   groups.flatMap((g) => g.items.map((i) => ({ id: i.id, label: i.label, group: g.id })));
 
 export const LIST_META: Record<OverridableListId, ListMeta> = {
-  "audit.scene": { label: "Scene checkpoints", idPrefix: "sc" },
-  "audit.story": { label: "Story checkpoints", idPrefix: "st" },
-  "audit.page": { label: "Prose checkpoints", idPrefix: "pr", groupPrefix: "pg" },
-  publishing: { label: "Publishing checklist", idPrefix: "pt", groupPrefix: "pg" },
-  prompts: { label: "Writing prompts", idPrefix: "wp" },
-  "scene.status": { label: "Scene statuses", idPrefix: "ss" },
-  "scene.fields": { label: "Scene inspector fields", idPrefix: "sf" },
+  "audit.scene": { label: "Szenen-Prüfpunkte", idPrefix: "sc" },
+  "audit.story": { label: "Geschichten-Prüfpunkte", idPrefix: "st" },
+  "audit.page": { label: "Prosatext-Prüfpunkte", idPrefix: "pr", groupPrefix: "pg" },
+  publishing: { label: "Veröffentlichungscheckliste", idPrefix: "pt", groupPrefix: "pg" },
+  prompts: { label: "Schreibimpulse", idPrefix: "wp" },
+  "plan.sections": { label: "Felder der Planungsnotiz", idPrefix: "ps" },
+  "scene.status": { label: "Szenenstatus", idPrefix: "ss" },
+  "scene.fields": { label: "Felder im Szeneninspektor", idPrefix: "sf" },
 };
 
 const PHASES: PromptPhase[] = ["draft", "revise"];
@@ -116,6 +120,13 @@ export const SPEC_PROMPTS: ListSpec<PromptExtra> = {
     return { phase: phase as PromptPhase, category: category as PromptCategory };
   },
 };
+/** Planning-note fields: rename / hide / reorder; H2 storage keys stay fixed. */
+export const SPEC_PLAN_SECTIONS: ListSpec = {
+  shipped: PLAN_SECTION_DEFS,
+  allowAdded: false,
+  allowGroups: false,
+  allowOrder: true,
+};
 /** Statuses: rename / hide / reorder only — the stored enum is frozen in 1.x. */
 export const SPEC_SCENE_STATUS: ListSpec = {
   shipped: SCENE_STATUSES.map((s) => ({ id: s, label: statusLabel(s) })),
@@ -148,6 +159,8 @@ export function normalizeListOverrides(raw: unknown): ListOverrides {
   if (publishing) out.publishing = publishing;
   const prompts = normalizeListOverride(rec["prompts"], SPEC_PROMPTS);
   if (prompts) out.prompts = prompts;
+  const planSections = normalizeListOverride(rec["plan.sections"], SPEC_PLAN_SECTIONS);
+  if (planSections) out["plan.sections"] = planSections;
   const status = normalizeListOverride(rec["scene.status"], SPEC_SCENE_STATUS);
   if (status) out["scene.status"] = status;
   const fields = normalizeListOverride(rec["scene.fields"], SPEC_SCENE_FIELDS);
