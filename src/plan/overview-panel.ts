@@ -25,7 +25,12 @@ import {
   readSection,
   writeSection,
 } from "./planning-note";
-import { PlanSection, planningSections } from "./sections";
+import {
+  EffectivePlanSection,
+  PlanSection,
+  planningSections,
+  presentPlanningSections,
+} from "./sections";
 import type InkswellPlugin from "../../main";
 
 export const OVERVIEW_FIELDS: { key: keyof ProjectOverview; label: string; placeholder: string }[] = [
@@ -128,40 +133,58 @@ export class OverviewPanel {
       if (file) openScene(this.app, file);
     };
 
-    const editors = new Map<PlanSection, HTMLTextAreaElement>();
     const fields = planningSections(this.plugin.settings.listOverrides["plan.sections"])
       .filter((field) => !field.hidden);
+    const fieldsRoot = sec.createDiv({ cls: "inkswell-overview__prosefields" });
+    const file = findPlanningNote(this.app, project);
+    if (!file) {
+      this.renderProseEditors(fieldsRoot, project, fields);
+      return;
+    }
+
+    // An existing planning note is authoritative for which managed fields it
+    // contains. Removing an H2 therefore removes its editor without deleting
+    // or rewriting anything else in the note.
+    void this.loadProse(project, file, fieldsRoot, fields);
+  }
+
+  private renderProseEditors(
+    root: HTMLElement,
+    project: Project,
+    fields: EffectivePlanSection[],
+    source?: string
+  ): void {
     for (const field of fields) {
       const { heading } = field;
-      const block = sec.createDiv({ cls: "inkswell-overview__section" });
+      const block = root.createDiv({ cls: "inkswell-overview__section" });
       block.createDiv({ cls: "inkswell-overview__label", text: field.label });
       const ta = block.createEl("textarea", { cls: "inkswell-overview__textarea" });
       tagField(ta, `overview:section:${field.id}`);
       ta.rows = field.rows;
       ta.placeholder = SECTION_PROMPTS[heading] ?? `${field.label}…`;
+      if (source !== undefined) ta.value = readSection(source, heading);
       ta.onchange = () => void this.saveSection(project, heading, ta.value);
-      editors.set(heading, ta);
     }
-
-    // Seed textareas from the existing planning note (if any) without blocking render.
-    void this.loadProse(project, editors);
   }
 
   private async loadProse(
     project: Project,
-    editors: Map<PlanSection, HTMLTextAreaElement>
+    file: TFile,
+    root: HTMLElement,
+    fields: EffectivePlanSection[]
   ): Promise<void> {
-    const file = findPlanningNote(this.app, project);
-    if (!file) return; // note not created yet — textareas stay empty
     // Found via fallback (stale pointer after a rename)? Heal the pointer now so
     // later saves and the tracker's classifier agree on which note this is.
     await this.rememberNote(project, file);
     const source = await this.app.vault.read(file);
-    for (const [heading, ta] of editors) {
-      // Don't clobber a field the user is actively editing.
-      if (activeDocument.activeElement === ta) continue;
-      ta.value = readSection(source, heading);
-    }
+    if (!root.isConnected) return;
+    const present = presentPlanningSections(source);
+    this.renderProseEditors(
+      root,
+      project,
+      fields.filter((field) => present.has(field.heading)),
+      source
+    );
   }
 
   private async saveSection(project: Project, heading: PlanSection, text: string): Promise<void> {

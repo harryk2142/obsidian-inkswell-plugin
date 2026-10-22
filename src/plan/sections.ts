@@ -33,6 +33,21 @@ export interface EffectivePlanSection {
   hidden: boolean;
 }
 
+/** Managed planning sections whose H2 headings actually occur in a note. */
+export function presentPlanningSections(source: string): Set<PlanSection> {
+  const known = new Map(
+    PLAN_SECTION_DEFS.map((section) => [section.heading.toLowerCase(), section.heading] as const)
+  );
+  const present = new Set<PlanSection>();
+  for (const line of source.split(/\r?\n/)) {
+    if (!/^##\s+/.test(line)) continue;
+    const heading = line.replace(/^##\s+/, "").trim().toLowerCase();
+    const managed = known.get(heading);
+    if (managed) present.add(managed);
+  }
+  return present;
+}
+
 /** Every planning-note field in effective order, including hidden fields. */
 export function planningSections(override?: ListOverride): EffectivePlanSection[] {
   return applyOverride(PLAN_SECTION_DEFS, override).map((item) => {
