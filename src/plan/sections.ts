@@ -33,19 +33,27 @@ export interface EffectivePlanSection {
   hidden: boolean;
 }
 
-/** Managed planning sections whose H2 headings actually occur in a note. */
-export function presentPlanningSections(source: string): Set<PlanSection> {
+/**
+ * Managed planning sections whose H2 headings actually occur in a note.
+ * The map value preserves the heading exactly as written for display in the UI.
+ */
+export function planningSectionHeadings(source: string): Map<PlanSection, string> {
   const known = new Map(
     PLAN_SECTION_DEFS.map((section) => [section.heading.toLowerCase(), section.heading] as const)
   );
-  const present = new Set<PlanSection>();
+  const present = new Map<PlanSection, string>();
   for (const line of source.split(/\r?\n/)) {
     if (!/^##\s+/.test(line)) continue;
-    const heading = line.replace(/^##\s+/, "").trim().toLowerCase();
-    const managed = known.get(heading);
-    if (managed) present.add(managed);
+    const heading = line.replace(/^##\s+/, "").trim();
+    const managed = known.get(heading.toLowerCase());
+    if (managed && !present.has(managed)) present.set(managed, heading);
   }
   return present;
+}
+
+/** Managed planning sections whose H2 headings actually occur in a note. */
+export function presentPlanningSections(source: string): Set<PlanSection> {
+  return new Set(planningSectionHeadings(source).keys());
 }
 
 /** Every planning-note field in effective order, including hidden fields. */

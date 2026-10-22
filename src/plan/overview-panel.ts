@@ -28,8 +28,8 @@ import {
 import {
   EffectivePlanSection,
   PlanSection,
+  planningSectionHeadings,
   planningSections,
-  presentPlanningSections,
 } from "./sections";
 import type InkswellPlugin from "../../main";
 
@@ -178,11 +178,16 @@ export class OverviewPanel {
     await this.rememberNote(project, file);
     const source = await this.app.vault.read(file);
     if (!root.isConnected) return;
-    const present = presentPlanningSections(source);
+    const noteHeadings = planningSectionHeadings(source);
     this.renderProseEditors(
       root,
       project,
-      fields.filter((field) => present.has(field.heading)),
+      fields
+        .filter((field) => noteHeadings.has(field.heading))
+        .map((field) => ({
+          ...field,
+          label: noteHeadings.get(field.heading) ?? field.label,
+        })),
       source
     );
   }

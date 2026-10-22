@@ -33,6 +33,7 @@ import {
 import { buildColumns } from "../src/outliner/board";
 import {
   PLAN_SECTION_DEFS,
+  planningSectionHeadings,
   planningSections,
   presentPlanningSections,
 } from "../src/plan/sections";
@@ -191,9 +192,12 @@ describe("scene inspector fields (rename / hide / reorder only)", () => {
 
 describe("planning-note fields (rename / hide / reorder only)", () => {
   it("detects only managed H2 sections that are present in an existing note", () => {
-    expect(
-      [...presentPlanningSections("# Plan\n\n## Act I\nText\n\n## Act II\nText\n\n## Notes\nOther")]
-    ).toEqual(["Act I", "Act II"]);
+    const source = "# Plan\n\n## Act I\nText\n\n## Act II\nText\n\n## Notes\nOther";
+    expect([...presentPlanningSections(source)]).toEqual(["Act I", "Act II"]);
+    expect([...planningSectionHeadings(source)]).toEqual([
+      ["Act I", "Act I"],
+      ["Act II", "Act II"],
+    ]);
   });
 
   it("hides a field from the overview without changing its stable heading", () => {
